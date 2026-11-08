@@ -335,6 +335,7 @@ h1, h2, h3, .big { text-wrap: balance; }
       <div class="row" style="margin-bottom:12px">
         <div class="field grow"><label for="oq">빠른 찾기</label><input type="search" id="oq" placeholder="이름 일부만 써도 돼요"></div>
         <div class="field"><span class="lbl">보기</span><div class="seg" id="oview"><button data-v="all" aria-pressed="true">전체</button><button data-v="have" aria-pressed="false">가진 것</button><button data-v="not" aria-pressed="false">없는 것</button></div></div>
+        <div class="field"><span class="lbl">정렬</span><div class="seg" id="osort"><button data-v="name" aria-pressed="true">이름순</button><button data-v="combat" aria-pressed="false">전투력순</button><button data-v="skill" aria-pressed="false">스킬순</button><button data-v="tier" aria-pressed="false">보스전 평가순</button></div></div>
         <div class="field"><span class="lbl">등급</span><div class="seg" id="orar"><button data-v="SSR" aria-pressed="true">SSR</button><button data-v="SR" aria-pressed="false">SR</button><button data-v="R" aria-pressed="false">R</button></div></div>
       </div>
       <div class="dex" id="ownList"></div>
@@ -439,7 +440,7 @@ h1, h2, h3, .big { text-wrap: balance; }
       <p class="lead">보스를 고르면 상위권이 쓰는 추천 덱을 보유 여부와 함께 보여주고, 가진 니케만으로 겹치지 않는 덱을 자동으로 짜줘요.</p>
     </div>
     <div class="panel" style="display:flex;flex-direction:column;gap:12px">
-      <div class="seg" id="raidMode"><button data-v="solo" aria-pressed="true">솔로 레이드</button><button data-v="union" aria-pressed="false">유니온 레이드</button><button data-v="anomaly" aria-pressed="false">이상개체 요격전</button><button data-v="custom" aria-pressed="false">보스 직접 만들기</button></div>
+      <div class="seg" id="raidMode"><button data-v="solo" aria-pressed="true">솔로 레이드</button><button data-v="union" aria-pressed="false">유니온 레이드</button><button data-v="anomaly" aria-pressed="false">이상개체 요격전</button><button data-v="coop" aria-pressed="false">협동작전</button><button data-v="custom" aria-pressed="false">보스 직접 만들기</button></div>
       <div id="raidBosses"></div>
       <div class="row" style="gap:8px;align-items:center"><button class="btn small" type="button" id="raidMine" aria-pressed="false">가진 니케로 되는 덱만 보기</button><span class="note" id="raidMineNote"></span></div>
     </div>
@@ -454,7 +455,7 @@ h1, h2, h3, .big { text-wrap: balance; }
     </div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="panel" id="raidRank" hidden></div>
-      <h3>추천 덱 (가진 니케가 많은 순)</h3>
+      <h3 id="teamsTitle">추천 덱 (가진 니케가 많은 순)</h3>
       <div id="raidTeams" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
   </section>
@@ -661,7 +662,7 @@ function card(c, opts = {}) {
     ${pfImg(c, "pf")}
     <span class="nm" title="${esc(c.en)}">${esc(c.ko)}</span>
     <button class="own" data-own="${esc(c.s)}" aria-pressed="${own}" aria-label="${esc(c.ko)} 보유">${own ? "✓" : ""}</button>
-    <span class="meta">${chips(c)}${opts.tier ? `<span class="tier" data-t="${esc(c.rb)}" title="보스전 평가">${esc(c.rb || "-")}</span>` : ""}</span>
+    <span class="meta">${chips(c)}${opts.extra ? `<span class="note">${opts.extra}</span>` : ""}${opts.tier ? `<span class="tier" data-t="${esc(c.rb)}" title="보스전 평가">${esc(c.rb || "-")}</span>` : ""}</span>
   </div>`;
 }
 function slot(s, slotLabel) {
@@ -774,7 +775,8 @@ function renderDex() {
 }
 
 // ---------- OWNED ----------
-const OWN = { view: "all", rar: new Set(["SSR"]) };
+const OWN = { view: "all", rar: new Set(["SSR"]), sort: (() => { try { return localStorage.getItem("nikke-helper-osort") || "name"; } catch (e) { return "name"; } })() };
+const skSum = c => (SKILL[c.s] || []).reduce((a, b) => a + b, 0);
 function renderOwned() {
   const total = C.filter(c => !c.tr).length;
   const have = [...S.owned].map(get).filter(Boolean);
@@ -787,10 +789,19 @@ function renderOwned() {
   ].map(([k, v, d]) => `<div class="stat"><span class="k">${k}</span><span class="v">${v}</span><span class="d" style="color:var(--muted)">${d}</span></div>`).join("");
   document.querySelectorAll("#oview button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === OWN.view));
   document.querySelectorAll("#orar button").forEach(b => b.setAttribute("aria-pressed", OWN.rar.has(b.dataset.v)));
+  document.querySelectorAll("#osort button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === OWN.sort));
   const q = document.getElementById("oq").value.trim();
   const list = C.filter(c => matchQ(c, q) && (!OWN.rar.size || OWN.rar.has(c.r)) && (OWN.view === "all" || (OWN.view === "have") === S.owned.has(c.s)))
-    .sort((a, b) => a.ko.localeCompare(b.ko, "ko"));
-  document.getElementById("ownList").innerHTML = list.length ? list.map(c => card(c)).join("") : `<div class="empty">${OWN.view === "have" ? "아직 체크한 니케가 없어요. ‘전체’에서 가진 니케를 눌러 체크하세요." : "조건에 맞는 니케가 없어요."}</div>`;
+    .sort((a, b) => {
+      const byName = a.ko.localeCompare(b.ko, "ko");
+      if (OWN.sort === "combat") return (COMBAT[b.s] || 0) - (COMBAT[a.s] || 0) || byName;
+      if (OWN.sort === "skill") return skSum(b) - skSum(a) || (COMBAT[b.s] || 0) - (COMBAT[a.s] || 0) || byName;
+      if (OWN.sort === "tier") return tScore(b.rb) - tScore(a.rb) || S.owned.has(b.s) - S.owned.has(a.s) || byName;
+      return byName;
+    });
+  const extra = c => OWN.sort === "combat" && COMBAT[c.s] ? `전투력 ${fmt(COMBAT[c.s])}` : OWN.sort === "skill" && SKILL[c.s] ? `스킬 ${SKILL[c.s].join("/")}` : "";
+  const noData = (OWN.sort === "combat" && !Object.keys(COMBAT).length) || (OWN.sort === "skill" && !Object.keys(SKILL).length);
+  document.getElementById("ownList").innerHTML = (noData ? `<div class="empty" style="grid-column:1/-1">위쪽에서 계정을 가져오면 ${OWN.sort === "combat" ? "전투력" : "스킬 레벨"} 순서로 정렬돼요.</div>` : "") + (list.length ? list.map(c => card(c, { extra: extra(c), tier: OWN.sort === "tier" })).join("") : `<div class="empty">${OWN.view === "have" ? "아직 체크한 니케가 없어요. ‘전체’에서 가진 니케를 눌러 체크하세요." : "조건에 맞는 니케가 없어요."}</div>`);
   // growth priority
   const grow = have.map(c => ({ c, sc: tScore(c.rb) * 2 + Math.min(RAID_USE.get(c.s) || 0, 12) })).filter(x => x.sc > 8).sort((a, b) => b.sc - a.sc).slice(0, 12);
   document.getElementById("growList").innerHTML = !have.length ? `<div class="empty">가진 니케를 체크하면 여기에 키울 순서가 나와요.</div>`
@@ -1708,9 +1719,11 @@ const FIT_LABEL = { good: ["ok", "코어 조건에 잘 맞아요"], mid: ["part"
 function teamsFor(el, boss) {
   const out = [];
   if (boss && boss.teams && boss.teams.length) {
-    const src = S.raid.mode === "anomaly" ? `${boss.ko} 추천` : `솔로 ${curSeason("solo").season}시즌 추천`;
+    const src = S.raid.mode === "anomaly" ? `${boss.ko} 추천` : S.raid.mode === "coop" ? `협동작전 ${boss.ko} 추천 파티` : `솔로 ${curSeason("solo").season}시즌 추천`;
     boss.teams.forEach(t => out.push({ name: t.name, m: t.m, sub: t.sub, src }));
   }
+  const tt = document.getElementById("teamsTitle"); if (tt) tt.textContent = S.raid.mode === "coop" ? "협동작전 추천 파티 (5명이 1명씩)" : "추천 덱 (가진 니케가 많은 순)";
+  if (S.raid.mode === "coop") return out.map(t => ({ ...t, have: t.m.filter(x => get(x) && S.owned.has(get(x).s)).length, need: t.m.length, fit: coreFit(t.m, boss) }));
   (D.raids.union.teams[el] || []).forEach(t => out.push({ name: t[0], m: t[1], src: `유니온 ${EL[el]} 추천 (${D.raids.union.teamsFrom}시즌 기준)` }));
   D.teams.forEach(t => {
     const atk = t[2].map(get).filter(c => c && c.c === "Attacker" && bursts(c).includes("III"));
@@ -1786,10 +1799,10 @@ const bossKey = s => String(s).replace(/\s+/g, "").replace(/^리빌드/, "리빌
 function appearances(boss) {
   if (!boss || boss.custom) return "";
   const k = bossKey(boss.ko), out = [];
-  for (const mode of ["solo", "union", "anomaly"]) for (const s of seasonsOf(mode)) for (const b of s.bosses) {
+  for (const mode of ["solo", "union", "anomaly", "coop"]) { if (!D.raids[mode]) continue; for (const s of seasonsOf(mode)) for (const b of s.bosses) {
     if (b.id === boss.id || bossKey(b.ko) !== k) continue;
-    out.push(mode === "anomaly" ? `이상개체 요격전(약점 ${EL[b.weak]})` : `${mode === "solo" ? "솔로" : "유니온"} ${s.season}시즌(약점 ${EL[b.weak]})`);
-  }
+    out.push(mode === "anomaly" ? `이상개체 요격전(약점 ${EL[b.weak]})` : mode === "coop" ? `협동작전 ${s.when ? s.when.slice(0, 10) : s.season}(약점 ${EL[b.weak]})` : `${mode === "solo" ? "솔로" : "유니온"} ${s.season}시즌(약점 ${EL[b.weak]})`);
+  } }
   return out.length ? `<p style="margin:0" class="note">다른 시즌 등장: ${out.join(", ")}</p>` : "";
 }
 const MINE_KEY = "nikke-helper-raid-mine-v1";
@@ -1833,6 +1846,36 @@ function renderRaidRank() {
     <p class="note" style="margin:4px 0 8px">상위 ${data.players}명 중 몇 %가 쓴 니케인지예요.</p>
     <div class="rk-use">${use}</div>`;
 }
+// Co-op: every player brings ONE nikke at level 40, so investment (skills, overload, cube) decides damage.
+function coopScore(c) {
+  const base = c.tr ? c : c;
+  const sk = (SKILL[c.s] || [1, 1, 1]).reduce((a, b) => a + b, 0);
+  const g = GEAR[c.s]; const done = g ? g.p.filter(p => p.some(x => x[0]) && olJudge(c, p).done).length : 0;
+  return tScore(c.rb) * 1.5 + sk / 5 + done * 0.8;
+}
+function renderCoopPick(el, boss) {
+  const card = document.querySelector("#autoOut").closest(".teamcard");
+  card.querySelector("h3").textContent = "내가 데려갈 니케";
+  document.getElementById("autoN").closest(".row").hidden = true;
+  const out = document.getElementById("autoOut");
+  const std = (boss.teams || []).find(t => t.std) || (boss.teams || [])[0];
+  const pool = [...S.owned].map(get).filter(c => c && !c.tr);
+  if (!pool.length) { out.innerHTML = `<div class="empty">‘보유 니케’ 탭에서 가진 니케를 체크하면 추천해 드려요.</div>`; return; }
+  const seenSlot = new Set();
+  const slots = (std ? std.m.map(get).filter(Boolean) : []).filter(c => { if (seenSlot.has(c.s)) return false; seenSlot.add(c.s); return true; });
+  const fallback = [{ b: "I", atk: false }, { b: "II", atk: false }, { b: "III", atk: true }];
+  const rows = (slots.length ? slots.map(c => ({ ref: c, b: bursts(c).find(x => x !== "III") && c.c !== "Attacker" ? bursts(c)[0] : bursts(c).includes("III") ? "III" : bursts(c)[0], atk: c.c === "Attacker" })) : fallback).map(r => {
+    const want = c => bursts(c).includes(r.b) && (r.atk ? c.c === "Attacker" && c.e === el : c.c !== "Attacker");
+    const cands = pool.filter(c => (r.ref && c.s === r.ref.s) || want(c)).sort((a, b) => ((r.ref && b.s === r.ref.s) - (r.ref && a.s === r.ref.s)) || coopScore(b) - coopScore(a)).slice(0, 3);
+    const label = r.atk ? `버스트 ${r.b} 딜러 · ${EL[el]}` : `버스트 ${r.b} ${r.ref ? (CLS[r.ref.c] || "") : "서포터"}`;
+    return `<div class="ar-deck"><div class="row" style="gap:6px 10px"><b>${label}</b>${r.ref ? `<span class="note">추천: ${esc(r.ref.ko)}${S.owned.has(r.ref.s) ? "" : " (안 가지고 있어요)"}</span>` : ""}</div>
+      ${cands.length ? `<div class="team">${cands.map(c => slot(c.s)).join("")}</div><p class="note" style="margin:0">${cands.map(c => `${esc(c.ko)} 스킬 ${(SKILL[c.s] || ["?", "?", "?"]).join("/")}`).join(" · ")}</p>` : `<p class="note" style="margin:0">이 자리에 맞는 가진 니케가 없어요.</p>`}</div>`;
+  });
+  document.getElementById("autoNote").textContent = "파티에서 비어 있는 자리를 골라 데려가세요";
+  const C0 = D.raids.coop || {};
+  out.innerHTML = `<p class="note" style="margin:0">협동작전은 레벨이 40으로 고정이라 스킬 레벨·오버로드·큐브가 딜을 정해요. 자리마다 내 니케 중 육성이 잘 된 순서로 보여줘요. 다른 사람과 같은 니케를 고르지 않게 파티 채팅으로 버스트 순서를 맞추세요.</p>${rows.join("")}
+    <details><summary style="cursor:pointer" class="note">협동작전 규칙 보기</summary><ul class="note" style="margin:8px 0 0;padding-left:18px">${[...(C0.rules || []), ...(C0.notes || [])].map(r => `<li>${esc(r)}</li>`).join("")}</ul></details>`;
+}
 function renderRaid() {
   const R = S.raid;
   document.querySelectorAll("#raidMode button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === R.mode));
@@ -1849,7 +1892,7 @@ function renderRaid() {
     if (!cur.bosses.find(b => b.id === R.boss)) R.boss = cur.bosses[0].id;
     host.innerHTML = `<div class="row" style="margin-bottom:8px"><div class="field"><label for="raidSeason">시즌</label>
       <select id="raidSeason" style="width:auto;max-width:100%">${ss.map(s => `<option value="${s.season}" ${s.season === cur.season ? "selected" : ""}>${typeof s.season === "number" ? s.season + "시즌" : esc(s.season)} ·${esc(s.when)}${R.mode === "solo" ? ` · ${esc(s.bosses[0].ko)} (약점 ${EL[s.bosses[0].weak]})` : ""}${s.note ? ` (${esc(s.note)})` : ""}</option>`).join("")}</select></div>
-      <span class="note grow">${R.mode === "union" ? "위에서부터 최신 시즌이에요." : R.mode === "solo" ? "같은 보스가 다른 속성으로 다시 나오기도 해요. 위에서부터 최신 시즌이에요." : "이상개체 요격전(특특요) 보스 5마리. 하루 한 보스씩 돌아가요."}</span></div>
+      <span class="note grow">${R.mode === "union" ? "위에서부터 최신 시즌이에요." : R.mode === "solo" ? "같은 보스가 다른 속성으로 다시 나오기도 해요. 위에서부터 최신 시즌이에요." : R.mode === "coop" ? "5명이 니케를 1명씩 데려가요. 레벨은 40 고정이에요. 위에서부터 최신이에요." : "이상개체 요격전(특특요) 보스 5마리. 하루 한 보스씩 돌아가요."}</span></div>
       <div class="boss">${cur.bosses.map(b => { const core = b.id in CORE_MAP ? CORE_MAP[b.id] : b.core;
         return `<button class="bossbtn" data-boss="${b.id}" aria-pressed="${R.boss === b.id}"><span class="bn">${esc(b.ko)}</span><span class="row" style="gap:4px"><span class="chip el" data-e="${b.element}">${EL[b.element]}</span><span class="note">약점</span><span class="chip el" data-e="${b.weak}">${EL[b.weak]}</span></span><span class="note">${core === true ? "코어 있음" : core === false ? "코어 없음" : "코어 모름"}${b.diff ? ` · ${esc(b.diff)}` : ""}</span></button>`; }).join("")}</div>`;
   }
@@ -1863,6 +1906,9 @@ function renderRaid() {
       ${boss.heal ? `<p style="margin:0"><b>힐 필요?</b> ${esc(boss.heal)}</p>` : ""}
       ${boss.tips ? `<ul class="tips">${boss.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
     </div>`;
+  if (R.mode === "coop") renderCoopPick(el, boss); else {
+  document.querySelector("#autoOut").closest(".teamcard").querySelector("h3").textContent = "내 니케로 자동 편성";
+  document.getElementById("autoN").closest(".row").hidden = false;
   const n = +document.getElementById("autoN").value;
   const out = document.getElementById("autoOut");
   if (!S.owned.size) { out.innerHTML = `<div class="empty">‘보유 니케’ 탭에서 가진 니케를 체크하면 자동으로 덱을 짜드려요.</div>`; document.getElementById("autoNote").textContent = ""; }
@@ -1873,8 +1919,9 @@ function renderRaid() {
       return `<div class="teamcard"><div class="teamhead"><h3>${i + 1}덱${t.guide ? ` · ${esc(t.guide)}` : ""}</h3><span class="badge ${t.warn ? "part" : "ok"}">${esc(t.why)}</span>${f ? `<span class="badge ${FIT_LABEL[f][0]}">${FIT_LABEL[f][1]}</span>` : ""}</div><div class="team">${t.m.map(c => slot(c.s, "cube")).join("")}</div></div>`; }).join("")
       : `<div class="empty">덱을 짤 만큼 니케가 없어요. 니케를 더 체크해 보세요.</div>`;
   }
+  }
   syncMineBtn();
-  const ts = teamsFor(el, boss).filter(t => !RAID_MINE || t.have === t.need).slice(0, 14);
+  const ts = teamsFor(el, boss).filter(t => !RAID_MINE || R.mode === "coop" || t.have === t.need).slice(0, 14);
   document.getElementById("raidTeams").innerHTML = ts.length ? ts.map(t => `<div class="panel teamcard"><div class="teamhead"><h3>${esc(t.name)}</h3><span class="note">${esc(t.src)}</span><span class="badge ${t.have === t.need ? "ok" : t.have ? "part" : "no"}">${t.have}/${t.need}명 보유</span>${t.fit ? `<span class="badge ${FIT_LABEL[t.fit][0]}">${FIT_LABEL[t.fit][1]}</span>` : ""}</div>
     <div class="team">${t.m.map(x => slot(x)).join("")}</div>${t.sub ? `<p class="note" style="margin:0">대체: ${esc(t.sub)}</p>` : ""}</div>`).join("")
     : `<div class="empty">${RAID_MINE ? "가진 니케로 그대로 쓸 수 있는 추천 덱이 없어요. 위의 ‘내 니케로 자동 편성’을 보세요." : "이 속성으로 등록된 추천 덱이 없어요."}</div>`;
@@ -1898,7 +1945,7 @@ document.addEventListener("click", e => {
 // Anomaly Interception is one attempt with one team; raids use five.
 document.addEventListener("click", e => {
   const rm = e.target.closest("#raidMode button");
-  if (rm) document.getElementById("autoN").value = rm.dataset.v === "anomaly" ? "1" : "5";
+  if (rm) document.getElementById("autoN").value = rm.dataset.v === "anomaly" || rm.dataset.v === "coop" ? "1" : "5";
 }, true);
 document.addEventListener("change", e => {
   if (e.target.id === "raidSeason") { S.raid.season[S.raid.mode] = +e.target.value; S.raid.boss = null; renderRaid(); }
@@ -2039,6 +2086,7 @@ document.addEventListener("click", e => {
   const op = e.target.closest("[data-open]");
   if (op) { e.preventDefault(); openChar(op.dataset.open); return; }
   const ov = e.target.closest("#oview button"); if (ov) { OWN.view = ov.dataset.v; renderOwned(); return; }
+  const os = e.target.closest("#osort button"); if (os) { OWN.sort = os.dataset.v; try { localStorage.setItem("nikke-helper-osort", OWN.sort); } catch (e) {} renderOwned(); return; }
   const orr = e.target.closest("#orar button"); if (orr) { OWN.rar.has(orr.dataset.v) ? OWN.rar.delete(orr.dataset.v) : OWN.rar.add(orr.dataset.v); renderOwned(); return; }
   const rm = e.target.closest("#raidMode button"); if (rm) { S.raid.mode = rm.dataset.v; S.raid.boss = null; renderRaid(); return; }
   const bb = e.target.closest("[data-boss]"); if (bb) { S.raid.boss = bb.dataset.boss; renderRaid(); return; }
@@ -2105,6 +2153,7 @@ document.getElementById("srcFoot").innerHTML = `<div class="srclist"><b>출처</
   <li>아레나 메타 덱·카운터·니케별 역할: 디시인사이드 니케 마이너 갤러리, 아카라이브 니케 채널, nikke.beomtachi.com, 에펨코리아 / 아레나 규칙·버스트 게이지: Prydwen, nikke.gg, NIKKE Synergy</li>
   <li>아레나 오버로드·큐브: nikke.beomtachi.com, Prydwen, nikke.gg, Vortex Gaming(메가니케) 가이드</li>
   <li>스킬 가성비·종결: 디시·아카라이브·에펨코리아, nikke.beomtachi.com, 니마갤 위키, Prydwen / 전초기지 시간당 생산량: NIKKE Synergy 전초기지 계산기, 루리웹 실측</li>
+  <li>협동작전 보스·파티: 니케허브, 아카라이브 니케 채널, 나무위키, NIKKE Fandom 위키, nikke.gg, 레츠도로</li>
   <li>니케별 오버로드 세팅 포인트: 아카라이브 니케 채널, nikke.beomtachi.com, nikke.gg, Prydwen, 나무위키</li>
   <li>유니온 레이드 보스 코어 여부: 아카라이브 니케 채널 시즌별 보스 특성·조합 정리글, Prydwen, nikke.gg</li>
   <li>유니온 레이드 보스: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지) · 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌 기준</li>

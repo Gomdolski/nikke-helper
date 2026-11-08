@@ -244,7 +244,11 @@ function buildRaids() {
     source: ai.source,
     seasons: [{ season: "상시", when: "매일 돌아가며 열려요", note: "", bosses: ai.bosses.map((b) => ({ ...b, teams: b.teams.map(([name, m]) => ({ name, m })) })) }],
   };
-  return { solo, union, anomaly };
+  const cf = path.join(HERE, "coop.json");
+  const cj = fs.existsSync(cf) ? JSON.parse(fs.readFileSync(cf, "utf8")) : null;
+  const KOS = new Map(chars.filter((c) => !c.tr).map((c) => [c.ko, c.s]));
+  const coop = cj ? { source: "협동작전 커뮤니티 정리", rules: cj.rules, notes: cj.notes, seasons: cj.seasons.map((x) => ({ ...x, bosses: x.bosses.map((b) => ({ ...b, teams: b.teams.map((t) => ({ ...t, m: t.m.map((k) => KOS.get(k) || k) })) })) })) } : null;
+  return { solo, union, anomaly, ...(coop ? { coop } : {}) };
 }
 
 // ---- Name index for importing a ShiftyPad list shown in Korean or English ----

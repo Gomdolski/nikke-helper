@@ -14,6 +14,7 @@
 | 유니온 보스 코어 여부 | 아카라이브 시즌별 보스 특성 정리 | `build/union_core.json` |
 | 아레나 메타 덱·카운터·역할 | 워커로 조사 후 `node build/make-arena.js A.txt B.txt C.txt` | `build/arena.json` |
 | 아레나 오버로드·큐브 | 워커로 조사 후 `node build/make-arena-ol.js 결과.txt` | `build/arena_ol.json` |
+| 협동작전 보스·파티 | 워커로 조사 후 `node build/make-coop.js 한국자료.txt 영문자료.txt` (새 보스가 나오면 시즌 줄 추가) | `build/coop.json` |
 | 니케별 스킬 가성비·종결 | 워커로 조사 | `build/skill_notes.json` |
 | 전초기지 시간당 생산량 (방어 레벨 상한이 오를 때) | NIKKE Synergy 전초기지 계산기 | `build/page.html`의 OP_TABLE |
 | 새 니케 초상화 | `node build/update-portraits.js` 실행 | `build/src/portraits.json` |
