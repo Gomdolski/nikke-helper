@@ -1,0 +1,1142 @@
+<title>니케 지휘관 도우미</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: sticky command bar with tabs, one working column (max 1120px), detail drawer on the right (bottom sheet on phones). */
+:root {
+  --bg: #edf0f4; --surface: #ffffff; --sunk: #e3e8ee; --ink: #16202c; --muted: #5a6777; --line: #d1d8e1;
+  --accent: #1d56d1; --accent-ink: #ffffff; --accent-soft: #dfe8fb;
+  --good: #1f8a52; --good-soft: #dcf1e5; --warn: #b7791f; --warn-soft: #f8ecd6; --bad: #c0392b; --bad-soft: #f7dfdc;
+  --fire: #d4462e; --water: #2a7bd0; --wind: #278f62; --elec: #8a4fd6; --iron: #a87316;
+  --font-display: "Black Han Sans", "IBM Plex Sans KR", "Malgun Gothic", sans-serif;
+  --font-body: "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e131a; --surface: #161d27; --sunk: #1d2531; --ink: #e4e9f0; --muted: #94a1b2; --line: #2a3443;
+  --accent: #6f9cff; --accent-ink: #0b1220; --accent-soft: #1d2b4a;
+  --good: #4cc387; --good-soft: #163527; --warn: #e3ad50; --warn-soft: #3a2d14; --bad: #f0796b; --bad-soft: #3e1d1a;
+  --fire: #f07a62; --water: #66a9f0; --wind: #5cc795; --elec: #b58af0; --iron: #d9a648;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0e131a; --surface: #161d27; --sunk: #1d2531; --ink: #e4e9f0; --muted: #94a1b2; --line: #2a3443;
+  --accent: #6f9cff; --accent-ink: #0b1220; --accent-soft: #1d2b4a;
+  --good: #4cc387; --good-soft: #163527; --warn: #e3ad50; --warn-soft: #3a2d14; --bad: #f0796b; --bad-soft: #3e1d1a;
+  --fire: #f07a62; --water: #66a9f0; --wind: #5cc795; --elec: #b58af0; --iron: #d9a648;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding-block: 12px 0; }
+.brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.brand h1 { font-family: var(--font-display); font-weight: 400; font-size: 24px; margin: 0; letter-spacing: 0.01em; }
+.brand .sub { color: var(--muted); font-size: 12px; }
+.save { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.save .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.save[data-s="db"] .dot { background: var(--good); }
+.save[data-s="local"] .dot { background: var(--warn); }
+nav.tabs { flex-basis: 100%; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+nav.tabs a { flex: 0 0 auto; padding: 10px 14px 11px; text-decoration: none; color: var(--muted); font-weight: 500; border-bottom: 3px solid transparent; white-space: nowrap; }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+main { padding-block: 20px 60px; }
+section.view { display: flex; flex-direction: column; gap: 18px; }
+h2 { font-family: var(--font-display); font-weight: 400; font-size: 22px; margin: 0; text-wrap: balance; }
+h3 { font-size: 15px; margin: 0; }
+.lead { color: var(--muted); margin: 4px 0 0; max-width: 68ch; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; min-width: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.grow { flex: 1 1 220px; min-width: 0; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label, .lbl { font-size: 12px; color: var(--muted); letter-spacing: 0.02em; }
+input[type=search], input[type=number], input[type=text], select {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; width: 100%; }
+input[type=number] { font-family: var(--font-mono); }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; font-weight: 500; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.small { padding: 4px 9px; font-size: 13px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.seg button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 11px; font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px 18px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; font-size: 12px; background: var(--sunk); color: var(--ink); white-space: nowrap; }
+.chip.el { color: #fff; }
+.chip.el[data-e="Fire"] { background: var(--fire); } .chip.el[data-e="Water"] { background: var(--water); }
+.chip.el[data-e="Wind"] { background: var(--wind); } .chip.el[data-e="Electric"] { background: var(--elec); } .chip.el[data-e="Iron"] { background: var(--iron); }
+:root[data-theme="dark"] .chip.el, :root:not([data-theme="light"]) .chip.el { color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip.el { color: #0e131a; } }
+:root[data-theme="dark"] .chip.el { color: #0e131a; }
+.chip.r-SSR { background: #e8c35a33; color: var(--warn); font-weight: 700; }
+.chip.r-SR { background: #8a4fd622; color: var(--elec); font-weight: 700; }
+.chip.r-R { background: #2a7bd022; color: var(--water); font-weight: 700; }
+.chip.burst { font-family: var(--font-mono); font-weight: 500; background: var(--accent-soft); color: var(--accent); }
+.tier { font-family: var(--font-mono); font-weight: 500; display: inline-block; min-width: 2.6em; text-align: center; border-radius: 6px; padding: 0 4px; font-size: 12px; }
+.tier[data-t^="S"] { background: var(--good-soft); color: var(--good); }
+.tier[data-t="A"], .tier[data-t="B"] { background: var(--accent-soft); color: var(--accent); }
+.tier[data-t="C"], .tier[data-t="D"] { background: var(--warn-soft); color: var(--warn); }
+.tier[data-t="E"], .tier[data-t="F"], .tier[data-t=""] { background: var(--sunk); color: var(--muted); }
+.count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+/* dex list */
+.dex { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+.card { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; width: 100%; min-width: 0; }
+.card:hover { border-color: var(--accent); }
+.card .stripe { grid-row: span 2; width: 4px; align-self: stretch; border-radius: 2px; background: var(--muted); }
+.card .stripe[data-e="Fire"] { background: var(--fire); } .card .stripe[data-e="Water"] { background: var(--water); }
+.card .stripe[data-e="Wind"] { background: var(--wind); } .card .stripe[data-e="Electric"] { background: var(--elec); } .card .stripe[data-e="Iron"] { background: var(--iron); }
+.card .nm { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.card .meta { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 4px; }
+.own { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--line); display: inline-grid; place-items: center; font-size: 13px; background: var(--surface); }
+.own[aria-pressed="true"] { background: var(--good); border-color: var(--good); color: #fff; }
+.card.owned { background: color-mix(in srgb, var(--good-soft) 55%, var(--surface)); }
+/* drawer */
+.scrim { position: fixed; inset: 0; background: #0008; z-index: 20; }
+.drawer { position: fixed; z-index: 21; top: 0; right: 0; bottom: 0; width: min(460px, 100%); background: var(--surface); border-left: 1px solid var(--line); overflow-y: auto;
+  padding: calc(16px + env(safe-area-inset-top, 0px)) max(18px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) 18px; display: flex; flex-direction: column; gap: 14px; }
+@media (max-width: 640px) { .drawer { top: auto; height: 86%; width: 100%; border-left: 0; border-top: 1px solid var(--line); border-radius: 16px 16px 0 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); } }
+.drawer .top { display: flex; gap: 10px; align-items: flex-start; }
+.drawer .top h2 { flex: 1; min-width: 0; }
+.drawer .en { color: var(--muted); font-size: 13px; }
+dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; }
+dl.kv dt { color: var(--muted); font-size: 13px; } dl.kv dd { margin: 0; min-width: 0; }
+.ol-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.ol-tag { border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; font-size: 13px; }
+.ol-tag b { font-family: var(--font-mono); font-weight: 500; color: var(--accent); margin-left: 4px; }
+.ol-tag.core { border-color: var(--good); background: var(--good-soft); }
+.ol-tag.sub { border-color: var(--warn); background: var(--warn-soft); }
+.note { font-size: 13px; color: var(--muted); }
+.team { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.slot { border: 1px solid var(--line); border-radius: 8px; padding: 6px 7px; font-size: 12.5px; min-width: 0; background: var(--surface); display: flex; flex-direction: column; gap: 2px; }
+.slot .n { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot .s { color: var(--muted); font-size: 11.5px; display: flex; gap: 4px; flex-wrap: wrap; }
+.slot.have { border-color: var(--good); background: color-mix(in srgb, var(--good-soft) 70%, var(--surface)); }
+.slot.miss { border-style: dashed; opacity: 0.8; }
+.slot.flex { border-style: dotted; color: var(--muted); }
+@media (max-width: 520px) { .team { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.teamcard { display: flex; flex-direction: column; gap: 8px; }
+.teamhead { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.teamhead h3 { flex: 1 1 auto; min-width: 0; }
+.badge { font-size: 12px; padding: 1px 8px; border-radius: 999px; font-weight: 500; }
+.badge.ok { background: var(--good-soft); color: var(--good); } .badge.part { background: var(--warn-soft); color: var(--warn); } .badge.no { background: var(--sunk); color: var(--muted); }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.verdict { border-radius: var(--r); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); }
+.verdict[data-v="good"] { background: var(--good-soft); border-color: var(--good); }
+.verdict[data-v="ok"] { background: var(--warn-soft); border-color: var(--warn); }
+.verdict[data-v="bad"] { background: var(--bad-soft); border-color: var(--bad); }
+.verdict .big { font-family: var(--font-display); font-size: 22px; }
+.olslots { display: grid; gap: 10px; }
+.olslot { display: grid; grid-template-columns: 64px 1fr 110px; gap: 8px; align-items: center; }
+.olslot .tag { font-size: 12px; color: var(--muted); }
+.olslot .res { grid-column: 2 / 4; font-size: 13px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+@media (max-width: 520px) { .olslot { grid-template-columns: 1fr 96px; } .olslot .tag { grid-column: 1 / 3; } .olslot .res { grid-column: 1 / 3; } }
+.scroll { overflow-x: auto; }
+table.data { border-collapse: collapse; width: 100%; font-size: 13px; }
+table.data th, table.data td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+table.data th:first-child, table.data td:first-child { text-align: left; }
+table.data th { color: var(--muted); font-weight: 500; font-size: 12px; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stat .v { font-family: var(--font-mono); font-size: 22px; font-weight: 500; overflow-wrap: anywhere; }
+.stat .k { font-size: 12px; color: var(--muted); }
+.stat .d { font-size: 12.5px; }
+.stat .d.short { color: var(--bad); } .stat .d.enough { color: var(--good); }
+.boss { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.bossbtn { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.bossbtn[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.bossbtn .bn { font-weight: 700; }
+ul.tips { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.empty { padding: 22px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--r); }
+.why { font-size: 12.5px; color: var(--muted); }
+.steps { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.step { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: start; border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; background: var(--surface); }
+.step.once { background: var(--sunk); }
+.step .no { font-family: var(--font-display); font-size: 20px; color: var(--accent); text-align: center; line-height: 1.1; }
+.step.once .no { font-family: var(--font-body); font-size: 12px; font-weight: 700; color: var(--muted); padding-top: 3px; }
+.step .body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.btn.bm { background: #f2c94c; border-color: #d9a520; color: #2b2208; text-decoration: none; font-weight: 700; cursor: grab; }
+#impText { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font: inherit; color: inherit; resize: vertical; }
+a.btn { display: inline-block; text-decoration: none; }
+a.btn.primary { color: var(--accent-ink); }
+footer.src { color: var(--muted); font-size: 12px; padding-block: 0 30px; }
+footer.src a { color: inherit; }
+@media (prefers-reduced-motion: no-preference) { .drawer { animation: slide .18s ease-out; } @keyframes slide { from { transform: translateX(16px); opacity: .6; } } }
+.upd { background: var(--accent-soft); color: var(--ink); border-bottom: 1px solid var(--accent); }
+.upd .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 10px; padding-bottom: 10px; }
+.upd p { margin: 0; flex: 1; min-width: 200px; }
+</style>
+
+<div class="upd" id="upd" hidden><div class="wrap"><p id="updText"></p><span id="updAct"></span></div></div>
+<header class="bar">
+  <div class="wrap">
+    <div class="brand"><h1>니케 지휘관 도우미</h1><span class="sub" id="dataDate"></span></div>
+    <div class="save" id="save" data-s="wait"><span class="dot"></span><span id="saveText">불러오는 중</span></div>
+    <nav class="tabs" aria-label="메뉴">
+      <a href="#dex" data-v="dex">니케 도감</a>
+      <a href="#owned" data-v="owned">보유 니케</a>
+      <a href="#ol" data-v="ol">오버로드 판정</a>
+      <a href="#cube" data-v="cube">하모니 큐브</a>
+      <a href="#raid" data-v="raid">레이드 덱</a>
+      <a href="#level" data-v="level">레벨 계산기</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- DEX -->
+  <section class="view" id="v-dex">
+    <div>
+      <h2>니케 도감</h2>
+      <p class="lead">이름을 누르면 추천 큐브, 오버로드 옵션, 스킬 레벨, 같이 쓰는 덱이 나와요. 오른쪽 체크 칸을 누르면 보유 니케로 표시돼요.</p>
+    </div>
+    <div class="panel filters" id="dexFilters">
+      <div class="field" style="grid-column: 1 / -1"><label for="q">이름 검색 (한글·영문)</label><input type="search" id="q" placeholder="예: 홍련, 리타, 레드 후드"></div>
+    </div>
+    <div class="row"><span class="count" id="dexCount"></span><span class="grow"></span>
+      <div class="field" style="flex-direction:row;align-items:center;gap:8px"><label for="sort">정렬</label>
+        <select id="sort" style="width:auto"><option value="rb">보스전 평가순</option><option value="rs">스토리 평가순</option><option value="name">이름순</option></select></div>
+    </div>
+    <div class="dex" id="dexList"></div>
+  </section>
+
+  <!-- OWNED -->
+  <section class="view" id="v-owned" hidden>
+    <div>
+      <h2>보유 니케</h2>
+      <p class="lead">가진 니케를 체크해 두면 레이드 덱 편성과 키울 순서 추천에 쓰여요. 체크한 목록은 이 페이지를 연 사람마다 따로 저장돼요.</p>
+    </div>
+    <div class="panel" id="importPanel" style="display:flex;flex-direction:column;gap:10px">
+      <div class="teamhead"><h3>블라블라링크에서 가져오기</h3><span class="note">ShiftyPad의 ‘나의 니케’ 목록으로 보유 니케를 한 번에 체크해요</span></div>
+      <div class="row" id="impAutoRow">
+        <button class="btn primary" id="impAuto">블라블라링크에서 바로 가져오기</button>
+        <span class="note" id="impAutoHint">Claude 데스크톱 앱에서 이 페이지를 열었을 때 쓸 수 있어요. 앱 안 브라우저에 블라블라링크 로그인이 돼 있어야 해요.</span>
+      </div>
+      <div id="impStatus" role="status"></div>
+      <details id="impManual">
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px">크롬·엣지에서 북마크로 가져오기 (Claude 없이)</summary>
+        <div class="steps">
+          <div class="step once"><span class="no">처음<br>한 번</span><div class="body">
+            <b>북마크 만들기</b>
+            <span class="note">아래 노란 버튼을 마우스로 끌어서 북마크바에 놓으세요. 북마크바가 안 보이면 Ctrl+Shift+B를 누르세요.</span>
+            <div class="row"><a class="btn bm" id="bmLink" href="#">★ 니케 목록 복사</a><button class="btn small" id="bmCopy">끌기가 안 되면: 코드 복사</button></div>
+            <span class="note" id="bmCopyMsg"></span>
+          </div></div>
+          <div class="step"><span class="no">1</span><div class="body">
+            <b>ShiftyPad 열기</b>
+            <span class="note">새 탭으로 ‘나의 니케’ 목록이 열려요. 로그인이 안 돼 있으면 로그인하세요.</span>
+            <div class="row"><a class="btn primary" id="shOpen" href="https://www.blablalink.com/shiftyspad/nikke-list" target="nikke_shiftypad">ShiftyPad ‘나의 니케’ 열기</a></div>
+          </div></div>
+          <div class="step"><span class="no">2</span><div class="body">
+            <b>북마크바의 ‘★ 니케 목록 복사’ 누르기</b>
+            <span class="note">목록이 다 뜬 다음에 누르세요. 다른 페이지에서 누르면 목록 페이지로 데려가 줘요.</span>
+          </div></div>
+          <div class="step"><span class="no">3</span><div class="body">
+            <b>이 탭으로 돌아오기</b>
+            <span class="note">1번 버튼으로 연 탭에서 북마크를 눌렀다면 이미 반영돼 있어요. 그대로면 아래 버튼을 누르거나 칸에 Ctrl+V 하세요.</span>
+            <div class="row"><button class="btn primary" id="impPaste">복사한 목록 붙여넣기</button><span class="note" id="impPasteMsg"></span></div>
+            <textarea id="impText" rows="2" placeholder="버튼도 안 되면 여기를 누르고 Ctrl+V"></textarea>
+          </div></div>
+        </div>
+      </details>
+    </div>
+    <div class="stats" id="ownStats"></div>
+    <div class="panel">
+      <div class="row" style="margin-bottom:12px">
+        <div class="field grow"><label for="oq">빠른 찾기</label><input type="search" id="oq" placeholder="이름 일부만 써도 돼요"></div>
+        <div class="field"><span class="lbl">보기</span><div class="seg" id="oview"><button data-v="all" aria-pressed="true">전체</button><button data-v="have" aria-pressed="false">가진 것</button><button data-v="not" aria-pressed="false">없는 것</button></div></div>
+        <div class="field"><span class="lbl">등급</span><div class="seg" id="orar"><button data-v="SSR" aria-pressed="true">SSR</button><button data-v="SR" aria-pressed="false">SR</button><button data-v="R" aria-pressed="false">R</button></div></div>
+      </div>
+      <div class="dex" id="ownList"></div>
+    </div>
+    <div class="panel">
+      <h3>먼저 키우면 좋은 니케</h3>
+      <p class="note" style="margin:4px 0 12px">가진 니케 중 보스전 평가가 높고 레이드 추천 덱에 자주 나오는 순서예요. 애장품 니케는 원래 니케를 가지고 있어야 해요.</p>
+      <div id="growList"></div>
+    </div>
+  </section>
+
+  <!-- OVERLOAD -->
+  <section class="view" id="v-ol" hidden>
+    <div>
+      <h2>오버로드 판정</h2>
+      <p class="lead">니케를 고르고 장비에 뜬 옵션과 단계(1~15)를 넣으면, 유지할지 다시 돌릴지 알려줘요. 옵션은 장비 한 개 기준으로 넣으세요.</p>
+    </div>
+    <div class="cols">
+      <div class="panel" style="display:flex;flex-direction:column;gap:14px">
+        <div class="field"><label for="olq">니케</label><input type="search" id="olq" list="olNames" placeholder="이름을 입력하고 목록에서 고르세요"><datalist id="olNames"></datalist></div>
+        <div id="olWant"></div>
+        <div class="olslots" id="olSlots"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="verdict" id="olVerdict"></div>
+        <div class="panel" id="olOdds"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>옵션별 수치표</h3>
+      <p class="note" style="margin:4px 0 10px">단계가 높을수록 수치가 커요. 처음 오버로드할 때는 11단계로 뜨지만, 재설정하면 1~5단계가 가장 자주 나와요(각 12%). 11~15단계는 각 1%예요.</p>
+      <div class="scroll"><table class="data" id="olTable"></table></div>
+    </div>
+  </section>
+
+  <!-- CUBE -->
+  <section class="view" id="v-cube" hidden>
+    <div>
+      <h2>하모니 큐브</h2>
+      <p class="lead">가진 니케 기준으로 어떤 큐브를 먼저 올리면 좋은지, 니케마다 어떤 큐브를 끼우면 좋은지 알려줘요. 모든 큐브는 레벨 5부터 우월코드 대미지 증가 효과가 같이 붙어요.</p>
+    </div>
+    <div class="panel">
+      <h3>먼저 키울 큐브</h3>
+      <p class="note" style="margin:4px 0 12px">가진 니케들이 1순위로 추천받는 큐브일수록, 보스전 평가가 높은 니케가 쓸수록 위에 와요. 큐브 레벨을 올리면 같은 큐브를 여러 니케가 같이 낄 수 있어요.</p>
+      <div id="cubeRank"></div>
+    </div>
+    <div class="panel">
+      <div class="row" style="margin-bottom:10px"><h3 class="grow">내 니케별 추천 큐브</h3>
+        <div class="field" style="flex-direction:row;align-items:center;gap:8px"><label for="cubeSort">정렬</label><select id="cubeSort" style="width:auto"><option value="rb">보스전 평가순</option><option value="cube">큐브별로 묶기</option></select></div></div>
+      <div id="cubeMine"></div>
+    </div>
+    <div class="panel">
+      <h3>큐브 18종 효과</h3>
+      <div class="scroll" style="margin-top:8px"><table class="data" id="cubeTable"></table></div>
+    </div>
+  </section>
+
+  <!-- RAID -->
+  <section class="view" id="v-raid" hidden>
+    <div>
+      <h2>레이드·요격전 덱 편성</h2>
+      <p class="lead">보스를 고르면 상위권이 쓰는 추천 덱을 보유 여부와 함께 보여주고, 가진 니케만으로 겹치지 않는 덱을 자동으로 짜줘요.</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+      <div class="seg" id="raidMode"><button data-v="solo" aria-pressed="true">솔로 레이드</button><button data-v="union" aria-pressed="false">유니온 레이드</button><button data-v="anomaly" aria-pressed="false">이상개체 요격전</button><button data-v="custom" aria-pressed="false">보스 직접 만들기</button></div>
+      <div id="raidBosses"></div>
+    </div>
+    <div id="raidInfo"></div>
+    <div class="panel teamcard">
+      <div class="teamhead"><h3>내 니케로 자동 편성</h3><span class="note" id="autoNote"></span></div>
+      <div class="row">
+        <div class="field"><label for="autoN">덱 개수</label><select id="autoN" style="width:auto"><option>1</option><option>2</option><option>3</option><option selected>5</option></select></div>
+        <label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="autoHeal"> 덱마다 힐러나 실드 1명 넣기</label>
+      </div>
+      <div id="autoOut" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <h3>추천 덱 (가진 니케가 많은 순)</h3>
+      <div id="raidTeams" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </section>
+
+  <!-- LEVEL -->
+  <section class="view" id="v-level" hidden>
+    <div>
+      <h2>레벨업 재료 계산기</h2>
+      <p class="lead">싱크로 디바이스(또는 니케) 레벨을 올리는 데 필요한 크레딧, 배틀 데이터, 코어 더스트를 계산해요. 가진 재료를 넣으면 모자란 양도 알려줘요.</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:14px">
+      <div class="filters">
+        <div class="field"><label for="lvFrom">지금 레벨</label><input type="number" id="lvFrom" min="1" max="1400" value="560"></div>
+        <div class="field"><label for="lvTo">목표 레벨</label><input type="number" id="lvTo" min="2" max="1401" value="600"></div>
+      </div>
+      <div class="row" id="lvQuick"></div>
+      <details>
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px">가진 재료 넣기 (선택)</summary>
+        <div class="filters" style="margin-top:10px">
+          <div class="field"><label for="hvCr">크레딧</label><input type="number" id="hvCr" min="0" placeholder="예: 350000000"></div>
+          <div class="field"><label for="hvBd">배틀 데이터</label><input type="number" id="hvBd" min="0" placeholder="예: 2000000000"></div>
+          <div class="field"><label for="hvCd">코어 더스트</label><input type="number" id="hvCd" min="0" placeholder="예: 400000"></div>
+        </div>
+      </details>
+    </div>
+    <div class="stats" id="lvOut"></div>
+    <div class="panel"><h3>구간별 1레벨당 비용</h3><p class="note" style="margin:4px 0 10px">201레벨부터는 50레벨 구간마다 비용이 같아요(801레벨부터는 200레벨 구간).</p><div class="scroll"><table class="data" id="lvTable"></table></div></div>
+  </section>
+</main>
+
+<footer class="wrap src" id="srcFoot"></footer>
+
+<div id="drawerHost"></div>
+
+<script>
+const D = /*__DATA__*/null;
+const APP_V = "__APP_V__";
+const SITE = "https://gomdolski.github.io/nikke-helper/";
+
+// ---------- vocab ----------
+const EL = { Fire: "작열", Water: "수냉", Wind: "풍압", Electric: "전격", Iron: "철갑" };
+const ELS = ["Fire", "Water", "Wind", "Electric", "Iron"];
+const WEAK = { Fire: "Water", Water: "Electric", Electric: "Iron", Iron: "Wind", Wind: "Fire" }; // boss element -> element that hits it hard
+const MAN = { Elysion: "엘리시온", Missilis: "미실리스", Tetra: "테트라", Pilgrim: "필그림", Abnormal: "어브노멀" };
+const CLS = { Attacker: "화력형", Defender: "방어형", Supporter: "지원형" };
+const WPN = { AR: "AR 돌격소총", SMG: "SMG 기관단총", SG: "SG 샷건", SR: "SR 저격소총", RL: "RL 런처", MG: "MG 기관총" };
+const SP = { "True Damage": "고정 피해", Buffer: "버퍼", Healer: "힐러", Cleanser: "디버프 해제", Pierce: "관통", "Stack Oriented": "중첩형", "Re-Enter Burst Stage": "버스트 재사용", Taunter: "도발", Debuffer: "디버퍼", "Burst CD Reduction": "버스트 쿨감", Revive: "부활", "Buff Time Alteration": "버프 시간 조절", "Screen Wipe": "광역 처리", Shielder: "실드", "Cover Heal": "엄폐물 회복", Decoy: "미끼", "Crowd Controller": "군중 제어" };
+const OLK = {}; D.ol.lines.forEach(l => OLK[l.k] = l);
+const OLSHORT = { ele: "우월코드", atk: "공격력", ammo: "최대 장탄", cd: "크리 대미지", cr: "크리 확률", def: "방어력", hit: "명중률", cs: "차지 속도", cdc: "차지 대미지" };
+const TIERS = ["SSS", "SS", "S", "A", "B", "C", "D", "E", "F"];
+const tScore = t => { const i = TIERS.indexOf(t); return i < 0 ? 0 : 10 - i; };
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const C = D.chars;
+const BY = new Map(C.map(c => [c.s, c]));
+// Some team lists use alternate slugs; map what we can.
+const ALIAS = { "aqua-marine-helm": "helm-aquamarine", "maid-mast": "mast-romantic-maid", "mast-maid": "mast-romantic-maid", "red-hood": "red-hood-b3" };
+const get = s => BY.get(s) || BY.get(ALIAS[s]);
+const bursts = c => c.tv ? [...new Set(c.tv.map(v => v.b))] : [c.b];
+
+// ---------- state + storage ----------
+const S = { owned: new Set(), view: "dex", f: { r: new Set(), m: new Set(), e: new Set(), b: new Set(), c: new Set(), w: new Set(), mine: false }, raid: { mode: "union", boss: null, season: {}, custom: { name: "", element: "Wind", core: null } } };
+let store = { kind: "wait", ref: null, timer: null, lastJson: "" };
+const LSKEY = "nikke-helper-owned-v1";
+function setSave(kind, text) { const el = document.getElementById("save"); el.dataset.s = kind; document.getElementById("saveText").textContent = text; }
+function applyOwned(list) {
+  const json = JSON.stringify([...list].sort());
+  if (json === store.lastJson) return;
+  store.lastJson = json;
+  S.owned = new Set(list.filter(s => BY.has(s)));
+  renderAll();
+}
+function persist() {
+  const list = [...S.owned].sort();
+  const json = JSON.stringify(list);
+  store.lastJson = json;
+  try { localStorage.setItem(LSKEY, json); } catch (e) {}
+  if (store.kind !== "db" || !store.ref) return;
+  clearTimeout(store.timer);
+  store.timer = setTimeout(async () => {
+    try { await store.ref.set({ owned: list, v: 1 }); setSave("db", "내 계정에 저장됨"); }
+    catch (e) { setSave("local", "계정 저장 실패, 이 브라우저에 저장됨"); }
+  }, 700);
+}
+function loadLocal() { try { const v = JSON.parse(localStorage.getItem(LSKEY) || "[]"); if (Array.isArray(v)) applyOwned(v); } catch (e) {} }
+async function initStore() {
+  loadLocal();
+  setSave("local", "이 브라우저에 저장됨");
+  const cl = window.claude;
+  if (!cl || typeof cl.use !== "function") return;
+  try {
+    const [db, user] = await Promise.all([cl.use("db"), cl.use("user")]);
+    if (!db || !user) return;
+    const id = await user.id();
+    if (!id) return;
+    store.ref = db.doc("data/users/" + id + "/nikke");
+    let first = true;
+    const to = setTimeout(() => { if (first) setSave("local", "계정 연결이 늦어요, 이 브라우저에 저장 중"); }, 10000);
+    store.ref.onSnapshot(snap => {
+      clearTimeout(to);
+      store.kind = "db";
+      setSave("db", "내 계정에 저장됨");
+      if (snap.exists) { const d = snap.data(); if (Array.isArray(d.owned)) applyOwned(d.owned); }
+      else if (first && S.owned.size) persist(); // move browser-only list into the account
+      first = false;
+    }, () => { clearTimeout(to); store.kind = "local"; setSave("local", "계정 저장 불가, 이 브라우저에 저장됨"); });
+  } catch (e) { /* stay local */ }
+}
+function toggleOwn(s) { S.owned.has(s) ? S.owned.delete(s) : S.owned.add(s); persist(); renderAll(); }
+
+// ---------- shared bits ----------
+const chips = c => `<span class="chip r-${esc(c.r)}">${esc(c.r)}</span><span class="chip el" data-e="${esc(c.e)}">${esc(EL[c.e] || c.e)}</span><span class="chip burst">${bursts(c).map(esc).join("/")}</span><span class="chip">${esc(CLS[c.c] || c.c)}</span><span class="chip">${esc(c.w)}</span>`;
+function card(c, opts = {}) {
+  const own = S.owned.has(c.s);
+  return `<div class="card ${own ? "owned" : ""}" data-open="${esc(c.s)}" role="button" tabindex="0">
+    <span class="stripe" data-e="${esc(c.e)}"></span>
+    <span class="nm" title="${esc(c.en)}">${esc(c.ko)}</span>
+    <button class="own" data-own="${esc(c.s)}" aria-pressed="${own}" aria-label="${esc(c.ko)} 보유">${own ? "✓" : ""}</button>
+    <span class="meta">${chips(c)}${opts.tier ? `<span class="tier" data-t="${esc(c.rb)}" title="보스전 평가">${esc(c.rb || "-")}</span>` : ""}</span>
+  </div>`;
+}
+function slot(s, slotLabel) {
+  const c = get(s);
+  if (!c) {
+    const lbl = /^flex$/i.test(s) ? "자유 칸" : /^b\d/i.test(s) ? `아무 버스트 ${"I".repeat(+s[1])}${/cdr/i.test(s) ? " 쿨감" : ""}` : s;
+    return `<div class="slot flex"><span class="n">${esc(lbl)}</span><span class="s">아무 니케</span></div>`;
+  }
+  const have = S.owned.has(c.s);
+  return `<div class="slot ${have ? "have" : "miss"}" data-open="${esc(c.s)}" role="button" tabindex="0" title="${esc(c.en)}">
+    <span class="n">${have ? "✓ " : ""}${esc(c.ko)}</span>
+    <span class="s"><span>${esc(bursts(c).join("/"))}</span><span>${esc(EL[c.e])}</span><span>${esc(c.w)}</span></span>${slotLabel === "cube" && c.cu ? `<span class="s" title="추천 큐브">큐브 · ${esc(c.cu[0].replace(/ 큐브$/, ""))}</span>` : ""}</div>`;
+}
+const olTag = (x, cls) => `<span class="ol-tag ${cls || ""}">${esc(OLSHORT[x[0]] || x[0])}${x[1] ? `<b>${esc(x[1])}개</b>` : ""}</span>`;
+
+// team usage count across raid guides (for growth priority)
+const RAID_USE = new Map();
+(() => {
+  const add = s => { const c = get(s); if (c) RAID_USE.set(c.s, (RAID_USE.get(c.s) || 0) + 1); };
+  D.raids.solo.seasons.forEach(s => s.bosses.forEach(b => (b.teams || []).forEach(t => t.m.forEach(add))));
+  Object.values(D.raids.union.teams).forEach(ts => ts.forEach(t => t[1].forEach(add)));
+  D.raids.anomaly.seasons[0].bosses.forEach(b => b.teams.forEach(t => t.m.forEach(add)));
+  D.teams.forEach(t => t[2].forEach(add));
+})();
+
+// ---------- drawer ----------
+function openChar(s) {
+  const c = get(s); if (!c) return;
+  const own = S.owned.has(c.s);
+  const tiers = c.tv ? c.tv.map(v => `<div>${esc(v.b)}: 스토리 <span class="tier" data-t="${esc(v.rs)}">${esc(v.rs || "-")}</span> 보스 <span class="tier" data-t="${esc(v.rb)}">${esc(v.rb || "-")}</span> PvP <span class="tier" data-t="${esc(v.rp)}">${esc(v.rp || "-")}</span></div>`).join("")
+    : `스토리 <span class="tier" data-t="${esc(c.rs)}">${esc(c.rs || "-")}</span> 보스 <span class="tier" data-t="${esc(c.rb)}">${esc(c.rb || "-")}</span> PvP <span class="tier" data-t="${esc(c.rp)}">${esc(c.rp || "-")}</span>`;
+  const teams = [];
+  D.raids.solo.seasons.forEach(s => s.bosses.forEach(b => (b.teams || []).forEach(t => { if (t.m.some(x => get(x)?.s === c.s)) teams.push([`솔로 ${s.season}시즌 · ${t.name}`, t.m]); })));
+  Object.entries(D.raids.union.teams).forEach(([el, ts]) => ts.forEach(t => { if (t[1].some(x => get(x)?.s === c.s)) teams.push([`유니온 ${EL[el]} · ${t[0]}`, t[1]]); }));
+  D.teams.forEach(t => { if (teams.length < 8 && t[2].some(x => get(x)?.s === c.s)) teams.push([`${t[1] === "B" ? "보스전" : "레이드"} 덱`, t[2]]); });
+  const html = `<div class="scrim" data-close></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-label="${esc(c.ko)} 정보">
+    <div class="top"><div style="flex:1;min-width:0"><h2>${esc(c.ko)}</h2><div class="en">${esc(c.en)}</div></div>
+      <button class="btn small" data-close>닫기</button></div>
+    <div class="row">${chips(c)}</div>
+    <button class="btn ${own ? "" : "primary"}" data-own="${esc(c.s)}">${own ? "보유 해제" : "보유 니케로 표시"}</button>
+    <dl class="kv">
+      <dt>제조사</dt><dd>${esc(MAN[c.m] || c.m)}${c.sq ? ` · ${esc(c.sq)}` : ""}</dd>
+      <dt>무기</dt><dd>${esc(WPN[c.w] || c.w)}${c.am ? ` · 장탄 ${c.am}발` : ""}</dd>
+      <dt>역할</dt><dd>${c.sp.length ? c.sp.map(x => `<span class="chip">${esc(SP[x] || x)}</span>`).join(" ") : "-"}</dd>
+      <dt>평가</dt><dd>${tiers}</dd>
+    </dl>
+    <div><h3>오버로드 추천 옵션</h3>
+      ${c.oi || c.of ? `<div class="ol-list" style="margin-top:6px">${(c.oi || []).map(x => olTag(x, "core")).join("")}${(c.of || []).map(x => olTag(x, "sub")).join("")}</div>
+      <p class="note" style="margin:6px 0 0">초록은 꼭 노릴 옵션, 노랑은 있으면 좋은 옵션이에요. 숫자는 장비 4개 중 몇 개에 붙이면 좋은지예요.</p>`
+      : `<p class="note" style="margin:6px 0 0">따로 노릴 옵션이 없어요. 오버로드는 전투력 올리는 용도로만 하면 돼요.</p>`}</div>
+    <div><h3>추천 하모니 큐브</h3>${c.cu ? `<ol style="margin:6px 0 0;padding-left:20px">${c.cu.map(x => `<li><b>${esc(x)}</b> <span class="note">${esc(cubeEff(x))}</span></li>`).join("")}</ol>` : `<p style="margin:6px 0 0">-</p>`}${c.cp ? `<p class="note" style="margin:2px 0 0">PvP: ${c.cp.map(esc).join(" → ")}</p>` : ""}</div>
+    <div><h3>추천 스킬 레벨</h3><p style="margin:6px 0 0" class="num">${c.sk ? `최소 ${esc(c.sk.mn || "-")} · 추천 ${esc(c.sk.rc || "-")} · 최대 ${esc(c.sk.hi || "-")}` : "-"}</p><p class="note" style="margin:2px 0 0">스킬1 / 스킬2 / 버스트 순서예요.</p></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><h3>같이 쓰는 덱</h3>
+      ${teams.length ? teams.slice(0, 8).map(t => `<div><div class="note" style="margin-bottom:4px">${esc(t[0])}</div><div class="team">${t[1].map(x => slot(x)).join("")}</div></div>`).join("") : `<p class="note">등록된 덱이 없어요.</p>`}
+    </div>
+  </aside>`;
+  const host = document.getElementById("drawerHost");
+  host.innerHTML = html;
+  host.dataset.s = c.s;
+  host.querySelector(".drawer button[data-close]").focus();
+}
+function closeDrawer() { const h = document.getElementById("drawerHost"); h.innerHTML = ""; delete h.dataset.s; }
+
+// ---------- DEX ----------
+const FILTERS = [
+  ["r", "등급", ["SSR", "SR", "R"], x => x],
+  ["e", "속성", ELS, x => EL[x]],
+  ["b", "버스트", ["I", "II", "III"], x => x],
+  ["c", "클래스", ["Attacker", "Defender", "Supporter"], x => CLS[x]],
+  ["w", "무기", ["AR", "SMG", "SG", "SR", "RL", "MG"], x => x],
+  ["m", "제조사", ["Elysion", "Missilis", "Tetra", "Pilgrim", "Abnormal"], x => MAN[x]],
+];
+function buildFilters() {
+  const host = document.getElementById("dexFilters");
+  host.insertAdjacentHTML("beforeend", FILTERS.map(([k, label, vals, fmt]) =>
+    `<div class="field"><span class="lbl">${label}</span><div class="seg" data-f="${k}">${vals.map(v => `<button data-v="${v}" aria-pressed="false">${esc(fmt(v))}</button>`).join("")}</div></div>`).join("")
+    + `<div class="field"><span class="lbl">보유</span><div class="seg" data-f="mine"><button data-v="1" aria-pressed="false">가진 니케만</button></div></div>`);
+  host.addEventListener("click", e => {
+    const b = e.target.closest(".seg button"); if (!b) return;
+    const k = b.parentElement.dataset.f;
+    if (k === "mine") { S.f.mine = !S.f.mine; } else { const set = S.f[k]; set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v); }
+    renderDex();
+  });
+}
+function matchQ(c, q) { if (!q) return true; q = q.toLowerCase().replace(/\s/g, ""); return c.ko.replace(/\s/g, "").toLowerCase().includes(q) || c.en.toLowerCase().replace(/\s/g, "").includes(q); }
+function renderDex() {
+  document.querySelectorAll("#dexFilters .seg").forEach(seg => seg.querySelectorAll("button").forEach(b => {
+    const k = seg.dataset.f; b.setAttribute("aria-pressed", k === "mine" ? S.f.mine : S.f[k].has(b.dataset.v));
+  }));
+  const q = document.getElementById("q").value.trim();
+  const f = S.f;
+  let list = C.filter(c => matchQ(c, q) && (!f.r.size || f.r.has(c.r)) && (!f.e.size || f.e.has(c.e)) && (!f.b.size || bursts(c).some(b => f.b.has(b))) && (!f.c.size || f.c.has(c.c)) && (!f.w.size || f.w.has(c.w)) && (!f.m.size || f.m.has(c.m)) && (!f.mine || S.owned.has(c.s)));
+  const sort = document.getElementById("sort").value;
+  list.sort(sort === "name" ? (a, b) => a.ko.localeCompare(b.ko, "ko") : (a, b) => tScore(b[sort]) - tScore(a[sort]) || a.ko.localeCompare(b.ko, "ko"));
+  document.getElementById("dexCount").textContent = `${list.length}명 표시 · 전체 ${C.length}명`;
+  document.getElementById("dexList").innerHTML = list.length ? list.map(c => card(c, { tier: true })).join("") : `<div class="empty">조건에 맞는 니케가 없어요. 필터를 줄여 보세요.</div>`;
+}
+
+// ---------- OWNED ----------
+const OWN = { view: "all", rar: new Set(["SSR"]) };
+function renderOwned() {
+  const total = C.filter(c => !c.tr).length;
+  const have = [...S.owned].map(get).filter(Boolean);
+  const byR = r => have.filter(c => c.r === r && !c.tr).length;
+  document.getElementById("ownStats").innerHTML = [
+    ["가진 니케", `${have.filter(c => !c.tr).length}`, `애장품 제외 전체 ${total}명 중`],
+    ["SSR", `${byR("SSR")}`, `SR ${byR("SR")} · R ${byR("R")}`],
+    ["애장품", `${have.filter(c => c.tr).length}`, "애장품 니케로 체크한 수"],
+  ].map(([k, v, d]) => `<div class="stat"><span class="k">${k}</span><span class="v">${v}</span><span class="d" style="color:var(--muted)">${d}</span></div>`).join("");
+  document.querySelectorAll("#oview button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === OWN.view));
+  document.querySelectorAll("#orar button").forEach(b => b.setAttribute("aria-pressed", OWN.rar.has(b.dataset.v)));
+  const q = document.getElementById("oq").value.trim();
+  const list = C.filter(c => matchQ(c, q) && (!OWN.rar.size || OWN.rar.has(c.r)) && (OWN.view === "all" || (OWN.view === "have") === S.owned.has(c.s)))
+    .sort((a, b) => a.ko.localeCompare(b.ko, "ko"));
+  document.getElementById("ownList").innerHTML = list.length ? list.map(c => card(c)).join("") : `<div class="empty">${OWN.view === "have" ? "아직 체크한 니케가 없어요. ‘전체’에서 가진 니케를 눌러 체크하세요." : "조건에 맞는 니케가 없어요."}</div>`;
+  // growth priority
+  const grow = have.map(c => ({ c, sc: tScore(c.rb) * 2 + Math.min(RAID_USE.get(c.s) || 0, 12) })).filter(x => x.sc > 8).sort((a, b) => b.sc - a.sc).slice(0, 12);
+  document.getElementById("growList").innerHTML = !have.length ? `<div class="empty">가진 니케를 체크하면 여기에 키울 순서가 나와요.</div>`
+    : `<div class="scroll"><table class="data"><thead><tr><th>니케</th><th>보스전</th><th>추천 덱 등장</th><th>오버로드 핵심 옵션</th></tr></thead><tbody>${grow.map(({ c }) =>
+      `<tr><td><a href="#owned" data-open="${esc(c.s)}" style="color:inherit">${esc(c.ko)}</a></td><td><span class="tier" data-t="${esc(c.rb)}">${esc(c.rb || "-")}</span></td><td class="num">${RAID_USE.get(c.s) || 0}회</td><td style="text-align:left">${(c.oi || []).map(x => OLSHORT[x[0]]).join(", ") || "전투력용"}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+// ---------- IMPORT (ShiftyPad "나의 니케" list) ----------
+const SHIFTY_URL = "https://www.blablalink.com/shiftyspad/nikke-list";
+// Same normalization as the build's name index (Korean and official English names).
+const nrm = s => String(s).toLowerCase().replace(/\s+/g, "").replace(/：/g, ":").replace(/-/g, "");
+// Owned units show "LV." and a number before their name; units you don't have show the name alone.
+// The list sits between the filter button and the site footer (Korean or English site).
+function parseShifty(text) {
+  let t = String(text || "");
+  const a = Math.max(t.indexOf("필터"), t.indexOf("Filter")); if (a >= 0) t = t.slice(t.indexOf("\n", a) + 1);
+  for (const end of ["승리의 여신", "Goddess of Victory", "GODDESS OF VICTORY"]) { const b = t.indexOf(end); if (b >= 0) t = t.slice(0, b); }
+  const lines = t.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const names = []; let lv = null;
+  for (let i = 0; i < lines.length; i++) {
+    const s = lines[i];
+    if (/^LV\.?$/.test(s)) { lv = lines[++i]; continue; } // the list uses upper-case "LV."; the commander profile's "Lv." is not a unit
+    if (/^LV\.\s*\d+$/.test(s)) { lv = s.replace(/\D/g, ""); continue; }
+    if (/^(\d{1,2}|MAX)$/.test(s) && lv !== null) continue; // star / core grade
+    if (lv !== null) { names.push(s); lv = null; }
+  }
+  const slugs = new Set(), unknown = [], seen = {};
+  for (const n of names) {
+    const k = nrm(n);
+    const hit = D.names[k];
+    if (!hit) { unknown.push(n); continue; }
+    // A name shared by two units: 1st time = standard unit, 2nd time = the collab unit.
+    const i = seen[k] = (seen[k] || 0); seen[k]++;
+    slugs.add(hit[Math.min(i, hit.length - 1)]);
+  }
+  return { slugs, count: names.length, matched: names.length - unknown.length, unknown, loginNeeded: /로그인하여|log ?in/i.test(String(text)) && !names.length };
+}
+let lastImportBackup = null;
+function applyImport(res, how) {
+  if (res.matched < res.count * 0.6) {
+    impStatus(`<div class="verdict" data-v="bad"><span class="big">이름을 거의 못 알아봤어요</span><span>목록 ${res.count}명 중 ${res.matched}명만 알아봐서 반영하지 않았어요. 기존 체크는 그대로예요.</span><span class="note">못 알아본 이름 예: ${res.unknown.slice(0, 8).map(esc).join(", ")}</span></div>`);
+    return;
+  }
+  const before = new Set(S.owned);
+  const next = new Set(res.slugs);
+  // keep 애장품 checks for units still owned
+  for (const s of before) { const c = get(s); if (c && c.tr) { const base = C.find(x => !x.tr && x.en === c.en.replace(/ \(Treasure\)/, "")); if (!base || next.has(base.s)) next.add(s); } }
+  const added = [...next].filter(s => !before.has(s)).length;
+  const removed = [...before].filter(s => !next.has(s)).length;
+  lastImportBackup = [...before];
+  S.owned = next; persist(); renderAll();
+  impStatus(`<div class="verdict" data-v="good"><span class="lbl">${esc(how)}</span><span class="big">보유 니케 ${res.matched}명 반영</span>
+    <span>새로 체크 ${added}명 · 체크 해제 ${removed}명${res.unknown.length ? ` · 이름을 못 찾은 니케: ${res.unknown.map(esc).join(", ")}` : ""}. 애장품 체크는 그대로 뒀어요.</span>
+    <span><button class="btn small" id="impUndo">되돌리기</button></span></div>`);
+}
+function impStatus(html) { document.getElementById("impStatus").innerHTML = html; }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const payloadText = r => { if (!r) return ""; if (typeof r.payload === "string") return r.payload; const t = (r.content || []).filter(b => b.type === "text").map(b => b.text).join("\n"); return t || (r.payload != null ? JSON.stringify(r.payload) : ""); };
+let impBusy = false;
+async function importFromBrowser() {
+  if (impBusy) return;
+  const btn = document.getElementById("impAuto");
+  const mcp = window.claude && typeof window.claude.use === "function" ? await window.claude.use("mcp") : null;
+  if (!mcp) { impStatus(`<p class="note" style="margin:0">이 화면에서는 바로 가져오기를 쓸 수 없어요. Claude 데스크톱 앱에서 이 페이지를 열거나, 아래 ‘다른 방법’을 쓰세요.</p>`); document.getElementById("impManual").open = true; return; }
+  impBusy = true; btn.disabled = true;
+  try {
+    impStatus(`<p class="note" style="margin:0">앱 안 브라우저에서 블라블라링크를 여는 중이에요…</p>`);
+    const opened = await mcp.callTool("host:claude_browser", "preview_start", { url: SHIFTY_URL }, { cache: false });
+    const ot = payloadText(opened);
+    const tabId = (opened.payload && typeof opened.payload === "object" && opened.payload.tabId) || (ot.match(/"tabId"\s*:\s*"([^"]+)"/) || [])[1];
+    for (let i = 0; i < 4; i++) {
+      await sleep(i ? 3000 : 4500);
+      impStatus(`<p class="note" style="margin:0">니케 목록을 읽는 중이에요… (${i + 1}/4)</p>`);
+      const got = await mcp.callTool("host:claude_browser", "get_page_text", tabId ? { tabId, max_chars: 80000 } : { max_chars: 80000 }, { cache: false });
+      const text = payloadText(got);
+      const res = parseShifty(text);
+      if (res.loginNeeded) { impStatus(`<div class="verdict" data-v="ok"><span class="big">로그인이 필요해요</span><span>앱 오른쪽의 브라우저 창(Ctrl+Shift+B)에서 블라블라링크에 로그인한 뒤 다시 눌러 주세요.</span></div>`); return; }
+      if (res.count) { applyImport(res, "블라블라링크에서 가져옴"); return; }
+    }
+    impStatus(`<div class="verdict" data-v="ok"><span class="big">목록을 읽지 못했어요</span><span>브라우저 창에 ‘나의 니케’ 목록이 다 뜬 걸 확인하고 다시 눌러 주세요.</span></div>`);
+  } catch (e) {
+    const code = e && e.code;
+    const msg = code === "server_not_connected" || code === "not_granted" || code === "capability_disabled"
+      ? "앱 안 브라우저에 연결할 수 없어요. Claude 데스크톱 앱에서 이 페이지를 열어 주세요. 이 기능은 페이지를 만든 사람만 쓸 수 있어요."
+      : code === "cancelled" ? "브라우저 사용을 허용하지 않아서 멈췄어요. 다시 누르고 ‘허용’을 고르면 돼요."
+      : code === "not_in_manifest" || code === "approval_required" || code === "consent_required" ? "브라우저 사용 허용이 필요해요. 다시 누르고 허용을 골라 주세요."
+      : `가져오는 중에 문제가 생겼어요 (${esc(code || "오류")}). 잠시 뒤 다시 눌러 주세요.`;
+    impStatus(`<div class="verdict" data-v="bad"><span class="big">가져오지 못했어요</span><span>${msg}</span></div>`);
+  } finally { impBusy = false; btn.disabled = false; }
+}
+// Bookmark that runs on blablalink.com: goes to the list page if needed, then copies the page text.
+// It first hands the list straight to the helper tab that opened ShiftyPad (no clipboard needed),
+// and also copies it with execCommand, which Chrome allows from a bookmark.
+const BOOKMARKLET = "javascript:(function(){var U='https://www.blablalink.com/shiftyspad/nikke-list';if(location.host.indexOf('blablalink.com')<0||location.pathname.indexOf('/shiftyspad/nikke-list')<0){if(confirm('나의 니케 목록 페이지로 이동할게요. 목록이 뜨면 이 북마크를 한 번 더 누르세요.'))location.href=U;return}var t=document.body.innerText;if(t.indexOf('LV.')<0){alert('목록이 아직 안 떴어요. 잠시 뒤 다시 누르세요. 로그인이 필요할 수도 있어요.');return}var sent=false;try{if(window.opener&&!window.opener.closed){window.opener.postMessage({type:'nikke-list',text:t},'*');sent=true}}catch(e){}var ok=false;try{var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.top='0';a.style.opacity='0';document.body.appendChild(a);a.focus();a.select();ok=document.execCommand('copy');document.body.removeChild(a)}catch(e){}if(sent){alert('니케 도우미로 보냈어요! 도우미 탭으로 돌아가면 반영돼 있어요.')}else if(ok){alert('복사했어요! 니케 도우미 탭의 칸에 Ctrl+V 하세요.')}else{prompt('Ctrl+C를 누른 뒤 확인을 누르세요',t)}})()";
+let armedUntil = 0, lastClip = "";
+function importText(text, how, quiet) {
+  const res = parseShifty(text);
+  if (res.count) { lastClip = text; applyImport(res, how); return true; }
+  if (!quiet && String(text).trim()) {
+    const head = String(text).trim().replace(/\s+/g, " ").slice(0, 50);
+    impStatus(`<div class="verdict" data-v="ok"><span class="big">니케 목록이 아니에요</span><span>들어온 내용 앞부분: “${esc(head)}…”</span><span>ShiftyPad ‘나의 니케’ 화면에서 북마크를 눌렀는지 확인해 주세요. 로그인 전이면 목록이 안 나와요.</span></div>`);
+  }
+  return false;
+}
+async function pasteFromClipboard(quiet) {
+  const msg = document.getElementById("impPasteMsg");
+  try {
+    const t = await navigator.clipboard.readText();
+    if (quiet && t === lastClip) return;
+    if (!importText(t, "붙여넣기로 가져옴", quiet) && !quiet && !t.trim()) msg.textContent = "복사된 내용이 없어요. 2번 북마크를 먼저 눌러 주세요.";
+    else msg.textContent = "";
+  } catch (e) {
+    if (quiet) return;
+    msg.textContent = "이 브라우저가 붙여넣기 버튼을 막았어요. 아래 칸을 누르고 Ctrl+V 하세요.";
+    document.getElementById("impText").focus();
+  }
+}
+function setupImport() {
+  const bm = document.getElementById("bmLink");
+  bm.setAttribute("href", BOOKMARKLET);
+  bm.addEventListener("click", e => { e.preventDefault(); document.getElementById("bmCopyMsg").textContent = "누르지 말고, 꾹 누른 채로 북마크바까지 끌어다 놓으세요."; });
+  document.getElementById("bmCopy").addEventListener("click", () => {
+    const m = document.getElementById("bmCopyMsg");
+    const done = () => m.textContent = "복사했어요. 북마크바에서 오른쪽 클릭 → ‘페이지 추가’ → 이름은 ‘니케 목록 복사’, URL 칸에 Ctrl+V 하세요.";
+    navigator.clipboard?.writeText(BOOKMARKLET).then(done, () => m.textContent = "복사가 막혔어요. 노란 버튼을 북마크바로 끌어다 놓아 주세요.");
+  });
+  document.getElementById("shOpen").addEventListener("click", () => { armedUntil = Date.now() + 15 * 60 * 1000; document.getElementById("impPasteMsg").textContent = ""; });
+  document.getElementById("impPaste").addEventListener("click", () => pasteFromClipboard(false));
+  // The bookmark, run in the ShiftyPad tab this page opened, posts the list here directly.
+  window.addEventListener("message", e => {
+    const d = e.data;
+    if (!d || d.type !== "nikke-list" || typeof d.text !== "string") return;
+    let host = ""; try { host = new URL(e.origin).hostname; } catch (err) {}
+    if (!/(^|\.)blablalink\.com$/.test(host)) return;
+    importText(d.text, "ShiftyPad에서 받아옴", false);
+  });
+  document.getElementById("impAuto").addEventListener("click", importFromBrowser);
+  const ta = document.getElementById("impText");
+  const run = () => { if (importText(ta.value, "붙여넣기로 가져옴", false)) ta.value = ""; };
+  ta.addEventListener("paste", () => setTimeout(run, 0));
+  ta.addEventListener("change", run);
+  document.addEventListener("click", e => { if (e.target.id === "impUndo" && lastImportBackup) { S.owned = new Set(lastImportBackup); lastImportBackup = null; persist(); renderAll(); impStatus(`<p class="note" style="margin:0">가져오기 전으로 되돌렸어요.</p>`); } });
+  if (!window.claude) { document.getElementById("impAutoRow").hidden = true; document.getElementById("impManual").open = true; }
+}
+
+// ---------- OVERLOAD ----------
+const OLS = { char: null, slots: [["", 1], ["", 1], ["", 1]] };
+function olPrefs(c) {
+  if (c && (c.oi || c.of)) return { core: (c.oi || []).map(x => x[0]), sub: (c.of || []).map(x => x[0]), generic: false };
+  if (c && c.c === "Attacker") return { core: ["ele", "atk"], sub: c.w === "MG" || c.w === "AR" || c.w === "SMG" ? ["ammo"] : ["cs", "ammo"], generic: true };
+  return { core: [], sub: ["atk", "ele"], generic: true };
+}
+function renderOL() {
+  const c = OLS.char;
+  const P = olPrefs(c);
+  document.getElementById("olWant").innerHTML = c
+    ? `<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 클래스 기준)" : ""}</div>
+       <div class="ol-list">${P.core.map(k => olTag([k], "core")).join("")}${P.sub.map(k => olTag([k], "sub")).join("")}${!P.core.length && !P.sub.length ? `<span class="note">아무 옵션이나 괜찮아요(전투력용).</span>` : ""}</div>`
+    : `<div class="note">니케를 고르면 노려야 할 옵션이 나와요.</div>`;
+  const opt = `<option value="">옵션 없음</option>` + D.ol.lines.map(l => `<option value="${l.k}">${esc(l.ko)}</option>`).join("");
+  const tierOpt = Array.from({ length: 15 }, (_, i) => `<option value="${i + 1}">${i + 1}단계</option>`).join("");
+  const host = document.getElementById("olSlots");
+  if (!host.dataset.ready) {
+    host.innerHTML = OLS.slots.map((_, i) => `<div class="olslot"><span class="tag">${i + 1}번 옵션</span><select id="ols${i}" aria-label="${i + 1}번 옵션">${opt}</select><select id="olt${i}" aria-label="${i + 1}번 단계">${tierOpt}</select><div class="res" id="olr${i}"></div></div>`).join("");
+    host.dataset.ready = 1;
+    OLS.slots.forEach((s, i) => { document.getElementById("ols" + i).value = s[0]; document.getElementById("olt" + i).value = s[1]; });
+  }
+  // Slot 1 always gets a line on a reroll; slots 2 and 3 only appear 50% / 30% of the time.
+  // So a good line sitting in slot 2 or 3 is the thing most worth locking.
+  const SP_ = D.ol.slot;
+  const res = OLS.slots.map(([k, t], i) => {
+    if (!k) return { i, empty: true };
+    const kind = P.core.includes(k) ? "core" : P.sub.includes(k) ? "sub" : "bad";
+    return { i, k, t, kind };
+  });
+  const filled = res.filter(r => !r.empty);
+  const cores = filled.filter(r => r.kind === "core");
+  const subs = filled.filter(r => r.kind === "sub");
+  const rare = r => r.i > 0; // slot 2 or 3
+  res.forEach(r => {
+    const el = document.getElementById("olr" + r.i);
+    if (r.empty) { el.innerHTML = `<span class="note">${r.i ? `빈 칸 · 돌리면 ${SP_[r.i] * 100}% 확률로 옵션이 생겨요` : "비어 있음"}</span>`; return; }
+    const L = OLK[r.k];
+    let badge = "no", label = "버리고 다시 돌리기";
+    if (!c) { label = "니케를 고르면 판정"; }
+    else if (r.kind === "core") { badge = "ok"; label = rare(r) ? `잠금 · ${r.i + 1}번 칸은 ${SP_[r.i] * 100}%로만 생겨요` : "잠금"; r.lock = true; }
+    else if (r.kind === "sub" && rare(r) && !cores.length) { badge = "part"; label = "잠가둘 만해요 · 칸 확보용"; r.lock = true; }
+    else if (r.kind === "sub") { badge = "part"; label = "있으면 좋음"; }
+    el.innerHTML = `<span class="badge ${badge}">${label}</span><span class="num">${esc(L.ko)} +${L.v[r.t - 1]}%</span>`;
+  });
+  const locks = res.filter(r => r.lock).map(r => `${r.i + 1}번`);
+  const v = document.getElementById("olVerdict");
+  let vv = "bad", big, why;
+  if (!c) { vv = ""; big = "니케를 먼저 고르세요"; why = "왼쪽에서 니케를 고르고 옵션을 넣으면 판정해 드려요."; }
+  else if (!filled.length) { vv = ""; big = "옵션을 넣어 주세요"; why = "장비에 뜬 옵션 1~3줄과 단계를 고르세요."; }
+  else if (!P.core.length && !P.sub.length) { vv = "good"; big = "그대로 써도 돼요"; why = `${c.ko}는 오버로드 옵션보다 전투력이 중요해요. 재료를 다른 니케에 쓰는 게 좋아요.`; }
+  else if (cores.length >= 2 && cores.length === filled.length && filled.length === 3) { vv = "good"; big = "완성이에요"; why = "세 줄 모두 핵심 옵션이에요. 더 돌리지 마세요."; }
+  else if (cores.length >= 2) { vv = "good"; big = "좋아요, 유지"; why = `${locks.join("·")} 줄을 잠그고 남은 칸만 더 돌려볼 수 있어요. 잠근 줄이 많을수록 비용이 더 드니 재료가 넉넉할 때만 하세요.`; }
+  else if (cores.length === 1 && rare(cores[0])) { vv = "ok"; big = `${cores[0].i + 1}번 줄 잠그고 돌리기`; why = `2·3번 칸에 핵심 옵션이 뜨는 건 드물어서 꼭 잡아두세요. 잠근 채로 계속 돌리면서 다른 칸에 핵심 옵션이 뜨면 그것도 잠그세요.`; }
+  else if (cores.length === 1) { vv = "ok"; big = "1번 줄 잠그고 돌리기"; why = "1번 칸의 핵심 옵션을 잠그고 돌리세요. 2·3번 칸에 핵심 옵션이 뜨면 그것도 잠그세요. 1번 단계가 낮으면 잠그지 않고 전부 돌려도 돼요."; }
+  else if (subs.some(rare)) { vv = "ok"; big = "칸 확보용으로 잠그기"; why = `핵심 옵션은 없지만 ${locks.join("·")} 칸에 있으면 좋은 옵션이 있어요. 칸을 잡아두려고 잠그고 돌리거나, 비용이 아까우면 전부 다시 돌리세요.`; }
+  else if (subs.length) { vv = "ok"; big = "전부 다시 돌리기 추천"; why = "1번 칸은 매번 새로 생기니, 있으면 좋은 옵션 1줄만으로는 잠글 이유가 적어요."; }
+  else { vv = "bad"; big = "전부 다시 돌리세요"; why = "이 니케에게 쓸모 있는 옵션이 없어요."; }
+  v.dataset.v = vv;
+  v.innerHTML = `<span class="lbl">판정</span><span class="big">${big}</span><span>${why}</span>`;
+  // odds
+  const W = D.ol.lines.reduce((a, l) => a + l.w, 0);
+  const pCore = P.core.reduce((a, k) => a + (OLK[k]?.w || 0), 0) / W;
+  const pAny = [...P.core, ...P.sub].reduce((a, k) => a + (OLK[k]?.w || 0), 0) / W;
+  const pct = x => (x * 100).toFixed(1) + "%";
+  document.getElementById("olOdds").innerHTML = `<h3>재설정 1번에 잠그지 않은 칸에서 나올 확률</h3>
+    <p class="note" style="margin:4px 0 10px">칸마다 옵션이 생길 확률은 1번 100%, 2번 50%, 3번 30%예요. 생기면 9가지 옵션 중 하나가 정해져요. 그래서 2·3번 칸에 좋은 옵션이 뜨면 잠가 두는 게 이득이에요.</p>
+    <div class="scroll"><table class="data"><thead><tr><th>칸</th><th>핵심 옵션</th><th>핵심 + 있으면 좋음</th><th>6단계 이상 핵심</th></tr></thead><tbody>
+    ${D.ol.slot.map((s, i) => { const hi = D.ol.tier.slice(5).reduce((a, b) => a + b, 0) / 100; return `<tr><td>${i + 1}번</td><td>${pct(s * pCore)}</td><td>${pct(s * pAny)}</td><td>${pct(s * pCore * hi)}</td></tr>`; }).join("")}
+    </tbody></table></div>`;
+}
+function buildOLTable() {
+  const cols = [1, 5, 6, 10, 11, 15];
+  document.getElementById("olTable").innerHTML = `<thead><tr><th>옵션</th>${cols.map(t => `<th>${t}단계</th>`).join("")}<th>나올 비중</th></tr></thead><tbody>${D.ol.lines.map(l => `<tr><td>${esc(l.ko)}</td>${cols.map(t => `<td>${l.v[t - 1]}%</td>`).join("")}<td>${l.w}%</td></tr>`).join("")}</tbody>`;
+  document.getElementById("olNames").innerHTML = C.map(c => `<option value="${esc(c.ko)}">${esc(c.en)}</option>`).join("");
+}
+
+// ---------- CUBE ----------
+const CUBE_BY = new Map(D.cubes.map(c => [c.ko, c]));
+const cubeEff = ko => CUBE_BY.get(ko)?.eff || "";
+function renderCube() {
+  const have = [...S.owned].map(get).filter(c => c && c.cu && c.cu.length);
+  const rankHost = document.getElementById("cubeRank");
+  const mineHost = document.getElementById("cubeMine");
+  if (!have.length) {
+    rankHost.innerHTML = mineHost.innerHTML = `<div class="empty">‘보유 니케’ 탭에서 가진 니케를 체크하면 큐브 추천이 나와요.</div>`;
+  } else {
+    const score = new Map(), users = new Map();
+    have.forEach(c => {
+      const w = 1 + tScore(c.rb) / 3;
+      c.cu.slice(0, 3).forEach((k, i) => {
+        score.set(k, (score.get(k) || 0) + w * [3, 1.5, 0.75][i]);
+        if (i === 0) { if (!users.has(k)) users.set(k, []); users.get(k).push(c); }
+      });
+    });
+    const ranked = [...score.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+    rankHost.innerHTML = `<div class="scroll"><table class="data"><thead><tr><th>순위</th><th style="text-align:left">큐브</th><th style="text-align:left">효과</th><th>1순위로 쓰는 내 니케</th></tr></thead><tbody>${ranked.map(([k], i) => {
+      const us = (users.get(k) || []).sort((a, b) => tScore(b.rb) - tScore(a.rb));
+      return `<tr><td>${i + 1}</td><td style="text-align:left"><b>${esc(k)}</b></td><td style="text-align:left">${esc(cubeEff(k))}</td><td style="text-align:left;white-space:normal">${us.length ? us.slice(0, 6).map(c => esc(c.ko)).join(", ") + (us.length > 6 ? ` 외 ${us.length - 6}명` : "") : "<span class='note'>2·3순위로만 추천</span>"}</td></tr>`;
+    }).join("")}</tbody></table></div>`;
+    const mode = document.getElementById("cubeSort").value;
+    const list = have.slice().sort((a, b) => mode === "cube" ? a.cu[0].localeCompare(b.cu[0], "ko") || tScore(b.rb) - tScore(a.rb) : tScore(b.rb) - tScore(a.rb) || a.ko.localeCompare(b.ko, "ko"));
+    mineHost.innerHTML = `<div class="scroll"><table class="data"><thead><tr><th>니케</th><th>보스전</th><th style="text-align:left">1순위</th><th style="text-align:left">2순위</th><th style="text-align:left">3순위</th></tr></thead><tbody>${list.map(c =>
+      `<tr><td><a href="#cube" data-open="${esc(c.s)}" style="color:inherit">${esc(c.ko)}</a></td><td><span class="tier" data-t="${esc(c.rb)}">${esc(c.rb || "-")}</span></td>${[0, 1, 2].map(i => `<td style="text-align:left">${c.cu[i] ? `${esc(c.cu[i])}<div class="note">${esc(cubeEff(c.cu[i]))}</div>` : "-"}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  }
+  document.getElementById("cubeTable").innerHTML = `<thead><tr><th>큐브</th><th style="text-align:left">주 효과</th><th style="text-align:left">영문 이름</th></tr></thead><tbody>${D.cubes.map(c => `<tr><td>${esc(c.ko)}</td><td style="text-align:left">${esc(c.eff)}</td><td style="text-align:left" class="note">${esc(c.en)}</td></tr>`).join("")}</tbody>`;
+}
+
+// ---------- RAID ----------
+// Core: hitting a core doubles normal-attack damage, so accurate weapons gain the most.
+// Without a core, that bonus is gone and each weapon's effective range on the boss matters.
+const CORE_KEY = "nikke-helper-core-v1";
+let CORE_MAP = {};
+try { CORE_MAP = JSON.parse(localStorage.getItem(CORE_KEY) || "{}") || {}; } catch (e) {}
+function setCore(id, v) { if (v === null) delete CORE_MAP[id]; else CORE_MAP[id] = v; try { localStorage.setItem(CORE_KEY, JSON.stringify(CORE_MAP)); } catch (e) {} }
+function seasonsOf(mode) { return D.raids[mode].seasons; }
+function curSeason(mode) { const ss = seasonsOf(mode); return ss.find(s => s.season === S.raid.season[mode]) || ss[0]; }
+function raidTarget() {
+  const R = S.raid;
+  if (R.mode === "custom") {
+    const el = R.custom.element;
+    return { el: WEAK[el], boss: { id: "custom", ko: R.custom.name || "직접 만든 보스", en: "", element: el, weak: WEAK[el], core: R.custom.core, custom: true } };
+  }
+  const bosses = curSeason(R.mode).bosses;
+  const b = bosses.find(x => x.id === R.boss) || bosses[0];
+  const core = b.id in CORE_MAP ? CORE_MAP[b.id] : b.core;
+  return { el: b.weak, boss: { ...b, core } };
+}
+const CORE_YES = { SR: 2.5, RL: 2, AR: 1.5, MG: 0.5, SMG: -0.5, SG: -1.5 };
+const CORE_NO = { SR: -1.5, RL: 0.5, AR: 0.5, MG: 0.5, SMG: 0.5, SG: 0.5 };
+function coreAdj(c, boss) {
+  if (!boss || c.c !== "Attacker") return 0;
+  // hidden core under armor: only Pierce units reach it
+  const pierce = boss.pierce && c.sp.includes("Pierce") ? 2 : 0;
+  if (boss.core == null) return pierce;
+  return pierce + coreBase(c, boss);
+}
+function coreBase(c, boss) {
+  if (boss.core) return CORE_YES[c.w] || 0;
+  const r = boss.range && boss.range[c.w];
+  if (r && r !== "-") return r === "없음" ? -2.5 : 1;
+  return CORE_NO[c.w] || 0;
+}
+function coreFit(members, boss) {
+  if (!boss || boss.core == null) return null;
+  const atk = members.map(get).filter(c => c && c.c === "Attacker" && bursts(c).includes("III"));
+  if (!atk.length) return null;
+  const avg = atk.reduce((a, c) => a + coreAdj(c, boss), 0) / atk.length;
+  return avg >= 1 ? "good" : avg <= -0.5 ? "bad" : "mid";
+}
+const FIT_LABEL = { good: ["ok", "코어 조건에 잘 맞아요"], mid: ["part", "코어 조건 보통"], bad: ["no", "코어 조건에 불리해요"] };
+function teamsFor(el, boss) {
+  const out = [];
+  if (boss && boss.teams && boss.teams.length) {
+    const src = S.raid.mode === "anomaly" ? `${boss.ko} 추천` : `솔로 ${curSeason("solo").season}시즌 추천`;
+    boss.teams.forEach(t => out.push({ name: t.name, m: t.m, sub: t.sub, src }));
+  }
+  (D.raids.union.teams[el] || []).forEach(t => out.push({ name: t[0], m: t[1], src: `유니온 ${EL[el]} 추천 (${D.raids.union.teamsFrom}시즌 기준)` }));
+  D.teams.forEach(t => {
+    const atk = t[2].map(get).filter(c => c && c.c === "Attacker" && bursts(c).includes("III"));
+    if (atk.length && atk.every(c => c.e === el)) out.push({ name: t[0], m: t[2], src: t[1] === "B" ? "보스전 덱" : "레이드 덱" });
+  });
+  const seen = new Set();
+  const fitRank = { good: 2, mid: 1, bad: 0 };
+  return out.filter(t => { const k = t.m.map(x => get(x)?.s || x).sort().join(","); if (seen.has(k)) return false; seen.add(k); return true; })
+    .map(t => { const real = t.m.filter(x => get(x)); const have = real.filter(x => S.owned.has(get(x).s)).length; return { ...t, have, need: real.length, fit: coreFit(t.m, boss) }; })
+    .sort((a, b) => (b.have / (b.need || 1)) - (a.have / (a.need || 1)) || (fitRank[b.fit] ?? 1) - (fitRank[a.fit] ?? 1) || b.have - a.have);
+}
+function autoBuild(el, n, wantHeal, boss) {
+  const pool = [...S.owned].map(get).filter(Boolean);
+  // an 애장품 unit replaces its base unit
+  const tre = new Set(pool.filter(c => c.tr).map(c => c.en.replace(/ \(Treasure\)/, "")));
+  const avail = pool.filter(c => !(!c.tr && tre.has(c.en)));
+  const used = new Set();
+  const score = c => {
+    let s = tScore(c.rb) * 1.6;
+    if (c.c === "Attacker") s += c.e === el ? 6 : -4;
+    else if (c.e === el) s += 1;
+    if (c.sp.includes("Burst CD Reduction")) s += 2;
+    if (c.sp.includes("Buffer")) s += 1.5;
+    s += Math.min(RAID_USE.get(c.s) || 0, 8) * 0.25;
+    s += coreAdj(c, boss);
+    return s;
+  };
+  const teams = [];
+  for (const t of teamsFor(el, boss)) {
+    if (teams.length >= n) break;
+    if (t.fit === "bad") continue;
+    const mem = t.m.map(get);
+    if (mem.length === 5 && mem.every(c => c && S.owned.has(c.s) && !used.has(c.s))) { mem.forEach(c => used.add(c.s)); teams.push({ m: mem, why: `추천 덱 그대로 (${t.src})`, guide: t.name }); }
+  }
+  const pick = (pred) => avail.filter(c => !used.has(c.s) && pred(c)).sort((a, b) => score(b) - score(a))[0];
+  while (teams.length < n) {
+    const m = [];
+    const take = c => { if (c) { used.add(c.s); m.push(c); } return c; };
+    take(pick(c => bursts(c).includes("III") && c.c === "Attacker"));
+    take(pick(c => bursts(c).includes("III") && c.c === "Attacker"));
+    take(pick(c => bursts(c).includes("I")));
+    take(pick(c => bursts(c).includes("II")));
+    if (wantHeal && !m.some(c => c.sp.some(x => ["Healer", "Shielder", "Cover Heal"].includes(x)))) take(pick(c => c.sp.some(x => ["Healer", "Shielder", "Cover Heal"].includes(x))));
+    while (m.length < 5) { if (!take(pick(() => true))) break; }
+    if (m.length < 3) { m.forEach(c => used.delete(c.s)); break; }
+    const order = c => (bursts(c).includes("I") && !bursts(c).includes("III") ? 0 : bursts(c).includes("II") ? 1 : 2);
+    m.sort((a, b) => order(a) - order(b));
+    const dps = m.filter(c => c.c === "Attacker" && c.e === el).length;
+    const lack = [];
+    if (!m.some(c => bursts(c).includes("I"))) lack.push("버스트 I");
+    if (!m.some(c => bursts(c).includes("II"))) lack.push("버스트 II");
+    if (m.filter(c => bursts(c).includes("III")).length < 2) lack.push("버스트 III 2명");
+    teams.push({ m, why: `${EL[el]} 딜러 ${dps}명` + (lack.length ? ` · 부족: ${lack.join(", ")}` : ""), warn: lack.length > 0 || dps === 0 });
+  }
+  return teams;
+}
+function coreSeg(boss) {
+  const v = boss.core;
+  const b = (val, label) => `<button data-core="${val}" aria-pressed="${v === val || (val === "null" && v == null)}">${label}</button>`;
+  return `<div class="seg" id="coreSeg">${b(true, "코어 있음")}${b(false, "코어 없음")}${b("null", "모름")}</div>`;
+}
+function coreText(boss) {
+  if (boss.core === true && boss.pierce) return "코어를 맞히면 평타 피해가 2배예요. 처음에는 코어가 장갑 아래 숨어 있어서 관통 니케가 유리하고, 정확한 무기(SR 저격·RL 런처·AR 돌격소총) 딜러도 우선 골라요.";
+  if (boss.core === true) return "코어를 맞히면 평타 피해가 2배예요. 정확한 무기(SR 저격·RL 런처·AR 돌격소총) 딜러를 우선 골라요. SG 샷건·SMG 기관단총은 코어를 잘 못 맞혀서 뒤로 밀려요.";
+  if (boss.core === false) return "코어가 없어서 2배 피해가 없어요. 코어에 크게 기대는 SR 저격은 뒤로 밀리고, 보스에서 적정 사거리가 나오는 무기를 우선 골라요." + (boss.range ? ` 이 보스의 적정 사거리: ${Object.entries(boss.range).filter(([, r]) => r !== "-").map(([k, r]) => `${k} ${esc(r)}`).join(" · ")}` : "");
+  return "코어 유무를 고르면 자동 편성과 추천 덱 순서에 반영돼요. 게임에서 보스를 보고 골라 주세요.";
+}
+// Other times the same boss showed up (solo and union), so past decks can be reused.
+const bossKey = s => String(s).replace(/\s+/g, "").replace(/^리빌드/, "리빌드");
+function appearances(boss) {
+  if (!boss || boss.custom) return "";
+  const k = bossKey(boss.ko), out = [];
+  for (const mode of ["solo", "union", "anomaly"]) for (const s of seasonsOf(mode)) for (const b of s.bosses) {
+    if (b.id === boss.id || bossKey(b.ko) !== k) continue;
+    out.push(mode === "anomaly" ? `이상개체 요격전(약점 ${EL[b.weak]})` : `${mode === "solo" ? "솔로" : "유니온"} ${s.season}시즌(약점 ${EL[b.weak]})`);
+  }
+  return out.length ? `<p style="margin:0" class="note">다른 시즌 등장: ${out.join(", ")}</p>` : "";
+}
+function renderRaid() {
+  const R = S.raid;
+  document.querySelectorAll("#raidMode button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === R.mode));
+  const host = document.getElementById("raidBosses");
+  if (R.mode === "custom") {
+    const c = R.custom;
+    host.innerHTML = `<div class="filters">
+      <div class="field"><label for="cbName">보스 이름 (선택)</label><input type="text" id="cbName" placeholder="예: 스톰 브링어" value="${esc(c.name)}"></div>
+      <div class="field"><span class="lbl">보스 속성</span><div class="seg" id="cbEl">${ELS.map(e => `<button data-v="${e}" aria-pressed="${c.element === e}">${EL[e]}</button>`).join("")}</div>
+        <span class="note">→ 약점: <b>${EL[WEAK[c.element]]}</b> 니케로 딜해요</span></div>
+    </div>`;
+  } else {
+    const ss = seasonsOf(R.mode), cur = curSeason(R.mode);
+    if (!cur.bosses.find(b => b.id === R.boss)) R.boss = cur.bosses[0].id;
+    host.innerHTML = `<div class="row" style="margin-bottom:8px"><div class="field"><label for="raidSeason">시즌</label>
+      <select id="raidSeason" style="width:auto;max-width:100%">${ss.map(s => `<option value="${s.season}" ${s.season === cur.season ? "selected" : ""}>${typeof s.season === "number" ? s.season + "시즌" : esc(s.season)} ·${esc(s.when)}${R.mode === "solo" ? ` · ${esc(s.bosses[0].ko)} (약점 ${EL[s.bosses[0].weak]})` : ""}${s.note ? ` (${esc(s.note)})` : ""}</option>`).join("")}</select></div>
+      <span class="note grow">${R.mode === "union" ? "보스 목록: 딜도로 기준. 위에서부터 최신 시즌이에요." : R.mode === "solo" ? "역대 보스: 나무위키 기준. 같은 보스가 다른 속성으로 다시 나오기도 해요. 위에서부터 최신 시즌이에요." : "이상개체 요격전(특특요) 보스 5마리. 하루 한 보스씩 돌아가요."}</span></div>
+      <div class="boss">${cur.bosses.map(b => { const core = b.id in CORE_MAP ? CORE_MAP[b.id] : b.core;
+        return `<button class="bossbtn" data-boss="${b.id}" aria-pressed="${R.boss === b.id}"><span class="bn">${esc(b.ko)}</span><span class="row" style="gap:4px"><span class="chip el" data-e="${b.element}">${EL[b.element]}</span><span class="note">약점</span><span class="chip el" data-e="${b.weak}">${EL[b.weak]}</span></span><span class="note">${core === true ? "코어 있음" : core === false ? "코어 없음" : "코어 모름"}${b.diff ? ` · ${esc(b.diff)}` : ""}</span></button>`; }).join("")}</div>`;
+  }
+  const { el, boss } = raidTarget();
+  document.getElementById("raidInfo").innerHTML = `<div class="panel" style="display:flex;flex-direction:column;gap:10px">
+      <div class="teamhead"><h3>${esc(boss.ko)} ${boss.en ? `<span class="en note">${esc(boss.en)}</span>` : ""}</h3><span class="row" style="gap:4px"><span class="note">보스 속성</span><span class="chip el" data-e="${boss.element}">${EL[boss.element]}</span><span class="note">→ 쓰면 좋은 속성</span><span class="chip el" data-e="${boss.weak}">${EL[boss.weak]}</span></span></div>
+      ${boss.pickup ? `<p style="margin:0" class="note">그 시즌 픽업 니케: ${esc(boss.pickup)}</p>` : ""}
+      ${appearances(boss)}
+      <div class="row">${coreSeg(boss)}</div>
+      <p style="margin:0" class="note">${coreText(boss)}</p>
+      ${boss.heal ? `<p style="margin:0"><b>힐 필요?</b> ${esc(boss.heal)}</p>` : ""}
+      ${boss.tips ? `<ul class="tips">${boss.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+    </div>`;
+  const n = +document.getElementById("autoN").value;
+  const out = document.getElementById("autoOut");
+  if (!S.owned.size) { out.innerHTML = `<div class="empty">‘보유 니케’ 탭에서 가진 니케를 체크하면 자동으로 덱을 짜드려요.</div>`; document.getElementById("autoNote").textContent = ""; }
+  else {
+    const ts = autoBuild(el, n, document.getElementById("autoHeal").checked, boss);
+    document.getElementById("autoNote").textContent = `${EL[el]} 딜러 위주${boss.core === true ? " · 코어 있음 반영" : boss.core === false ? " · 코어 없음 반영" : ""} · 덱끼리 니케가 겹치지 않아요`;
+    out.innerHTML = ts.length ? ts.map((t, i) => { const f = coreFit(t.m.map(c => c.s), boss);
+      return `<div class="teamcard"><div class="teamhead"><h3>${i + 1}덱${t.guide ? ` · ${esc(t.guide)}` : ""}</h3><span class="badge ${t.warn ? "part" : "ok"}">${esc(t.why)}</span>${f ? `<span class="badge ${FIT_LABEL[f][0]}">${FIT_LABEL[f][1]}</span>` : ""}</div><div class="team">${t.m.map(c => slot(c.s, "cube")).join("")}</div></div>`; }).join("")
+      : `<div class="empty">덱을 짤 만큼 니케가 없어요. 니케를 더 체크해 보세요.</div>`;
+  }
+  const ts = teamsFor(el, boss).slice(0, 14);
+  document.getElementById("raidTeams").innerHTML = ts.length ? ts.map(t => `<div class="panel teamcard"><div class="teamhead"><h3>${esc(t.name)}</h3><span class="note">${esc(t.src)}</span><span class="badge ${t.have === t.need ? "ok" : t.have ? "part" : "no"}">${t.have}/${t.need}명 보유</span>${t.fit ? `<span class="badge ${FIT_LABEL[t.fit][0]}">${FIT_LABEL[t.fit][1]}</span>` : ""}</div>
+    <div class="team">${t.m.map(x => slot(x)).join("")}</div>${t.sub ? `<p class="note" style="margin:0">대체: ${esc(t.sub)}</p>` : ""}</div>`).join("")
+    : `<div class="empty">이 속성으로 등록된 추천 덱이 없어요.</div>`;
+}
+document.addEventListener("click", e => {
+  const cs = e.target.closest("#coreSeg button");
+  if (cs) {
+    const v = cs.dataset.core === "true" ? true : cs.dataset.core === "false" ? false : null;
+    if (S.raid.mode === "custom") S.raid.custom.core = v; else setCore(raidTarget().boss.id, v);
+    renderRaid(); return;
+  }
+  const ce = e.target.closest("#cbEl button");
+  if (ce) { S.raid.custom.element = ce.dataset.v; renderRaid(); }
+});
+// Anomaly Interception is one attempt with one team; raids use five.
+document.addEventListener("click", e => {
+  const rm = e.target.closest("#raidMode button");
+  if (rm) document.getElementById("autoN").value = rm.dataset.v === "anomaly" ? "1" : "5";
+}, true);
+document.addEventListener("change", e => {
+  if (e.target.id === "raidSeason") { S.raid.season[S.raid.mode] = +e.target.value; S.raid.boss = null; renderRaid(); }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "cbName") { S.raid.custom.name = e.target.value; const h = document.querySelector("#raidInfo h3"); if (h) h.textContent = e.target.value || "직접 만든 보스"; }
+});
+
+// ---------- LEVEL ----------
+const fmtKo = n => {
+  if (!isFinite(n)) return "-";
+  const a = Math.abs(n), sign = n < 0 ? "-" : "";
+  if (a >= 1e8) { const eok = Math.floor(a / 1e8), man = Math.round((a % 1e8) / 1e4); return sign + eok.toLocaleString() + "억" + (man ? " " + man.toLocaleString() + "만" : ""); }
+  if (a >= 1e4) return sign + (a / 1e4).toLocaleString(undefined, { maximumFractionDigits: 1 }) + "만";
+  return sign + Math.round(a).toLocaleString();
+};
+function lvSum(from, to) { // cost to go from level `from` to `to`
+  let cr = 0, bd = 0, cd = 0;
+  for (let L = from; L < to && L <= D.lv.length; L++) { const r = D.lv[L - 1]; cr += r[0]; bd += r[1]; cd += r[2]; }
+  return [cr, bd, cd];
+}
+function renderLevel() {
+  let a = Math.max(1, Math.min(1400, Math.floor(+document.getElementById("lvFrom").value || 1)));
+  let b = Math.max(a + 1, Math.min(1401, Math.floor(+document.getElementById("lvTo").value || a + 1)));
+  const [cr, bd, cd] = lvSum(a, b);
+  const have = [+document.getElementById("hvCr").value || 0, +document.getElementById("hvBd").value || 0, +document.getElementById("hvCd").value || 0];
+  const any = have.some(x => x > 0);
+  const st = (k, v, h) => { const d = h - v; return `<div class="stat"><span class="k">${k}</span><span class="v">${fmtKo(v)}</span><span class="d num" style="color:var(--muted)">${Math.round(v).toLocaleString()}</span>${any ? `<span class="d ${d < 0 ? "short" : "enough"}">${d < 0 ? `${fmtKo(-d)} 모자라요` : `${fmtKo(d)} 남아요`}</span>` : ""}</div>`; };
+  // how far can I go with what I have
+  let reach = "";
+  if (any) { let L = a, acc = [0, 0, 0]; while (L <= 1400) { const r = D.lv[L - 1]; if (acc[0] + r[0] > have[0] || acc[1] + r[1] > have[1] || acc[2] + r[2] > have[2]) break; acc = [acc[0] + r[0], acc[1] + r[1], acc[2] + r[2]]; L++; } reach = `<div class="stat"><span class="k">가진 재료로 갈 수 있는 레벨</span><span class="v">${L}</span><span class="d" style="color:var(--muted)">지금보다 ${L - a}레벨 위</span></div>`; }
+  document.getElementById("lvOut").innerHTML = `<div class="stat"><span class="k">구간</span><span class="v">${a} → ${b}</span><span class="d" style="color:var(--muted)">${b - a}레벨</span></div>` + st("크레딧", cr, have[0]) + st("배틀 데이터", bd, have[1]) + st("코어 더스트", cd, have[2]) + reach;
+}
+function buildLevel() {
+  const q = document.getElementById("lvQuick");
+  const presets = [[1, "+1"], [10, "+10"], [50, "+50"], [100, "+100"]];
+  q.innerHTML = `<span class="lbl">목표 빠르게</span>` + presets.map(([d, l]) => `<button class="btn small" data-plus="${d}">${l}</button>`).join("");
+  q.addEventListener("click", e => { const b = e.target.closest("[data-plus]"); if (!b) return; const from = +document.getElementById("lvFrom").value || 1; document.getElementById("lvTo").value = Math.min(1401, from + +b.dataset.plus); renderLevel(); });
+  // bands table from the data
+  const rows = []; let start = 1;
+  for (let L = 2; L <= D.lv.length + 1; L++) {
+    const prev = D.lv[L - 2], cur = D.lv[L - 1];
+    if (!cur || L - 1 < 200 || cur[0] !== prev[0] || cur[1] !== prev[1] || cur[2] !== prev[2]) { if (L - 1 >= 200) rows.push([start, L - 1, prev]); start = L; }
+  }
+  const bandRows = rows.filter(r => r[0] >= 200);
+  document.getElementById("lvTable").innerHTML = `<thead><tr><th>레벨</th><th>크레딧</th><th>배틀 데이터</th><th>코어 더스트</th></tr></thead><tbody>${bandRows.map(([s, e, r]) => `<tr><td>${s} → ${e + 1}</td><td>${r[0].toLocaleString()}</td><td>${r[1].toLocaleString()}</td><td>${r[2].toLocaleString()}</td></tr>`).join("")}</tbody>`;
+}
+
+// ---------- routing + events ----------
+const VIEWS = ["dex", "owned", "ol", "cube", "raid", "level"];
+function route() {
+  const h = location.hash.slice(1);
+  S.view = VIEWS.includes(h) ? h : "dex";
+  VIEWS.forEach(v => document.getElementById("v-" + v).hidden = v !== S.view);
+  document.querySelectorAll("nav.tabs a").forEach(a => a.setAttribute("aria-current", a.dataset.v === S.view ? "page" : "false"));
+  renderAll();
+}
+function renderAll() {
+  if (S.view === "dex") renderDex();
+  if (S.view === "owned") renderOwned();
+  if (S.view === "ol") renderOL();
+  if (S.view === "cube") renderCube();
+  if (S.view === "raid") renderRaid();
+  if (S.view === "level") renderLevel();
+  const host = document.getElementById("drawerHost");
+  if (host.dataset.s) { const btn = host.querySelector(".drawer [data-own]"); const own = S.owned.has(host.dataset.s); if (btn) { btn.textContent = own ? "보유 해제" : "보유 니케로 표시"; btn.classList.toggle("primary", !own); } }
+}
+document.addEventListener("click", e => {
+  const own = e.target.closest("[data-own]");
+  if (own) { e.stopPropagation(); toggleOwn(own.dataset.own); return; }
+  if (e.target.closest("[data-close]")) { closeDrawer(); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { e.preventDefault(); openChar(op.dataset.open); return; }
+  const ov = e.target.closest("#oview button"); if (ov) { OWN.view = ov.dataset.v; renderOwned(); return; }
+  const orr = e.target.closest("#orar button"); if (orr) { OWN.rar.has(orr.dataset.v) ? OWN.rar.delete(orr.dataset.v) : OWN.rar.add(orr.dataset.v); renderOwned(); return; }
+  const rm = e.target.closest("#raidMode button"); if (rm) { S.raid.mode = rm.dataset.v; S.raid.boss = null; renderRaid(); return; }
+  const bb = e.target.closest("[data-boss]"); if (bb) { S.raid.boss = bb.dataset.boss; renderRaid(); return; }
+  const re = e.target.closest("#raidEl button"); if (re) { S.raid.el = re.dataset.v; renderRaid(); return; }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeDrawer();
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches("[data-open][role=button]")) { e.preventDefault(); openChar(e.target.dataset.open); }
+});
+document.getElementById("q").addEventListener("input", renderDex);
+document.getElementById("sort").addEventListener("change", renderDex);
+document.getElementById("oq").addEventListener("input", renderOwned);
+document.getElementById("olq").addEventListener("input", e => {
+  const v = e.target.value.trim(); const c = C.find(x => x.ko === v) || C.find(x => x.en.toLowerCase() === v.toLowerCase());
+  if (c && c !== OLS.char) { OLS.char = c; renderOL(); }
+});
+document.getElementById("olSlots").addEventListener("change", () => {
+  OLS.slots = OLS.slots.map((_, i) => [document.getElementById("ols" + i).value, +document.getElementById("olt" + i).value]);
+  renderOL();
+});
+document.getElementById("cubeSort").addEventListener("change", renderCube);
+["autoN", "autoHeal"].forEach(id => document.getElementById(id).addEventListener("change", renderRaid));
+["lvFrom", "lvTo", "hvCr", "hvBd", "hvCd"].forEach(id => document.getElementById(id).addEventListener("input", renderLevel));
+window.addEventListener("hashchange", route);
+
+// ---------- boot ----------
+document.getElementById("dataDate").textContent = `데이터 ${D.src.prydwen} 기준 · ${C.length}명`;
+document.getElementById("srcFoot").innerHTML = `캐릭터 평가·추천 옵션·추천 덱: <a href="https://www.prydwen.gg/nikke" target="_blank" rel="noopener">Prydwen</a> (${esc(D.src.prydwen)} 갱신분). 한국어 이름·레벨 비용: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a>. 오버로드 수치: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a>. 유니온 레이드 보스 목록: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지). 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌, 솔로 추천 덱은 솔로 ${D.raids.solo.seasons[1].season}시즌 기준이에요. 역대 솔로 레이드 보스: 나무위키. 게임 저작권은 SHIFT UP에 있어요. 개인용 팬 페이지예요. 항상 최신 버전: <a href="${SITE}" target="_blank" rel="noopener">${SITE}</a>`;
+buildFilters(); buildOLTable(); buildLevel(); setupImport();
+OLS.char = get("scarlet") || C[0];
+document.getElementById("olq").value = OLS.char.ko;
+OLS.slots = [["ammo", 7], ["def", 3], ["", 1]];
+route();
+initStore();
+checkUpdate();
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkUpdate(); });
+
+// ---------- update notice ----------
+// The web copy (SITE) is always the newest. Opened from there, a reload is enough;
+// an older copy saved on disk links to the web address instead.
+let updShown = false;
+async function checkUpdate() {
+  if (window.claude || updShown) return;
+  try {
+    const r = await fetch(SITE + "version.json?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) return;
+    const j = await r.json();
+    if (!j.v || j.v === APP_V) return;
+    updShown = true;
+    const onSite = location.href.startsWith(SITE);
+    const note = j.note ? ` (${esc(j.note)})` : "";
+    document.getElementById("updText").innerHTML = onSite
+      ? `<b>새 버전이 나왔어요</b>${note}. 새로고침하면 바로 적용돼요.`
+      : `<b>새 버전이 나왔어요</b>${note}. 웹 주소로 열면 앞으로 항상 최신이에요. 보유 목록은 거기서 한 번만 다시 가져오면 돼요.`;
+    document.getElementById("updAct").innerHTML = onSite
+      ? `<button class="btn primary" type="button" id="updGo">새로고침</button>`
+      : `<a class="btn primary" href="${SITE}" target="_blank" rel="noopener">웹에서 열기</a>`;
+    const go = document.getElementById("updGo"); if (go) go.addEventListener("click", () => location.reload());
+    document.getElementById("upd").hidden = false;
+  } catch (e) { /* offline or blocked: keep using this copy */ }
+}
+</script>

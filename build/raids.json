@@ -1,0 +1,108 @@
+{
+  "solo": {
+    "season": 42,
+    "updated": "2026-10-18",
+    "bosses": [
+      {
+        "id": "altruia",
+        "ko": "알트루이아",
+        "en": "Altruia",
+        "element": "Water",
+        "weak": "Electric",
+        "core": false,
+        "range": {"AR": "항상 적정 사거리", "SMG": "방패·본체", "MG": "후광·등 깃발", "SR": "없음", "SG": "없음", "RL": "-"},
+        "tips": [
+          "코어가 없어요. 무기별 적정 사거리를 보고 딜러를 고르세요.",
+          "부술 수 있는 지형이 있어요. RL로 쏘면 버스트 게이지가 더 빨리 차요.",
+          "전체 화면 QTE는 RL로 가운데 원을 맞추면 한 번에 깨져요.",
+          "두 번째로 나오는 방패 2개(참회)는 받는 피해를 60% 줄여요. 이때 강한 공격이 겹치지 않게 버스트 순서를 조절하세요.",
+          "보스의 레이저는 대부분 공격력이 가장 높은 니케를 노려요.",
+          "마지막 1분쯤 전체 공격이 5번 와요. 체력과 엄폐물을 남겨두세요."
+        ],
+        "teams": [
+          {"name": "신데렐라 몰아주기", "m": ["isabel", "arcana", "anis-star", "flora-treasure", "cinderella"], "sub": "플로라(애장품) → 크라운"},
+          {"name": "로잔나(애장품) 전기 덱", "m": ["rosanna-treasure", "crown", "sparkling-summer-anis", "maiden-ice-rose", "siren"], "sub": "메이든: 아이스 로즈 → 프리바티(애장품), 크라운 → 마리 또는 에이드: 에이전트 버니"},
+          {"name": "네온 메이드 덱", "m": ["liter", "mast-romantic-maid", "neon-vision-eye", "liberalio", "anchor-innocent-maid"], "sub": "리타 → 세이렌 또는 모란(애장품). 레드 후드를 B1로 쓰지 마세요."},
+          {"name": "모란(애장품) 범용 덱", "m": ["moran-treasure", "nayuta", "snow-white-heavy-arms", "cinderella-crystal-wave", "privaty-treasure"], "sub": "나유타·프리바티(애장품) → 민트·프리카"},
+          {"name": "미란다(애장품) 확정 치명타 덱", "m": ["miranda-treasure", "takina-inoue", "ein", "rouge", "ada-wong"], "sub": "타키나 → 나유타 또는 에이드: 에이전트 버니, 아인 → 미하라: 본딩 체인, 루주 → 솔린: 프로스트 티켓"},
+          {"name": "아이돌 확정 치명타 덱", "m": ["rapi-red-hood", "mint", "ein", "ada-wong", "prika"], "sub": "레드 후드 → 아무 B1 쿨감"},
+          {"name": "아니스: 스타 몰아주기", "m": ["crown", "sparkling-summer-anis", "anis-star", "privaty-treasure", "maiden-ice-rose"], "sub": "크라운 → 나유타·에이드: 에이전트 버니·마리, 프리바티(애장품) → 헬름(애장품)"}
+        ]
+      }
+    ]
+  },
+  "union": {
+    "season": 44,
+    "updated": "2026-09-25",
+    "bosses": [
+      {"id": "laitance", "ko": "레이턴스", "en": "Laitance", "element": "Electric", "weak": "Iron", "heal": "엄폐로 줄일 수 있음. 싱크로가 낮으면 힐러 필요", "diff": "낮은 싱크로는 보통, 높으면 쉬움"},
+      {"id": "tombstone", "ko": "툼스톤", "en": "Tombstone", "element": "Fire", "weak": "Water", "heal": "필요 없음", "diff": "쉬움"},
+      {"id": "modernia", "ko": "모더니아", "en": "Modernia", "element": "Wind", "weak": "Fire", "heal": "방패만 깨면 크게 필요 없음", "diff": "낮은 싱크로는 보통"},
+      {"id": "rebuild-stout", "ko": "리빌드 스타우트", "en": "Rebuild Stout", "element": "Water", "weak": "Electric", "heal": "싱크로가 높지 않으면 필요(나유타 추천)", "diff": "매우 쉬움"},
+      {"id": "annihilio", "ko": "어나일리오", "en": "Annihilio", "element": "Iron", "weak": "Wind", "heal": "싱크로가 높지 않으면 필요(나유타 추천)", "diff": "보통"}
+    ],
+    "teams": {
+      "Iron": [
+        ["철 메인", ["siren", "crown", "cinderella-crystal-wave", "rapi-red-hood", "privaty-treasure"]],
+        ["철 서브 (크라운 아끼기)", ["liter", "ade-agent-bunny", "cinderella-crystal-wave", "rapi-red-hood", "centi-treasure"]],
+        ["철 2번째 덱 A", ["siren", "crown", "cinderella-crystal-wave", "eve", "mast-romantic-maid"]],
+        ["철 2번째 덱 B", ["anis-star", "prika", "rapi-red-hood", "privaty-treasure", "mint"]],
+        ["철 3번째 덱", ["miranda-treasure", "ade-agent-bunny", "marciana-marine-study", "raven", "soline-frost-ticket"]]
+      ],
+      "Water": [
+        ["수냉 메인", ["moran-treasure", "crown", "snow-white-heavy-arms", "privaty-treasure", "elegg-boom-and-shock"]],
+        ["헤비암즈 3덱용", ["anis-star", "mint", "snow-white-heavy-arms", "ludmilla-winter-owner", "prika"]],
+        ["샷건 덱", ["tove-treasure", "arcana-fortune-mate", "dorothy-serendipity", "sugar-treasure", "soline-frost-ticket"]],
+        ["헬름(애장품) 덱", ["siren", "crown", "helm-treasure", "privaty-treasure", "elegg-boom-and-shock"]]
+      ],
+      "Fire": [
+        ["레드 후드 메인", ["anis-star", "brid-silent-track", "rapi-red-hood", "diesel-winter-sweets", "mihara-bonding-chain"]],
+        ["공격력 버프 덱", ["anis-star", "brid-silent-track", "mihara-bonding-chain", "diesel-winter-sweets", "mast-romantic-maid"]],
+        ["레드 후드 없는 메인", ["anis-star", "brid-silent-track", "helm-treasure", "diesel-winter-sweets", "mihara-bonding-chain"]],
+        ["화염 2덱 A", ["anis-star", "crown", "rapi-red-hood", "rei-ayanami", "privaty-treasure"]],
+        ["화염 2덱 B", ["siren", "brid-silent-track", "helm-treasure", "diesel-winter-sweets", "mihara-bonding-chain"]],
+        ["퀸·유키코 덱", ["siren", "crown", "queen-makoto", "yukiko", "privaty-treasure"]],
+        ["화염 3덱", ["moran-treasure", "prika", "snow-white-heavy-arms", "rapi-red-hood", "mint"]]
+      ],
+      "Electric": [
+        ["가장 흔한 전기 덱", ["anis-star", "crown", "cinderella", "neon-vision-eye", "mast-romantic-maid"]],
+        ["이사벨·아르카나 덱", ["anis-star", "isabel", "arcana", "flora-treasure", "cinderella"]],
+        ["신데렐라·네온 중 하나만 있을 때", ["anis-star", "crown", "neon-vision-eye", "sparkling-summer-anis", "maiden-ice-rose"]],
+        ["아이돌 전기 덱", ["anis-star", "prika", "cinderella", "neon-vision-eye", "mint"]],
+        ["아니스: 스타 아끼기", ["moran-treasure", "ade-agent-bunny", "cinderella", "sparkling-summer-anis", "maiden-ice-rose"]],
+        ["2덱 A", ["moran-treasure", "crown", "neon-vision-eye", "sparkling-summer-anis", "maiden-ice-rose"]],
+        ["2덱 B", ["rosanna-treasure", "crown", "sparkling-summer-anis", "maiden-ice-rose", "siren"]],
+        ["3덱 A", ["takina-inoue", "ein", "ada-wong", "miranda-treasure", "siren"]],
+        ["3덱 B", ["moran-treasure", "prika", "liberalio", "neon-vision-eye", "mint"]]
+      ],
+      "Wind": [
+        ["풍압 메인", ["siren", "nayuta", "scarlet-black-shadow", "liberalio", "velvet"]],
+        ["풍압 2덱 A", ["anis-star", "nayuta", "scarlet-black-shadow", "liberalio", "mast-romantic-maid"]],
+        ["풍압 2덱 B", ["siren", "crown", "asuka-shikinami-langley-wille", "rei-ayanami-tentative-name", "velvet"]],
+        ["풍압 3덱 A", ["anis-star", "mast-romantic-maid", "scarlet-black-shadow", "liberalio", "anchor-innocent-maid"]],
+        ["풍압 3덱 B", ["siren", "crown", "asuka-shikinami-langley-wille", "rei-ayanami-tentative-name", "privaty-treasure"]],
+        ["풍압 3덱 C", ["rapi-red-hood", "nayuta", "ark-ranger-black", "snow-white-heavy-arms", "velvet"]],
+        ["마티스 덱", ["drake-great-villain", "rouge", "laplace-ultimate-hero", "maxwell-ordinary-mechanic", "velvet"]]
+      ]
+    }
+  },
+  "levels": {
+    "note": "1~200은 레벨마다, 201 이후는 구간 안 레벨 1개당 비용",
+    "perLevel": "FROM_PAGE",
+    "bands": [
+      [201, 250, 1694200, 20944600, 10000],
+      [251, 300, 3134000, 39883600, 10000],
+      [301, 350, 3809800, 50478800, 10000],
+      [351, 400, 4762250, 56536256, 11000],
+      [401, 450, 5952813, 61624519, 12000],
+      [451, 500, 7441016, 67170726, 13000],
+      [501, 550, 8185117, 72544384, 14000],
+      [551, 600, 9003629, 78347935, 15000],
+      [601, 650, 9453810, 83832290, 16000],
+      [651, 700, 9926501, 89700550, 17000],
+      [701, 750, 10422826, 95082583, 18000],
+      [751, 800, 10943967, 100787538, 19000],
+      [801, 9999, 11491166, 105826915, 20000]
+    ]
+  }
+}

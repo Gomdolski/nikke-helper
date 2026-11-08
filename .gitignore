@@ -1,0 +1,6 @@
+out/
+build/data.json
+node_modules/
+*.log
+owned_doc*.json
+shiftypad_*.json

@@ -1,0 +1,42 @@
+{
+  "source": "Prydwen Anomaly Interception guides (2026-09)",
+  "bosses": [
+    { "id": "ai-kraken", "ko": "크라켄", "en": "Kraken", "element": "Iron", "weak": "Wind", "core": true, "pierce": true,
+      "tips": ["커스텀 모듈이 추가로 나와서 가장 많이 도는 보스예요.", "1페이즈에는 앞쪽 큰 촉수 안에 코어가 있어요. 장갑 아래 숨은 코어는 관통 니케만 맞힐 수 있어요.", "2페이즈에는 앞쪽 촉수를 늦게 부수는 게 좋아요."],
+      "teams": [
+        ["다들 딜러인 덱", ["nayuta", "anis-star", "scarlet-black-shadow", "liberalio", "mast-romantic-maid"]],
+        ["아스카 : WILLE 덱", ["crown", "anis-star", "liberalio", "asuka-shikinami-langley-wille", "mast-romantic-maid"]],
+        ["메이드 해적 덱", ["mast-romantic-maid", "anchor-innocent-maid", "anis-star", "scarlet-black-shadow", "liberalio"]]
+      ] },
+    { "id": "ai-harvester", "ko": "하베스터", "en": "Harvester", "element": "Fire", "weak": "Water", "core": true,
+      "tips": ["머리를 부수면 보스가 기절하고(QTE 전에 부술 때) 그 뒤로 코어가 계속 열려요.", "코어가 피해를 크게 올리니 죽지 않는 선에서 머리부터 빨리 부수세요."],
+      "teams": [
+        ["헤비암즈 덱", ["crown", "anis-star", "snow-white-heavy-arms", "helm-treasure", "mast-romantic-maid"]],
+        ["브래디 덱", ["crown", "anis-star", "bready", "liberalio", "mast-romantic-maid"]]
+      ] },
+    { "id": "ai-mirror", "ko": "미러 컨테이너", "en": "Mirror Container", "element": "Water", "weak": "Electric", "core": true,
+      "tips": ["코어가 항상 열려 있어서 코어만 잘 맞혀도 피해가 크게 늘어요."],
+      "teams": [
+        ["네온·스파클링 덱", ["crown", "anis-star", "neon-vision-eye", "sparkling-summer-anis", "maiden-ice-rose"]],
+        ["네온·신데렐라 덱", ["crown", "anis-star", "neon-vision-eye", "cinderella", "mast-romantic-maid"]],
+        ["아인·에이다 덱", ["ein", "flora-treasure", "anis-star", "crown", "ada-wong"]],
+        ["이사벨·아르카나 덱", ["isabel", "arcana", "anis-star", "crown", "cinderella"]],
+        ["로산나(애장품) 덱", ["rosanna-treasure", "crown", "neon-vision-eye", "moran-treasure", "cinderella"]]
+      ] },
+    { "id": "ai-ultra", "ko": "울트라", "en": "Ultra", "element": "Electric", "weak": "Iron", "core": true, "pierce": true,
+      "tips": ["1페이즈에는 코어가 숨어 있어서 관통 니케가 유리해요.", "2페이즈에는 코어가 열려서 기관총도 잘 맞아요."],
+      "teams": [
+        ["레드 후드 덱", ["crown", "anis-star", "red-hood", "cinderella-crystal-wave", "mast-romantic-maid"]],
+        ["헬름(애장품) 덱", ["crown", "anis-star", "cinderella-crystal-wave", "helm-treasure", "mast-romantic-maid"]],
+        ["츠바이(애장품) 덱", ["crown", "zwei-treasure", "snow-white", "maxwell", "aqua-marine-helm"]]
+      ] },
+    { "id": "ai-indivilia", "ko": "인디빌리아", "en": "Indivilia", "element": "Wind", "weak": "Fire", "core": true,
+      "tips": ["코어가 열려 있는 시간이 길어서 코어를 잘 맞히는 작열 딜러가 좋아요."],
+      "teams": [
+        ["레드 후드·유키코 덱", ["rapi-red-hood", "crown", "anis-star", "mast-romantic-maid", "yukiko"]],
+        ["레드 후드·헬름 덱", ["crown", "anis-star", "rapi-red-hood", "mast-romantic-maid", "helm-treasure"]],
+        ["헬름·유키코 덱", ["crown", "rapi-red-hood", "helm-treasure", "yukiko", "mast-romantic-maid"]],
+        ["미하라 덱", ["mast-romantic-maid", "anis-star", "rapi-red-hood", "mihara-bonding-chain", "anchor-innocent-maid"]]
+      ] }
+  ]
+}
