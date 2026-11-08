@@ -485,8 +485,9 @@ h1, h2, h3, .big { text-wrap: balance; }
         <div class="field"><label for="lvTo">목표 레벨</label><input type="number" id="lvTo" min="2" max="1401" value="600"></div>
       </div>
       <div class="row" id="lvQuick"></div>
-      <details>
+      <details id="lvHave">
         <summary style="cursor:pointer;color:var(--muted);font-size:13px">가진 재료 넣기 (선택)</summary>
+        <p class="note" id="lvHaveNote" style="margin:8px 0 0"></p>
         <div class="filters" style="margin-top:10px">
           <div class="field"><label for="hvCr">크레딧</label><input type="number" id="hvCr" min="0" placeholder="예: 350000000"></div>
           <div class="field"><label for="hvBd">배틀 데이터</label><input type="number" id="hvBd" min="0" placeholder="예: 2000000000"></div>
@@ -1117,7 +1118,11 @@ async function importFromLink(opts = {}) {
     // profile (campaign progress, squad power) + per-nikke combat for the campaign tab
     try {
       const pr = await fetch(`${NAPI}/api/user/${encodeURIComponent(id)}`).then(x => x.ok ? x.json() : null);
-      if (pr && pr.profile) { PROFILE = { campaign: pr.profile.campaign, teamCombat: pr.profile.teamCombat, towers: pr.profile.towers, costumeCount: pr.profile.costumeCount, at: today }; localStorage.setItem(PROFILE_KEY, JSON.stringify(PROFILE)); }
+      if (pr && pr.profile) {
+        // currency type codes: 1000 credits, 2000 battle data (character EXP), 3000 core dust — matched against the level cost table
+        const cur = {}; (pr.profile.currencies || []).forEach(x => { cur[x.type] = +x.value || 0; });
+        PROFILE = { campaign: pr.profile.campaign, teamCombat: pr.profile.teamCombat, towers: pr.profile.towers, costumeCount: pr.profile.costumeCount, at: today,
+          cur: { cr: cur[1000], bd: cur[2000], cd: cur[3000] }, synchro: pr.outpost && pr.outpost.synchroLevel, curAt: Date.now() }; localStorage.setItem(PROFILE_KEY, JSON.stringify(PROFILE)); }
     } catch (e) {}
     COMBAT = {};
     for (const n of j.nikkes) { const sl = slugFromApi(n.character || {}); if (sl && n.combat) COMBAT[sl] = n.combat; }
@@ -1714,7 +1719,23 @@ function lvSum(from, to) { // cost to go from level `from` to `to`
   for (let L = from; L < to && L <= D.lv.length; L++) { const r = D.lv[L - 1]; cr += r[0]; bd += r[1]; cd += r[2]; }
   return [cr, bd, cd];
 }
+// fill from the imported profile once per import (manual edits stay until the next import)
+let LV_FILLED = 0;
+function fillLevelFromProfile() {
+  const P = PROFILE; if (!P || !P.cur || !P.curAt || LV_FILLED === P.curAt) return;
+  LV_FILLED = P.curAt;
+  const set = (id, v) => { if (v != null) document.getElementById(id).value = v; };
+  set("hvCr", P.cur.cr); set("hvBd", P.cur.bd); set("hvCd", P.cur.cd);
+  if (P.synchro) {
+    document.getElementById("lvFrom").value = P.synchro;
+    const to = +document.getElementById("lvTo").value || 0;
+    if (to <= P.synchro) document.getElementById("lvTo").value = Math.min(1401, P.synchro + 40);
+  }
+  document.getElementById("lvHave").open = true;
+  document.getElementById("lvHaveNote").textContent = `블라블라링크에서 가져온 값이에요 (${new Date(P.curAt).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" })} 기준). 지금 레벨은 싱크로 레벨이에요. 보관함에 있는 배틀 데이터 세트·코어 더스트 상자는 빠져 있을 수 있어서, 열지 않은 상자가 있으면 직접 더해 주세요.`;
+}
 function renderLevel() {
+  fillLevelFromProfile();
   let a = Math.max(1, Math.min(1400, Math.floor(+document.getElementById("lvFrom").value || 1)));
   let b = Math.max(a + 1, Math.min(1401, Math.floor(+document.getElementById("lvTo").value || a + 1)));
   const [cr, bd, cd] = lvSum(a, b);
