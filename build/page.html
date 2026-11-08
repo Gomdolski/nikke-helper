@@ -341,7 +341,7 @@ h1, h2, h3, .big { text-wrap: balance; }
     <div class="panel" style="display:flex;flex-direction:column;gap:12px">
       <div class="row" style="align-items:flex-end;gap:12px">
         <div class="field grow"><label for="olq">니케</label><input type="search" id="olq" list="olNames" placeholder="이름을 입력하고 목록에서 고르세요"><datalist id="olNames"></datalist></div>
-        <div class="field grow" id="gearPick" hidden><label for="gearSel">장비를 가져온 니케 (강한 순)</label><select id="gearSel"></select></div>
+        <div class="field grow" id="gearPick" hidden><label for="gearSel" id="gearPickLbl">내 니케</label><select id="gearSel"></select></div>
       </div>
       <div id="olWant"></div>
       <div id="gearMsg" role="status"></div>
@@ -962,18 +962,27 @@ function renderOL() {
   const P = olPrefs(c);
   const tag = (k, cls) => olTag([k], cls);
   document.getElementById("olWant").innerHTML = c
-    ? `<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 무기·클래스 기준)" : ""}</div>
+    ? `${COMBAT[c.s] ? `<p style="margin:0 0 8px"><b>${esc(c.ko)}</b> · 내 전투력 <b>${fmt(COMBAT[c.s])}</b></p>` : ""}<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 무기·클래스 기준)" : ""}</div>
        <div class="ol-list">${P.core.map(k => tag(k, "core")).join("")}${P.sub.map(k => tag(k, "sub")).join("")}${!P.core.length && !P.sub.length ? `<span class="note">옵션작보다 장비 강화가 먼저예요. 아무 옵션이나 괜찮아요.</span>` : ""}</div>
        ${noAmmo(c) && !c.oln ? `<p class="note" style="margin:6px 0 0">${esc(c.ko)}는 최대 장탄이 오히려 손해예요(마지막 탄·장탄 기믹).</p>` : ""}
        ${olnBox(c)}
        ${c.c !== "Attacker" && P.core.length ? `<p class="note" style="margin:6px 0 0">지원형·방어형은 옵션작보다 장비 강화 레벨이 더 중요해요.</p>` : ""}`
     : `<div class="note">니케를 고르면 노려야 할 옵션이 나와요.</div>`;
-  // picker of nikkes with saved gear
-  const keys = Object.keys(GEAR).filter(x => get(x)).sort((a, b) => tScore(get(b).rb) - tScore(get(a).rb) || get(a).ko.localeCompare(get(b).ko, "ko"));
+  // picker: every owned nikke (base units; 애장품 gear lives on the base), strongest first by my combat power
+  const mine = new Set([...S.owned].map(get).filter(Boolean).map(x => x.tr ? (C.find(b => !b.tr && b.en === x.en.replace(/ \(Treasure\)$/, "")) || x).s : x.s));
+  Object.keys(GEAR).forEach(x => { if (get(x)) mine.add(x); });
+  const keys = [...mine].sort((a, b) => (COMBAT[b] || 0) - (COMBAT[a] || 0) || tScore(get(b).rb) - tScore(get(a).rb) || get(a).ko.localeCompare(get(b).ko, "ko"));
   document.getElementById("gearPick").hidden = !keys.length;
+  document.getElementById("gearPickLbl").textContent = Object.keys(COMBAT).length ? `내 니케 ${keys.length}명 (전투력 높은 순)` : `내 니케 ${keys.length}명`;
   const sel = document.getElementById("gearSel");
-  sel.innerHTML = `<option value="">골라 주세요</option>` + keys.map(x => { const ps = GEAR[x].p.filter(p => p.some(y => y[0])); const n = ps.filter(p => olJudge(get(x), p).done).length; return `<option value="${esc(x)}">${esc(get(x).ko)} · 완성 ${n}/${ps.length}</option>`; }).join("");
-  sel.value = c && GEAR[c.s] ? c.s : "";
+  sel.innerHTML = `<option value="">골라 주세요</option>` + keys.map(x => {
+    const g = GEAR[x], ps = g ? g.p.filter(p => p.some(y => y[0])) : [];
+    const cx = get(x), P = olPrefs(cx);
+    const noNeed = (!P.core.length && !P.sub.length) || (cx.c !== "Attacker" && cx.oln && /불필요|무의미/.test(cx.oln.key));
+    const st = noNeed ? "옵작 불필요" : ps.length ? `완성 ${ps.filter(p => olJudge(cx, p).done).length}/${ps.length}` : "오버로드 전";
+    return `<option value="${esc(x)}">${esc(get(x).ko)}${COMBAT[x] ? ` · ${fmt(COMBAT[x])}` : ""} · ${st}</option>`;
+  }).join("");
+  sel.value = c && mine.has(c.s) ? c.s : "";
   // 4 pieces
   const optHtml = `<option value="">옵션 없음</option>` + D.ol.lines.map(l => `<option value="${l.k}">${esc(l.ko.replace(/ 증가$/, ""))}</option>`).join("");
   const tierHtml = Array.from({ length: 15 }, (_, i) => `<option value="${i + 1}">${i + 1}단계</option>`).join("");
@@ -1797,7 +1806,7 @@ document.getElementById("srcFoot").innerHTML = `<div class="srclist"><b>출처</
 </ul></div>
 <p>게임 저작권은 SHIFT UP에 있어요. SHIFT UP·Level Infinite와 관계없는 비공식 비영리 팬 페이지예요. 평가와 추천은 각 출처의 의견을 요약한 거예요. 항상 최신 버전: <a href="${SITE}" target="_blank" rel="noopener">${SITE}</a></p>`;
 buildFilters(); buildOLTable(); buildLevel(); setupImport(); buildCubeLv(); renderWeekly();
-OLS.char = Object.keys(GEAR).map(get).filter(Boolean).sort((a, b) => tScore(b.rb) - tScore(a.rb))[0] || get("scarlet") || C[0];
+OLS.char = Object.keys(GEAR).map(get).filter(Boolean).sort((a, b) => (COMBAT[b.s] || 0) - (COMBAT[a.s] || 0) || tScore(b.rb) - tScore(a.rb))[0] || get("scarlet") || C[0];
 document.getElementById("olq").value = OLS.char.ko;
 route();
 initStore();
