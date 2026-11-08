@@ -172,6 +172,18 @@ footer.src a { color: inherit; }
 .upd { background: var(--accent-soft); color: var(--ink); border-bottom: 1px solid var(--accent); }
 .upd .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 10px; padding-bottom: 10px; }
 .upd p { margin: 0; flex: 1; min-width: 200px; }
+.tierlist { width: 100%; border-collapse: collapse; min-width: 640px; }
+.tierlist th, .tierlist td { border-bottom: 1px solid var(--line); padding: 8px; vertical-align: top; text-align: left; }
+.tierlist thead th { font-size: 13px; color: var(--muted); font-weight: 600; background: var(--sunk); }
+.tierlist tbody th { width: 3.5em; text-align: center; vertical-align: middle; }
+.tierlist td { width: 31%; }
+.tl { display: flex; flex-wrap: wrap; gap: 4px; }
+.tn { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 12.5px; cursor: pointer; color: var(--ink); }
+.tn:hover { border-color: var(--accent); }
+.tn .d { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.tn .d[data-e="Fire"] { background: var(--fire); } .tn .d[data-e="Water"] { background: var(--water); } .tn .d[data-e="Wind"] { background: var(--wind); } .tn .d[data-e="Electric"] { background: var(--elec); } .tn .d[data-e="Iron"] { background: var(--iron); }
+.tn.have { border-color: var(--good); background: var(--good-soft); }
+.tn .k { color: var(--muted); font-size: 11px; }
 </style>
 
 <div class="upd" id="upd" hidden><div class="wrap"><p id="updText"></p><span id="updAct"></span></div></div>
@@ -184,6 +196,7 @@ footer.src a { color: inherit; }
       <a href="#owned" data-v="owned">보유 니케</a>
       <a href="#ol" data-v="ol">오버로드 판정</a>
       <a href="#cube" data-v="cube">하모니 큐브</a>
+      <a href="#tier" data-v="tier">티어표</a>
       <a href="#raid" data-v="raid">레이드 덱</a>
       <a href="#level" data-v="level">레벨 계산기</a>
     </nav>
@@ -221,7 +234,7 @@ footer.src a { color: inherit; }
       </div>
       <div id="impStatus" role="status"></div>
       <details id="impManual">
-        <summary style="cursor:pointer;color:var(--muted);font-size:13px">크롬·엣지에서 북마크로 가져오기 (Claude 없이)</summary>
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px">크롬·엣지에서 북마크로 가져오기</summary>
         <div class="steps">
           <div class="step once"><span class="no">처음<br>한 번</span><div class="body">
             <b>북마크 만들기</b>
@@ -293,6 +306,11 @@ footer.src a { color: inherit; }
       <h2>하모니 큐브</h2>
       <p class="lead">가진 니케 기준으로 어떤 큐브를 먼저 올리면 좋은지, 니케마다 어떤 큐브를 끼우면 좋은지 알려줘요. 모든 큐브는 레벨 5부터 우월코드 대미지 증가 효과가 같이 붙어요.</p>
     </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+      <h3>니케별 큐브 찾기</h3>
+      <div class="field"><label for="cubeQ">니케</label><input type="search" id="cubeQ" list="olNames" placeholder="이름을 입력하고 목록에서 고르세요"></div>
+      <div id="cubePick"></div>
+    </div>
     <div class="panel">
       <h3>먼저 키울 큐브</h3>
       <p class="note" style="margin:4px 0 12px">가진 니케들이 1순위로 추천받는 큐브일수록, 보스전 평가가 높은 니케가 쓸수록 위에 와요. 큐브 레벨을 올리면 같은 큐브를 여러 니케가 같이 낄 수 있어요.</p>
@@ -307,6 +325,21 @@ footer.src a { color: inherit; }
       <h3>큐브 18종 효과</h3>
       <div class="scroll" style="margin-top:8px"><table class="data" id="cubeTable"></table></div>
     </div>
+  </section>
+
+  <!-- TIER -->
+  <section class="view" id="v-tier" hidden>
+    <div>
+      <h2>버스트별 티어표</h2>
+      <p class="lead">버스트 단계마다 누가 강한지 한눈에 봐요. 버스트를 여러 개 쓰는 니케는 칸마다 그 버스트로 쓸 때 평가로 나와요. 이름을 누르면 자세히 볼 수 있어요.</p>
+    </div>
+    <div class="panel row" style="gap:12px 18px">
+      <div class="field"><span class="lbl">평가 기준</span><div class="seg" id="tierMode"><button data-v="rb" aria-pressed="true">보스전</button><button data-v="rs" aria-pressed="false">스토리</button><button data-v="rp" aria-pressed="false">아레나</button></div></div>
+      <div class="field"><span class="lbl">등급</span><div class="seg" id="tierRar"><button data-v="SSR" aria-pressed="true">SSR만</button><button data-v="all" aria-pressed="false">전체</button></div></div>
+      <label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="tierMine"> 가진 니케만</label>
+    </div>
+    <div class="panel scroll" style="padding:0"><table class="tierlist" id="tierTable"></table></div>
+    <p class="note" style="margin:0">평가는 Prydwen 기준이에요. 같은 칸 안에서는 화력형이 먼저, 그다음 이름순이에요. 초록 테두리는 가진 니케예요.</p>
   </section>
 
   <!-- RAID -->
@@ -712,17 +745,39 @@ function setupImport() {
 
 // ---------- OVERLOAD ----------
 const OLS = { char: null, slots: [["", 1], ["", 1], ["", 1]] };
+// Korean community consensus (DC 니케 갤, arca 니케 채널, fmkorea, 2025-2026):
+// - 우월코드 + 공격력 are the core pair for attackers; stop at 2 good lines per piece (8줄작).
+// - Slots 2/3 only appear 50%/30% of the time, so a good line there is locked whatever its tier.
+// - Slot 1 always appears, so it is rerolled unless it is blue (tier 12+).
+// - 방어력 is junk; 명중률 does nothing for MG/SR/RL; ammo hurts a few units.
+const NO_AMMO = new Set(["dorothy", "pepper", "sparkling-summer-anis", "exia"]);
+const OL_CUT = { ele: [9, 10, 12], atk: [7, 9, 12], ammo: [7, 9, 12] }; // tier: 타협 / 권장 / 종결(파랑)
 function olPrefs(c) {
-  if (c && (c.oi || c.of)) return { core: (c.oi || []).map(x => x[0]), sub: (c.of || []).map(x => x[0]), generic: false };
-  if (c && c.c === "Attacker") return { core: ["ele", "atk"], sub: c.w === "MG" || c.w === "AR" || c.w === "SMG" ? ["ammo"] : ["cs", "ammo"], generic: true };
-  return { core: [], sub: ["atk", "ele"], generic: true };
+  if (!c) return { main: [], core: [], sub: [], generic: true };
+  const pry = (c.oi || []).map(x => x[0]), pf = (c.of || []).map(x => x[0]);
+  const core = new Set(pry), sub = new Set(pf);
+  const atkr = c.c === "Attacker";
+  if (atkr) { core.add("ele"); core.add("atk"); }
+  if (!pry.length && atkr) {
+    if (["MG", "SG", "RL"].includes(c.w)) sub.add("ammo");
+    if (["SR", "RL"].includes(c.w)) sub.add("cs");
+  }
+  if (NO_AMMO.has(c.s)) { core.delete("ammo"); sub.delete("ammo"); }
+  core.delete("def");
+  if (["MG", "SR", "RL"].includes(c.w)) { core.delete("hit"); sub.delete("hit"); }
+  core.forEach(k => sub.delete(k));
+  const main = ["ele", "atk"].filter(k => core.has(k));
+  return { main, core: [...core], sub: [...sub], generic: !pry.length && !pf.length, light: !atkr && !pry.length };
 }
 function renderOL() {
   const c = OLS.char;
   const P = olPrefs(c);
+  const tag = (k, cls) => olTag([k], cls);
   document.getElementById("olWant").innerHTML = c
-    ? `<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 클래스 기준)" : ""}</div>
-       <div class="ol-list">${P.core.map(k => olTag([k], "core")).join("")}${P.sub.map(k => olTag([k], "sub")).join("")}${!P.core.length && !P.sub.length ? `<span class="note">아무 옵션이나 괜찮아요(전투력용).</span>` : ""}</div>`
+    ? `<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 무기·클래스 기준)" : ""}</div>
+       <div class="ol-list">${P.core.map(k => tag(k, "core")).join("")}${P.sub.map(k => tag(k, "sub")).join("")}${!P.core.length && !P.sub.length ? `<span class="note">옵션작보다 장비 강화가 먼저예요. 아무 옵션이나 괜찮아요.</span>` : ""}</div>
+       ${NO_AMMO.has(c.s) ? `<p class="note" style="margin:6px 0 0">${esc(c.ko)}는 최대 장탄이 오히려 손해예요(마지막 탄·장탄 기믹).</p>` : ""}
+       ${c.c !== "Attacker" && P.core.length ? `<p class="note" style="margin:6px 0 0">지원형·방어형은 옵션작보다 장비 강화 레벨이 더 중요해요.</p>` : ""}`
     : `<div class="note">니케를 고르면 노려야 할 옵션이 나와요.</div>`;
   const opt = `<option value="">옵션 없음</option>` + D.ol.lines.map(l => `<option value="${l.k}">${esc(l.ko)}</option>`).join("");
   const tierOpt = Array.from({ length: 15 }, (_, i) => `<option value="${i + 1}">${i + 1}단계</option>`).join("");
@@ -732,54 +787,68 @@ function renderOL() {
     host.dataset.ready = 1;
     OLS.slots.forEach((s, i) => { document.getElementById("ols" + i).value = s[0]; document.getElementById("olt" + i).value = s[1]; });
   }
-  // Slot 1 always gets a line on a reroll; slots 2 and 3 only appear 50% / 30% of the time.
-  // So a good line sitting in slot 2 or 3 is the thing most worth locking.
   const SP_ = D.ol.slot;
   const res = OLS.slots.map(([k, t], i) => {
     if (!k) return { i, empty: true };
-    const kind = P.core.includes(k) ? "core" : P.sub.includes(k) ? "sub" : "bad";
-    return { i, k, t, kind };
+    const kind = P.main.includes(k) ? "main" : P.core.includes(k) ? "core" : P.sub.includes(k) ? "sub" : "bad";
+    let lock = false;
+    if (kind === "main") lock = i > 0 || t >= 12;
+    else if (kind === "core") lock = (i === 2 && t >= 8) || (i === 1 && t >= 10) || (i === 0 && t >= 13);
+    return { i, k, t, kind, lock };
   });
   const filled = res.filter(r => !r.empty);
-  const cores = filled.filter(r => r.kind === "core");
-  const subs = filled.filter(r => r.kind === "sub");
-  const rare = r => r.i > 0; // slot 2 or 3
+  const good = filled.filter(r => r.kind === "main" || r.kind === "core");
+  const mains = filled.filter(r => r.kind === "main");
+  const empties = res.filter(r => r.empty).length;
+  const lowCut = r => OL_CUT[r.k] && r.t < OL_CUT[r.k][0];
+  const done = !!c && (mains.length >= 2 || (good.length >= 2 && !P.main.length));
   res.forEach(r => {
     const el = document.getElementById("olr" + r.i);
     if (r.empty) { el.innerHTML = `<span class="note">${r.i ? `빈 칸 · 돌리면 ${SP_[r.i] * 100}% 확률로 옵션이 생겨요` : "비어 있음"}</span>`; return; }
     const L = OLK[r.k];
     let badge = "no", label = "버리고 다시 돌리기";
-    if (!c) { label = "니케를 고르면 판정"; }
-    else if (r.kind === "core") { badge = "ok"; label = rare(r) ? `잠금 · ${r.i + 1}번 칸은 ${SP_[r.i] * 100}%로만 생겨요` : "잠금"; r.lock = true; }
-    else if (r.kind === "sub" && rare(r) && !cores.length) { badge = "part"; label = "잠가둘 만해요 · 칸 확보용"; r.lock = true; }
-    else if (r.kind === "sub") { badge = "part"; label = "있으면 좋음"; }
-    el.innerHTML = `<span class="badge ${badge}">${label}</span><span class="num">${esc(L.ko)} +${L.v[r.t - 1]}%</span>`;
+    if (!c) label = "니케를 고르면 판정";
+    else if (done && (r.kind === "main" || r.kind === "core")) { badge = "ok"; label = lowCut(r) ? "유지 · 수치 재설정 추천" : "유지"; }
+    else if (done) { badge = "no"; label = "신경 안 써도 돼요"; }
+    else if (r.lock) { badge = "ok"; label = r.i ? `잠금 · ${r.i + 1}번 칸은 ${SP_[r.i] * 100}%로만 생겨요` : "잠금 · 파랑(12단계) 이상이에요"; }
+    else if (r.kind === "main" && r.i === 0) { badge = "part"; label = "좋은 옵션이지만 1번 칸이라 잠그지 않아도 돼요"; }
+    else if (r.kind === "core") { badge = "part"; label = "좋은 옵션 · 단계가 낮아서 잠그긴 아까워요"; }
+    else if (r.kind === "sub") { badge = "part"; label = "있으면 좋음 · 잠그지 마세요"; }
+    el.innerHTML = `<span class="badge ${badge}">${label}</span><span class="num">${esc(L.ko)} +${L.v[r.t - 1]}% (${r.t}단계)</span>`;
   });
-  const locks = res.filter(r => r.lock).map(r => `${r.i + 1}번`);
+  const locks = res.filter(r => r.lock);
+  const lockTxt = locks.map(r => `${r.i + 1}번`).join("·");
+  const cost = n => `잠금 ${n}줄이면 모듈이 ${n === 1 ? 2 : n === 2 ? 3 : 4}개 들고, 옵션 변경은 1번에 ${1 + n}개씩 들어요.`;
   const v = document.getElementById("olVerdict");
   let vv = "bad", big, why;
   if (!c) { vv = ""; big = "니케를 먼저 고르세요"; why = "왼쪽에서 니케를 고르고 옵션을 넣으면 판정해 드려요."; }
   else if (!filled.length) { vv = ""; big = "옵션을 넣어 주세요"; why = "장비에 뜬 옵션 1~3줄과 단계를 고르세요."; }
-  else if (!P.core.length && !P.sub.length) { vv = "good"; big = "그대로 써도 돼요"; why = `${c.ko}는 오버로드 옵션보다 전투력이 중요해요. 재료를 다른 니케에 쓰는 게 좋아요.`; }
-  else if (cores.length >= 2 && cores.length === filled.length && filled.length === 3) { vv = "good"; big = "완성이에요"; why = "세 줄 모두 핵심 옵션이에요. 더 돌리지 마세요."; }
-  else if (cores.length >= 2) { vv = "good"; big = "좋아요, 유지"; why = `${locks.join("·")} 줄을 잠그고 남은 칸만 더 돌려볼 수 있어요. 잠근 줄이 많을수록 비용이 더 드니 재료가 넉넉할 때만 하세요.`; }
-  else if (cores.length === 1 && rare(cores[0])) { vv = "ok"; big = `${cores[0].i + 1}번 줄 잠그고 돌리기`; why = `2·3번 칸에 핵심 옵션이 뜨는 건 드물어서 꼭 잡아두세요. 잠근 채로 계속 돌리면서 다른 칸에 핵심 옵션이 뜨면 그것도 잠그세요.`; }
-  else if (cores.length === 1) { vv = "ok"; big = "1번 줄 잠그고 돌리기"; why = "1번 칸의 핵심 옵션을 잠그고 돌리세요. 2·3번 칸에 핵심 옵션이 뜨면 그것도 잠그세요. 1번 단계가 낮으면 잠그지 않고 전부 돌려도 돼요."; }
-  else if (subs.some(rare)) { vv = "ok"; big = "칸 확보용으로 잠그기"; why = `핵심 옵션은 없지만 ${locks.join("·")} 칸에 있으면 좋은 옵션이 있어요. 칸을 잡아두려고 잠그고 돌리거나, 비용이 아까우면 전부 다시 돌리세요.`; }
-  else if (subs.length) { vv = "ok"; big = "전부 다시 돌리기 추천"; why = "1번 칸은 매번 새로 생기니, 있으면 좋은 옵션 1줄만으로는 잠글 이유가 적어요."; }
-  else { vv = "bad"; big = "전부 다시 돌리세요"; why = "이 니케에게 쓸모 있는 옵션이 없어요."; }
+  else if (!P.core.length && !P.sub.length) { vv = "good"; big = "그대로 써도 돼요"; why = `${esc(c.ko)}는 옵션작보다 장비 강화가 중요해요. 모듈은 딜러에게 쓰는 게 좋아요.`; }
+  else if (done) {
+    const low = good.filter(lowCut);
+    vv = "good"; big = "옵션은 완성이에요";
+    why = `좋은 옵션 ${good.length}줄이면 이 장비는 옵션 변경을 그만해도 돼요(8줄작 기준).`
+      + (low.length ? ` ${low.map(r => `${r.i + 1}번 ${OLK[r.k].ko}`).join(", ")} 단계가 낮으니 수치 재설정만 해 보세요.` : " 수치도 괜찮아요. 다음 장비로 넘어가세요.")
+      + (empties || filled.length > good.length ? " 남은 칸에 하나 더 노리는 것보다 수치를 올리는 게 훨씬 싸요." : "");
+  }
+  else if (locks.length) { vv = "ok"; big = `${lockTxt} 줄 잠그고 옵션 변경`; why = `${locks.some(r => r.i > 0) ? "2·3번 칸은 잘 안 생겨서" : "1번 칸이라도 파랑(12단계) 이상은 다시 뽑기 어려워서 잡아 둘 만해요. 2·3번 칸은 잘 안 생겨서"} 좋은 옵션이 뜨면 단계와 상관없이 잡아 두는 게 이득이에요. 잠근 채로 돌리다가 다른 칸에 우월코드나 공격력이 뜨면 그것도 잠그세요. ${cost(locks.length)}`; }
+  else if (good.length) { vv = "ok"; big = "잠그지 말고 전부 다시 돌리기"; why = "좋은 옵션이 1번 칸에만 있거나 단계가 낮아요. 1번 칸은 매번 100% 다시 생겨서 잠그면 비용만 늘어요. 2·3번 칸에 좋은 옵션이 뜰 때 잠그세요."; }
+  else { vv = "bad"; big = "전부 다시 돌리세요"; why = "이 니케에게 쓸모 있는 옵션이 없어요. 잠금 없이 옵션 변경을 하세요."; }
   v.dataset.v = vv;
   v.innerHTML = `<span class="lbl">판정</span><span class="big">${big}</span><span>${why}</span>`;
-  // odds
+  // odds + value cuts
   const W = D.ol.lines.reduce((a, l) => a + l.w, 0);
-  const pCore = P.core.reduce((a, k) => a + (OLK[k]?.w || 0), 0) / W;
-  const pAny = [...P.core, ...P.sub].reduce((a, k) => a + (OLK[k]?.w || 0), 0) / W;
+  const pMain = (P.main.length ? P.main : P.core).reduce((a, k) => a + (OLK[k]?.w || 0), 0) / W;
   const pct = x => (x * 100).toFixed(1) + "%";
-  document.getElementById("olOdds").innerHTML = `<h3>재설정 1번에 잠그지 않은 칸에서 나올 확률</h3>
-    <p class="note" style="margin:4px 0 10px">칸마다 옵션이 생길 확률은 1번 100%, 2번 50%, 3번 30%예요. 생기면 9가지 옵션 중 하나가 정해져요. 그래서 2·3번 칸에 좋은 옵션이 뜨면 잠가 두는 게 이득이에요.</p>
-    <div class="scroll"><table class="data"><thead><tr><th>칸</th><th>핵심 옵션</th><th>핵심 + 있으면 좋음</th><th>6단계 이상 핵심</th></tr></thead><tbody>
-    ${D.ol.slot.map((s, i) => { const hi = D.ol.tier.slice(5).reduce((a, b) => a + b, 0) / 100; return `<tr><td>${i + 1}번</td><td>${pct(s * pCore)}</td><td>${pct(s * pAny)}</td><td>${pct(s * pCore * hi)}</td></tr>`; }).join("")}
-    </tbody></table></div>`;
+  const cutRow = k => { const L = OLK[k]; return `<tr><td>${esc(L.ko)}</td>${OL_CUT[k].map(t => `<td>${t}단계 · ${L.v[t - 1]}%</td>`).join("")}</tr>`; };
+  document.getElementById("olOdds").innerHTML = `<h3>순서는 3번 → 2번 → 1번</h3>
+    <p class="note" style="margin:4px 0 10px">칸마다 옵션이 생길 확률은 1번 100%, 2번 50%, 3번 30%예요. 그래서 3번이나 2번에 좋은 옵션이 뜨면 바로 잠그고, 1번은 마지막에 맞춰요. 옵션 종류를 먼저 맞추고 수치 재설정은 마지막에 하세요.</p>
+    <div class="scroll"><table class="data"><thead><tr><th>칸</th><th>옵션 변경 1번에 ${P.main.length ? "우월코드·공격력" : "좋은 옵션"}이 뜰 확률</th></tr></thead><tbody>
+    ${D.ol.slot.map((s, i) => `<tr><td>${i + 1}번</td><td>${pct(s * pMain)}</td></tr>`).join("")}
+    </tbody></table></div>
+    <h3 style="margin-top:14px">이 정도 수치면 충분해요</h3>
+    <div class="scroll"><table class="data"><thead><tr><th>옵션</th><th>타협</th><th>권장</th><th>종결(파랑)</th></tr></thead><tbody>${["ele", "atk", "ammo"].map(cutRow).join("")}</tbody></table></div>
+    <p class="note" style="margin:8px 0 0">처음 오버로드하면 모든 줄이 11단계로 떠서 함부로 버리지 마세요. 12단계부터 파란색이에요. 출처: 디시 니케 갤, 아카라이브 니케 채널, 에펨코리아 공략 글 정리.</p>`;
 }
 function buildOLTable() {
   const cols = [1, 5, 6, 10, 11, 15];
@@ -790,7 +859,19 @@ function buildOLTable() {
 // ---------- CUBE ----------
 const CUBE_BY = new Map(D.cubes.map(c => [c.ko, c]));
 const cubeEff = ko => CUBE_BY.get(ko)?.eff || "";
+let CUBE_PICK = null;
+function renderCubePick() {
+  const host = document.getElementById("cubePick");
+  const c = CUBE_PICK;
+  if (!c) { host.innerHTML = `<div class="note">니케를 고르면 보스전·아레나에서 낄 큐브를 순서대로 보여줘요.</div>`; return; }
+  const users = k => [...S.owned].map(get).filter(x => x && x !== c && x.cu && x.cu[0] === k).map(x => x.ko);
+  const row = (k, i) => { const u = users(k); return `<tr><td>${i + 1}순위</td><td style="text-align:left"><b>${esc(k)}</b><div class="note">${esc(cubeEff(k))}</div></td><td style="text-align:left;white-space:normal">${u.length ? esc(u.slice(0, 5).join(", ")) + (u.length > 5 ? ` 외 ${u.length - 5}명` : "") : "<span class='note'>없음</span>"}</td></tr>`; };
+  const table = (title, list) => list && list.length ? `<div><div class="lbl" style="margin-bottom:6px">${title}</div><div class="scroll"><table class="data"><thead><tr><th>순서</th><th style="text-align:left">큐브</th><th style="text-align:left">이 큐브를 1순위로 쓰는 내 다른 니케</th></tr></thead><tbody>${list.slice(0, 3).map(row).join("")}</tbody></table></div></div>` : "";
+  const body = table("보스전 (레이드·요격전)", c.cu) + table("아레나", c.cp);
+  host.innerHTML = `<div class="row" style="gap:8px">${card(c, { tier: true })}</div>${body || `<div class="note">${esc(c.ko)}는 추천 큐브 정보가 없어요. 아무 큐브나 껴도 괜찮아요.</div>`}<p class="note" style="margin:0">같은 큐브는 레벨을 올리면 여러 니케가 나눠 낄 수 있어요. 1순위 큐브가 다른 니케와 겹치면 2순위를 써도 손해가 크지 않아요.</p>`;
+}
 function renderCube() {
+  renderCubePick();
   const have = [...S.owned].map(get).filter(c => c && c.cu && c.cu.length);
   const rankHost = document.getElementById("cubeRank");
   const mineHost = document.getElementById("cubeMine");
@@ -817,6 +898,35 @@ function renderCube() {
   }
   document.getElementById("cubeTable").innerHTML = `<thead><tr><th>큐브</th><th style="text-align:left">주 효과</th><th style="text-align:left">영문 이름</th></tr></thead><tbody>${D.cubes.map(c => `<tr><td>${esc(c.ko)}</td><td style="text-align:left">${esc(c.eff)}</td><td style="text-align:left" class="note">${esc(c.en)}</td></tr>`).join("")}</tbody>`;
 }
+
+// ---------- TIER LIST ----------
+const TIER = { mode: "rb", rar: "SSR", mine: false };
+const CLS_ORDER = { Attacker: 0, Supporter: 1, Defender: 2 };
+function renderTier() {
+  const cols = ["I", "II", "III"];
+  const grid = {}; TIERS.forEach(t => { grid[t] = { I: [], II: [], III: [] }; });
+  C.forEach(c => {
+    if (TIER.rar === "SSR" && c.r !== "SSR") return;
+    if (TIER.mine && !S.owned.has(c.s)) return;
+    const vars = c.tv ? c.tv : [{ b: c.b, rs: c.rs, rb: c.rb, rp: c.rp }];
+    vars.forEach(v => { const t = v[TIER.mode]; if (grid[t] && grid[t][v.b]) grid[t][v.b].push({ c, multi: !!c.tv }); });
+  });
+  const cell = list => `<div class="tl">${list.sort((a, b) => (CLS_ORDER[a.c.c] ?? 3) - (CLS_ORDER[b.c.c] ?? 3) || a.c.ko.localeCompare(b.c.ko, "ko")).map(({ c, multi }) =>
+    `<span class="tn ${S.owned.has(c.s) ? "have" : ""}" data-open="${esc(c.s)}" role="button" tabindex="0" title="${esc(c.en)} · ${esc(CLS[c.c] || c.c)} · ${esc(c.w)}"><span class="d" data-e="${esc(c.e)}"></span>${esc(c.ko)}${multi ? `<span class="k">유동</span>` : ""}</span>`).join("")}</div>`;
+  const rows = TIERS.filter(t => cols.some(b => grid[t][b].length));
+  document.getElementById("tierTable").innerHTML = `<thead><tr><th></th>${cols.map(b => `<th>버스트 ${b}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map(t =>
+    `<tr><th><span class="tier" data-t="${t}">${t}</span></th>${cols.map(b => `<td>${cell(grid[t][b])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="4"><div class="empty">조건에 맞는 니케가 없어요.</div></td></tr>`}</tbody>`;
+}
+function segPick(id, fn) {
+  document.getElementById(id).addEventListener("click", e => {
+    const b = e.target.closest("button[data-v]"); if (!b) return;
+    b.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    fn(b.dataset.v); renderTier();
+  });
+}
+segPick("tierMode", v => TIER.mode = v);
+segPick("tierRar", v => TIER.rar = v);
+document.getElementById("tierMine").addEventListener("change", e => { TIER.mine = e.target.checked; renderTier(); });
 
 // ---------- RAID ----------
 // Core: hitting a core doubles normal-attack damage, so accurate weapons gain the most.
@@ -1053,7 +1163,7 @@ function buildLevel() {
 }
 
 // ---------- routing + events ----------
-const VIEWS = ["dex", "owned", "ol", "cube", "raid", "level"];
+const VIEWS = ["dex", "owned", "ol", "cube", "tier", "raid", "level"];
 function route() {
   const h = location.hash.slice(1);
   S.view = VIEWS.includes(h) ? h : "dex";
@@ -1066,6 +1176,7 @@ function renderAll() {
   if (S.view === "owned") renderOwned();
   if (S.view === "ol") renderOL();
   if (S.view === "cube") renderCube();
+  if (S.view === "tier") renderTier();
   if (S.view === "raid") renderRaid();
   if (S.view === "level") renderLevel();
   const host = document.getElementById("drawerHost");
@@ -1099,17 +1210,21 @@ document.getElementById("olSlots").addEventListener("change", () => {
   renderOL();
 });
 document.getElementById("cubeSort").addEventListener("change", renderCube);
+document.getElementById("cubeQ").addEventListener("input", e => {
+  const v = e.target.value.trim(); const c = C.find(x => x.ko === v) || C.find(x => x.en.toLowerCase() === v.toLowerCase());
+  if (c && c !== CUBE_PICK) { CUBE_PICK = c; renderCubePick(); }
+});
 ["autoN", "autoHeal"].forEach(id => document.getElementById(id).addEventListener("change", renderRaid));
 ["lvFrom", "lvTo", "hvCr", "hvBd", "hvCd"].forEach(id => document.getElementById(id).addEventListener("input", renderLevel));
 window.addEventListener("hashchange", route);
 
 // ---------- boot ----------
-document.getElementById("dataDate").textContent = `데이터 ${D.src.prydwen} 기준 · ${C.length}명 · 버전 ${APP_V.slice(0, 10)}`;
+document.getElementById("dataDate").textContent = `니케 ${C.length}명 · 데이터 ${D.src.prydwen} 기준 · 버전 ${APP_V.slice(0, 10)}`;
 document.getElementById("srcFoot").innerHTML = `캐릭터 평가·추천 옵션·추천 덱: <a href="https://www.prydwen.gg/nikke" target="_blank" rel="noopener">Prydwen</a> (${esc(D.src.prydwen)} 갱신분). 한국어 이름·레벨 비용: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a>. 오버로드 수치: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a>. 유니온 레이드 보스 목록: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지). 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌, 솔로 추천 덱은 솔로 ${D.raids.solo.seasons[1].season}시즌 기준이에요. 역대 솔로 레이드 보스: 나무위키. 게임 저작권은 SHIFT UP에 있어요. 개인용 팬 페이지예요. 항상 최신 버전: <a href="${SITE}" target="_blank" rel="noopener">${SITE}</a>`;
 buildFilters(); buildOLTable(); buildLevel(); setupImport();
 OLS.char = get("scarlet") || C[0];
 document.getElementById("olq").value = OLS.char.ko;
-OLS.slots = [["ammo", 7], ["def", 3], ["", 1]];
+OLS.slots = [["atk", 11], ["def", 4], ["ele", 6]];
 route();
 initStore();
 let updShown = false;
