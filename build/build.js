@@ -142,6 +142,13 @@ for (const [name, u] of Object.entries(AOL.units)) {
   else console.log("arena OL name not found:", name);
 }
 
+// ---- Skill advice (build/skill_notes.json: 가성비 / 종결 / 우선 / 이유) ----
+{
+  const sf = path.join(HERE, "skill_notes.json");
+  const units = fs.existsSync(sf) ? JSON.parse(fs.readFileSync(sf, "utf8")).units : {};
+  for (const [name, u] of Object.entries(units)) { const c = chars.find((x) => x.ko === name); if (c) c.skn = u; else console.log("skill note name not found:", name); }
+}
+
 // ---- Community nicknames (build/nicknames.json: { "공식이름": ["별명", "애장품 전용 별명*"] }) ----
 {
   const nf = path.join(HERE, "nicknames.json");
