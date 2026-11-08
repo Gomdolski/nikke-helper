@@ -1104,7 +1104,7 @@ document.getElementById("cubeSort").addEventListener("change", renderCube);
 window.addEventListener("hashchange", route);
 
 // ---------- boot ----------
-document.getElementById("dataDate").textContent = `데이터 ${D.src.prydwen} 기준 · ${C.length}명`;
+document.getElementById("dataDate").textContent = `데이터 ${D.src.prydwen} 기준 · ${C.length}명 · 버전 ${APP_V.slice(0, 10)}`;
 document.getElementById("srcFoot").innerHTML = `캐릭터 평가·추천 옵션·추천 덱: <a href="https://www.prydwen.gg/nikke" target="_blank" rel="noopener">Prydwen</a> (${esc(D.src.prydwen)} 갱신분). 한국어 이름·레벨 비용: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a>. 오버로드 수치: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a>. 유니온 레이드 보스 목록: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지). 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌, 솔로 추천 덱은 솔로 ${D.raids.solo.seasons[1].season}시즌 기준이에요. 역대 솔로 레이드 보스: 나무위키. 게임 저작권은 SHIFT UP에 있어요. 개인용 팬 페이지예요. 항상 최신 버전: <a href="${SITE}" target="_blank" rel="noopener">${SITE}</a>`;
 buildFilters(); buildOLTable(); buildLevel(); setupImport();
 OLS.char = get("scarlet") || C[0];
@@ -1112,13 +1112,13 @@ document.getElementById("olq").value = OLS.char.ko;
 OLS.slots = [["ammo", 7], ["def", 3], ["", 1]];
 route();
 initStore();
+let updShown = false;
 checkUpdate();
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkUpdate(); });
 
 // ---------- update notice ----------
 // The web copy (SITE) is always the newest. Opened from there, a reload is enough;
 // an older copy saved on disk links to the web address instead.
-let updShown = false;
 async function checkUpdate() {
   if (window.claude || updShown) return;
   try {
