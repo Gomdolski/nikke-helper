@@ -660,7 +660,7 @@ function skillBox(c) {
   if (mine) {
     const goalA = n ? n.cheap : c.sk && c.sk.rc, goalB = n ? n.end : c.sk && c.sk.hi;
     const a = goalA ? gap(mine, goalA) : null, b = goalB ? gap(mine, goalB) : null;
-    html += `<p style="margin:6px 0 0">지금 내 스킬 <b class="num">${mine.join("/")}</b>${a === "" ? ` · <span class="badge ok">${n ? "가성비" : "추천"} 달성</span>` : a ? ` · ${n ? "가성비" : "추천"}: ${a}` : ""}${b === "" ? ` · <span class="badge ok">${n ? "종결" : "최대"} 달성</span>` : b ? ` · ${n ? "종결" : "최대"}: ${b}` : ""}</p>`;
+    html += `<p style="margin:6px 0 0">지금 내 스킬 <b class="num">${mine.join("/")}</b>${b === "" ? ` · <span class="badge ok">${n ? "종결" : "최대"} 달성</span>` : a === "" ? ` · <span class="badge ok">${n ? "가성비" : "추천"} 달성</span>` : ""}</p>`;
   }
   return html;
 }
