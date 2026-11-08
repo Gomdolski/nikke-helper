@@ -211,6 +211,10 @@ h1, h2, h3, .big { text-wrap: balance; }
 .slot .n .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .drawer .dpf { width: 72px; height: 72px; border-radius: 12px; object-fit: cover; background: var(--sunk); flex: none; }
 .tn .mini { width: 20px; height: 20px; border-radius: 4px; margin-left: -2px; }
+.weekly summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.weekly h4 { margin: 12px 0 4px; font-size: 13px; color: var(--muted); }
+.weekly ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
+.weekly .wklinks { margin: 12px 0 0; }
 </style>
 
 <div class="upd" id="upd" hidden><div class="wrap"><p id="updText"></p><span id="updAct"></span></div></div>
@@ -238,6 +242,11 @@ h1, h2, h3, .big { text-wrap: balance; }
       <h2>니케 도감</h2>
       <p class="lead">이름을 누르면 추천 큐브, 오버로드 옵션, 스킬 레벨, 같이 쓰는 덱이 나와요. 오른쪽 체크 칸을 누르면 보유 니케로 표시돼요.</p>
     </div>
+    <details class="panel weekly" id="weekly" hidden>
+      <summary><b id="wkTitle"></b><span class="note" id="wkDate"></span></summary>
+      <div id="wkBody"></div>
+      <p class="note wklinks">자세한 내용은 공식 공지에서 보세요: <a href="https://nikke-kr.com/news.html" target="_blank" rel="noopener">니케 공식 공지</a> · <a href="https://www.blablalink.com/" target="_blank" rel="noopener">블라블라링크</a></p>
+    </details>
     <div class="panel filters" id="dexFilters">
       <div class="field" style="grid-column: 1 / -1"><label for="q">검색 (이름·영문·별명·콜라보·스쿼드·기업)</label><input type="search" id="q" placeholder="예: 흑련, 레후, 애헬름, 에게리, 카운터스"></div>
     </div>
@@ -1692,6 +1701,22 @@ document.getElementById("cubeQ").addEventListener("input", e => {
 ["lvFrom", "lvTo", "hvCr", "hvBd", "hvCd"].forEach(id => document.getElementById(id).addEventListener("input", renderLevel));
 window.addEventListener("hashchange", route);
 
+// ---------- weekly summary ----------
+function renderWeekly() {
+  const w = D.weekly; if (!w) return;
+  const box = document.getElementById("weekly");
+  const list = (t, xs) => xs && xs.length ? `<h4>${t}</h4><ul>${xs.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : "";
+  document.getElementById("wkTitle").textContent = `이번 주 바뀐 점 · ${w.title || ""}`;
+  document.getElementById("wkDate").textContent = w.at ? `${w.at} 기준` : "";
+  document.getElementById("wkBody").innerHTML = list("게임", w.game) + list("도우미", w.helper);
+  box.hidden = false;
+  // open it once per new summary, then remember it was read
+  const KEY = "nikke-helper-weekly-seen";
+  let seen = ""; try { seen = localStorage.getItem(KEY) || ""; } catch (e) {}
+  if (seen !== w.at) box.open = true;
+  box.addEventListener("toggle", () => { if (!box.open) { try { localStorage.setItem(KEY, w.at); } catch (e) {} } });
+}
+
 // ---------- boot ----------
 document.getElementById("dataDate").textContent = `니케 ${C.length}명 · 데이터 ${D.src.prydwen} 기준 · 버전 ${APP_V.slice(0, 10)}`;
 document.getElementById("srcFoot").innerHTML = `<div class="srclist"><b>출처</b><ul>
@@ -1705,7 +1730,7 @@ document.getElementById("srcFoot").innerHTML = `<div class="srclist"><b>출처</
   <li>별명: 디시인사이드, 아카라이브, 에펨코리아, 니마갤 위키, 인벤</li>
 </ul></div>
 <p>게임 저작권은 SHIFT UP에 있어요. SHIFT UP·Level Infinite와 관계없는 비공식 비영리 팬 페이지예요. 평가와 추천은 각 출처의 의견을 요약한 거예요. 항상 최신 버전: <a href="${SITE}" target="_blank" rel="noopener">${SITE}</a></p>`;
-buildFilters(); buildOLTable(); buildLevel(); setupImport(); buildCubeLv();
+buildFilters(); buildOLTable(); buildLevel(); setupImport(); buildCubeLv(); renderWeekly();
 OLS.char = Object.keys(GEAR).map(get).filter(Boolean).sort((a, b) => tScore(b.rb) - tScore(a.rb))[0] || get("scarlet") || C[0];
 document.getElementById("olq").value = OLS.char.ko;
 route();
