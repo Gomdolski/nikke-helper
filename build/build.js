@@ -171,6 +171,8 @@ const olLines = ol.lines.map((l) => ({ k: KEYMAP[l.groupId] || String(l.groupId)
 
 // ---- Raids: solo seasons (newest first) and union seasons from dildoro ----
 const RANK = fs.existsSync(path.join(D, "soloraid_rank.json")) ? JSON.parse(fs.readFileSync(path.join(D, "soloraid_rank.json"), "utf8")) : null;
+// Union raid boss cores (build/union_core.json: "S<season>|<boss>" -> core true/false, pierce, note)
+const UCORE = fs.existsSync(path.join(HERE, "union_core.json")) ? JSON.parse(fs.readFileSync(path.join(HERE, "union_core.json"), "utf8")).bosses : {};
 function buildRaids() {
   const us = JSON.parse(fs.readFileSync(path.join(HERE, "union_seasons.json"), "utf8"));
   const WEAKOF = { Fire: "Water", Water: "Electric", Electric: "Iron", Iron: "Wind", Wind: "Fire" };
@@ -203,7 +205,9 @@ function buildRaids() {
       bosses: names.map((ko, i) => {
         const el = us.slotElements[i];
         const extra = season === 44 ? us.details44[ko] || {} : {};
-        return { id: `u${season}-${i}`, ko, element: el, weak: WEAKOF[el], core: null, ...extra };
+        const cr = UCORE[`S${season}|${ko}`];
+        const core = cr ? { core: cr.core, coreNote: cr.note, ...(cr.pierce ? { pierce: true } : {}) } : { core: null };
+        return { id: `u${season}-${i}`, ko, element: el, weak: WEAKOF[el], ...extra, ...core };
       }),
     })),
   };

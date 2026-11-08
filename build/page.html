@@ -1530,6 +1530,9 @@ function coreSeg(boss) {
   return `<div class="seg" id="coreSeg">${b(true, "코어 있음")}${b(false, "코어 없음")}${b("null", "모름")}</div>`;
 }
 function coreText(boss) {
+  return coreBaseText(boss) + (boss.coreNote ? ` <b>이 보스:</b> ${esc(boss.coreNote)}` : "");
+}
+function coreBaseText(boss) {
   if (boss.core === true && boss.pierce) return "코어를 맞히면 평타 피해가 2배예요. 처음에는 코어가 장갑 아래 숨어 있어서 관통 니케가 유리하고, 정확한 무기(SR 저격·RL 런처·AR 돌격소총) 딜러도 우선 골라요.";
   if (boss.core === true) return "코어를 맞히면 평타 피해가 2배예요. 정확한 무기(SR 저격·RL 런처·AR 돌격소총) 딜러를 우선 골라요. SG 샷건·SMG 기관단총은 코어를 잘 못 맞혀서 뒤로 밀려요.";
   if (boss.core === false) return "코어가 없어서 2배 피해가 없어요. 코어에 크게 기대는 SR 저격은 뒤로 밀리고, 보스에서 적정 사거리가 나오는 무기를 우선 골라요." + (boss.range ? ` 이 보스의 적정 사거리: ${Object.entries(boss.range).filter(([, r]) => r !== "-").map(([k, r]) => `${k} ${esc(r)}`).join(" · ")}` : "");
@@ -1777,6 +1780,7 @@ document.getElementById("srcFoot").innerHTML = `<div class="srclist"><b>출처</
   <li>한국어 이름·레벨 비용·초상화·계정 가져오기·스테이지 권장 전투력: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a> (블라블라링크 공개 자료 기반)</li>
   <li>오버로드 옵션 수치·확률: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a></li>
   <li>오버로드 잠금·수치 기준: 디시인사이드 니케 마이너 갤러리, 아카라이브 니케 채널, 에펨코리아 공략 글</li>
+  <li>유니온 레이드 보스 코어 여부: 아카라이브 니케 채널 시즌별 보스 특성·조합 정리글, Prydwen, nikke.gg</li>
   <li>유니온 레이드 보스: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지) · 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌 기준</li>
   <li>역대 솔로 레이드 보스: 나무위키 · 솔로 추천 덱은 솔로 ${D.raids.solo.seasons[1].season}시즌 기준</li>
   <li>솔로 레이드 상위권 덱·사용률: <a href="https://letsdoro.com/soloraid" target="_blank" rel="noopener">레츠도로</a> (한국 서버 상위 50명, ${esc(D.soloRank ? D.soloRank.at : "")} 받아옴)</li>
