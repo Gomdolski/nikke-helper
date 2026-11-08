@@ -359,7 +359,7 @@ h1, h2, h3, .big { text-wrap: balance; }
   <section class="view" id="v-ol" hidden>
     <div>
       <h2>오버로드 계산기</h2>
-      <p class="lead">니케를 고르면 장비 4개(머리·몸통·팔·다리)의 오버로드 옵션과 합계를 보여줘요. 옵션을 새로 돌렸다면 그 장비 칸만 바꿔 보세요. 장비마다 ‘완성 / 잠그고 돌리기 / 다시 돌리기’를 알려줘요.</p>
+      <p class="lead">니케를 고르면 등급, 장비 4개 옵션과 합계, 장비별로 잠글지 다시 돌릴지 알려줘요.</p>
       <p class="note" style="margin:6px 0 0">‘보유 니케’ 탭에서 블라블라링크 링크로 가져오면 내 장비가 자동으로 채워져요. 직접 고친 내용은 이 브라우저에 저장돼요.</p>
     </div>
     <div class="panel" style="display:flex;flex-direction:column;gap:12px">
@@ -367,7 +367,7 @@ h1, h2, h3, .big { text-wrap: balance; }
         <div class="field grow"><label for="olq">니케</label><input type="search" id="olq" list="olNames" placeholder="이름을 입력하고 목록에서 고르세요"><datalist id="olNames"></datalist></div>
         <div class="field grow" id="gearPick" hidden><label for="gearSel" id="gearPickLbl">내 니케</label><select id="gearSel"></select></div>
       </div>
-      <div class="row" style="gap:8px;align-items:center"><span class="lbl">어디에 쓸 니케?</span><div class="seg" id="olMode"><button data-v="boss" aria-pressed="true">보스전</button><button data-v="arena" aria-pressed="false">아레나</button></div><span class="note" id="olModeNote"></span></div>
+      <div class="row" style="gap:8px;align-items:center"><div class="seg" id="olMode"><button data-v="boss" aria-pressed="true" title="레이드·요격전·캠페인">PVE</button><button data-v="arena" aria-pressed="false" title="아레나">PVP</button></div><span class="note" id="olModeNote"></span></div>
       <div id="olStat"></div>
       <div id="olWant"></div>
       <div id="gearMsg" role="status"></div>
@@ -1024,34 +1024,32 @@ function olJudge(c, slots) {
   // once 우월코드+공격력 are in, only their values matter
   const lowCut = r => OL_CUT[r.k] && r.t < OL_CUT[r.k][0] && (!done || !P.main.length || P.main.includes(r.k));
   res.forEach(r => {
-    if (r.empty) { r.badge = ""; r.label = r.i ? `빈 칸 · 돌리면 ${SP_[r.i] * 100}% 확률로 옵션이 생겨요` : "비어 있음"; return; }
-    let badge = "no", label = "버리고 다시 돌리기";
+    if (r.empty) { r.badge = ""; r.label = r.i ? `빈 칸 · 생길 확률 ${SP_[r.i] * 100}%` : "비어 있음"; return; }
+    let badge = "no", label = "버림";
     if (!c) label = "니케를 고르면 판정";
-    else if (done && (r.kind === "main" || r.kind === "core")) { badge = "ok"; label = lowCut(r) ? "유지 · 수치 재설정 추천" : "유지"; }
-    else if (done) { badge = "no"; label = "신경 안 써도 돼요"; }
-    else if (r.lock) { badge = "ok"; label = r.i ? `잠금 · ${r.i + 1}번 칸은 ${SP_[r.i] * 100}%로만 생겨요` : "잠금 · 파랑(12단계) 이상이에요"; }
-    else if (r.kind === "main" && r.i === 0) { badge = "part"; label = "좋은 옵션이지만 1번 칸이라 잠그지 않아도 돼요"; }
-    else if (r.kind === "core") { badge = "part"; label = "좋은 옵션 · 단계가 낮아서 잠그긴 아까워요"; }
-    else if (r.kind === "sub") { badge = "part"; label = "있으면 좋음 · 잠그지 마세요"; }
+    else if (done && (r.kind === "main" || r.kind === "core")) { badge = "ok"; label = lowCut(r) ? "유지 · 수치 재설정" : "유지"; }
+    else if (done) { badge = "no"; label = "상관없음"; }
+    else if (r.lock) { badge = "ok"; label = r.i ? "잠금" : "잠금 · 12단계 이상"; }
+    else if (r.kind === "main" && r.i === 0) { badge = "part"; label = "좋음 · 1번 칸이라 안 잠금"; }
+    else if (r.kind === "core") { badge = "part"; label = "좋음 · 단계 낮음"; }
+    else if (r.kind === "sub") { badge = "part"; label = "있으면 좋음"; }
     r.badge = badge; r.label = label;
   });
   const locks = done ? [] : res.filter(r => r.lock);
   const lockTxt = locks.map(r => `${r.i + 1}번`).join("·");
-  const cost = n => `잠금 ${n}줄이면 모듈이 ${n === 1 ? 2 : n === 2 ? 3 : 4}개 들고, 옵션 변경은 1번에 ${1 + n}개씩 들어요.`;
+  const cost = n => `모듈: 잠금 ${n === 1 ? 2 : n === 2 ? 3 : 4}개, 돌릴 때마다 ${1 + n}개`;
   let vv = "bad", big, why;
-  if (!c) { vv = ""; big = "니케를 먼저 고르세요"; why = "왼쪽에서 니케를 고르고 옵션을 넣으면 판정해 드려요."; }
-  else if (!filled.length) { vv = ""; big = "옵션을 넣어 주세요"; why = "장비에 뜬 옵션 1~3줄과 단계를 고르세요."; }
-  else if (!P.core.length && !P.sub.length) { vv = "good"; big = "그대로 써도 돼요"; why = `${esc(c.ko)}는 옵션작보다 장비 강화가 중요해요. 모듈은 딜러에게 쓰는 게 좋아요.`; }
+  if (!c) { vv = ""; big = "니케를 먼저 고르세요"; why = ""; }
+  else if (!filled.length) { vv = ""; big = "옵션을 넣어 주세요"; why = ""; }
+  else if (!P.core.length && !P.sub.length) { vv = "good"; big = "그대로 써도 돼요"; why = "옵션보다 장비 강화가 먼저"; }
   else if (done) {
     const low = good.filter(lowCut);
-    vv = "good"; big = low.length ? "옵션 완성 · 수치만 올리기" : "완성이에요";
-    why = `좋은 옵션 ${good.length}줄이면 이 장비는 옵션 변경을 그만해도 돼요(8줄작 기준).`
-      + (low.length ? ` ${low.map(r => `${r.i + 1}번 ${OLK[r.k].ko}`).join(", ")} 단계가 낮으니 수치 재설정만 해 보세요.` : " 수치도 괜찮아요. 다음 장비로 넘어가세요.")
-      + (empties || filled.length > good.length ? " 남은 칸에 하나 더 노리는 것보다 수치를 올리는 게 훨씬 싸요." : "");
+    vv = "good"; big = low.length ? "완성 · 수치만 올리기" : "완성";
+    why = low.length ? `${low.map(r => `${r.i + 1}번`).join("·")} 줄 수치 재설정` : "다음 장비로";
   }
-  else if (locks.length) { vv = "ok"; big = `${lockTxt} 줄 잠그고 옵션 변경`; why = `${locks.some(r => r.i > 0) ? "2·3번 칸은 잘 안 생겨서" : "1번 칸이라도 파랑(12단계) 이상은 다시 뽑기 어려워서 잡아 둘 만해요. 2·3번 칸은 잘 안 생겨서"} 좋은 옵션이 뜨면 단계와 상관없이 잡아 두는 게 이득이에요. 잠근 채로 돌리다가 다른 칸에 우월코드나 공격력이 뜨면 그것도 잠그세요. ${cost(locks.length)}`; }
-  else if (good.length) { vv = "ok"; big = "잠그지 말고 전부 다시 돌리기"; why = "좋은 옵션이 1번 칸에만 있거나 단계가 낮아요. 1번 칸은 매번 100% 다시 생겨서 잠그면 비용만 늘어요. 2·3번 칸에 좋은 옵션이 뜰 때 잠그세요."; }
-  else { vv = "bad"; big = "전부 다시 돌리세요"; why = "이 니케에게 쓸모 있는 옵션이 없어요. 잠금 없이 옵션 변경을 하세요."; }
+  else if (locks.length) { vv = "ok"; big = `${lockTxt} 잠그고 돌리기`; why = cost(locks.length); }
+  else if (good.length) { vv = "ok"; big = "전부 다시 돌리기"; why = "2·3번에 좋은 옵션 뜨면 그때 잠그기"; }
+  else { vv = "bad"; big = "전부 다시 돌리기"; why = "쓸 만한 옵션 없음"; }
   const lowN = done ? good.filter(lowCut).length : 0;
   return { P, res, vv, big, why, done, lowN };
 }
@@ -1098,7 +1096,7 @@ const aolBox = c => c && c.aol ? `<div class="olnote"><div class="row" style="ga
 function renderOL() {
   const c = OLS.char;
   document.querySelectorAll("#olMode button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === OLS.mode ? "true" : "false"));
-  document.getElementById("olModeNote").textContent = OLS.mode === "arena" ? "아레나는 차지 속도·장탄·생존이 먼저예요. 우월코드보다 공격력, 명중률은 쓸모없어요." : "";
+  document.getElementById("olModeNote").textContent = OLS.mode === "arena" ? "아레나 기준 · 차지 속도·장탄·생존 우선" : "";
   if (c && OLS.loaded !== c.s) olLoad(c);
   const P = olPrefs(c);
   const tag = (k, cls) => olTag([k], cls);
@@ -1144,10 +1142,10 @@ function renderOL() {
     const filled = slots.some(x => x[0]);
     const J = c && filled ? olJudge(c, slots) : null;
     if (J && J.done) done.push(i);
-    const head = J ? `<span class="big">${J.big}</span><span class="note why">${J.why}</span>` : `<span class="big">${filled ? "니케를 골라 주세요" : "비어 있음"}</span><span class="note why">${filled ? "" : "오버로드 전이거나 아직 안 넣었어요. 옵션을 고르면 판정해요."}</span>`;
+    const head = J ? `<span class="big">${J.big}</span><span class="note why">${J.why}</span>` : `<span class="big">${filled ? "니케를 골라 주세요" : "비어 있음"}</span><span class="note why">${filled ? "" : "오버로드 전"}</span>`;
     return `<div class="panel piece verdict" data-v="${J ? J.vv : ""}"><div class="phead"><b>${PNAME[i]}</b>${filled ? `<button class="btn small" type="button" data-clear="${i}">비우기</button>` : ""}</div>${head}
       ${slots.map(([k, t], j) => { const r = J ? J.res[j] : null; return `<div class="pline"><span class="tg">${j + 1}</span><select data-p="${i}" data-l="${j}" data-f="k" aria-label="${PNAME[i]} ${j + 1}번 옵션">${optHtml}</select><select data-p="${i}" data-l="${j}" data-f="t" aria-label="${PNAME[i]} ${j + 1}번 단계" ${k ? "" : "disabled"}>${tierHtml}</select>
-        <div class="pres">${k ? `${r && r.badge !== undefined ? `<span class="badge ${r.badge}">${r.label}</span>` : ""}<span class="num">+${OLK[k].v[t - 1]}%</span>` : `<span class="note">${j ? `빈 칸 · 돌리면 ${D.ol.slot[j] * 100}% 확률로 생겨요` : "비어 있음"}</span>`}</div></div>`; }).join("")}
+        <div class="pres">${k ? `${r && r.badge !== undefined ? `<span class="badge ${r.badge}">${r.label}</span>` : ""}<span class="num">+${OLK[k].v[t - 1]}%</span>` : `<span class="note">${j ? `빈 칸 · 생길 확률 ${D.ol.slot[j] * 100}%` : "비어 있음"}</span>`}</div></div>`; }).join("")}
     </div>`;
   }).join("");
   document.querySelectorAll("#olPieces select[data-f]").forEach(el => { const [k, t] = OLS.pieces[+el.dataset.p][+el.dataset.l]; el.value = el.dataset.f === "k" ? k : String(t); });
@@ -1584,7 +1582,7 @@ async function renderCampStages() {
   host.innerHTML = `<div class="scroll"><table class="data"><thead><tr><th>스테이지</th><th>권장 전투력</th>${my ? "<th>내 전투력 대비</th>" : ""}</tr></thead><tbody>${list.map(x => {
     const r = my ? my / x.battlePower : 0;
     const done = cleared && x.id <= cleared;
-    return `<tr><td>${esc(x.name.replace(/ (HARD )?STAGE$/, ""))}${done ? ' <span class="note">· 깸</span>' : ""}</td><td>${fmt(x.battlePower)}</td>${my ? `<td><span class="badge ${r >= 1 ? "ok" : r >= 0.85 ? "part" : "no"}">${Math.round(r * 100)}%</span></td>` : ""}</tr>`;
+    return `<tr><td>${esc(x.name.replace(/ (HARD )?STAGE$/, ""))}${done ? ' <span class="note">· 클리어</span>' : ""}</td><td>${fmt(x.battlePower)}</td>${my ? `<td><span class="badge ${r >= 1 ? "ok" : r >= 0.85 ? "part" : "no"}">${Math.round(r * 100)}%</span></td>` : ""}</tr>`;
   }).join("")}</tbody></table></div>`;
 }
 function renderCamp() {
@@ -1599,11 +1597,11 @@ function renderCamp() {
   const c = campChapter(CAMP.ch);
   const elSel = document.getElementById("campEl");
   if (!elSel.dataset.ready) { elSel.innerHTML = `<option value="">모름·상관없음</option>` + ELS.map(e => `<option value="${e}">${EL[e]}</option>`).join(""); elSel.dataset.ready = 1; }
-  if (!CAMP.elTouched) CAMP.el = c && c.adv ? c.adv : "";
+  if (!CAMP.elTouched) CAMP.el = c && c.adv && !c.est ? c.adv : "";
   elSel.value = CAMP.el;
   const weak = CAMP.el || "";
   document.getElementById("campInfo").innerHTML = c
-    ? `<div class="row" style="gap:6px 12px;align-items:center"><b>${CAMP.ch}장${c.title ? " · " + esc(c.title) : ""}</b>${c.boss ? `<span>보스 ${esc(c.boss)}</span>` : ""}${c.adv ? `<span class="chip el" data-e="${esc(c.adv)}">${EL[c.adv]} 데려가기</span>` : ""}${c.est ? `<span class="note">추정</span>` : ""}${c.core === true ? '<span class="chip">코어 있음</span>' : c.core === false ? '<span class="chip">코어 없음</span>' : ""}</div>${c.note ? `<p class="note" style="margin:6px 0 0">${esc(c.note)}</p>` : ""}<p class="note" style="margin:6px 0 0">추정이 섞여 있어 틀릴 수 있어요. 게임의 스테이지 정보창에 뜨는 코드 아이콘이 가장 정확해요. 하드도 보스는 같아요.</p>`
+    ? `<div class="row" style="gap:6px 12px;align-items:center"><b>${CAMP.ch}장${c.title ? " · " + esc(c.title) : ""}</b>${c.boss ? `<span>보스 ${esc(c.boss)}</span>` : ""}${c.adv && !c.est ? `<span class="chip el" data-e="${esc(c.adv)}">${EL[c.adv]} 데려가기</span>` : `<span class="note">보스 속성 정보 없음</span>`}${c.core === true ? '<span class="chip">코어 있음</span>' : c.core === false ? '<span class="chip">코어 없음</span>' : ""}</div>${c.note ? `<p class="note" style="margin:6px 0 0">${esc(c.note)}</p>` : ""}<p class="note" style="margin:6px 0 0">하드도 보스는 같아요.</p>`
     : `<span class="note">이 챕터의 보스 정보는 아직 없어요. 보스 속성을 알면 위에서 골라 주세요.</span>`;
   const m = storyDeck(weak);
   document.getElementById("campNote").textContent = weak ? `${EL[weak]} 딜러 우선` : "스토리 평가가 높은 순";
