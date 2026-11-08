@@ -1605,7 +1605,7 @@ function renderCamp() {
   elSel.value = CAMP.el;
   const weak = CAMP.el || "";
   document.getElementById("campInfo").innerHTML = c
-    ? `<div class="row" style="gap:6px 12px;align-items:center"><b>${CAMP.ch}장${c.title ? " · " + esc(c.title) : ""}</b>${c.boss ? `<span>보스 ${esc(c.boss)}</span>` : ""}${c.adv ? `<span class="note">보스전</span><span class="chip el" data-e="${esc(c.adv)}">${EL[c.adv]} 데려가기</span>` : `<span class="note">보스 속성 정보 없음</span>`}${c.stageAdv ? `<span class="note">일반 스테이지</span><span class="chip el" data-e="${esc(c.stageAdv)}">${EL[c.stageAdv]} 데려가기</span>` : ""}${c.core === true ? '<span class="chip">코어 있음</span>' : c.core === false ? '<span class="chip">코어 없음</span>' : ""}</div>${c.note ? `<p class="note" style="margin:6px 0 0">${esc(c.note)}</p>` : ""}<p class="note" style="margin:6px 0 0">하드도 보스는 같아요.</p>`
+    ? `<div class="row" style="gap:6px 12px;align-items:center"><b>${CAMP.ch}장${c.title ? " · " + esc(c.title) : ""}</b>${c.boss ? `<span>보스 ${esc(c.boss)}</span>` : ""}${c.adv ? `<span class="chip el" data-e="${esc(c.adv)}">${EL[c.adv]} 데려가기 (보스)</span>` : `<span class="note">보스 속성 정보 없음</span>`}${c.core === true ? '<span class="chip">코어 있음</span>' : c.core === false ? '<span class="chip">코어 없음</span>' : ""}</div>${c.note ? `<p class="note" style="margin:6px 0 0">${esc(c.note)}</p>` : ""}<p class="note" style="margin:6px 0 0">하드도 보스는 같아요.</p>`
     : `<span class="note">이 챕터의 보스 정보는 아직 없어요. 보스 속성을 알면 위에서 골라 주세요.</span>`;
   const m = storyDeck(weak);
   document.getElementById("campNote").textContent = weak ? `${EL[weak]} 딜러 우선` : "스토리 평가가 높은 순";
