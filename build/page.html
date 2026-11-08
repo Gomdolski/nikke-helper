@@ -241,6 +241,10 @@ h1, h2, h3, .big { text-wrap: balance; }
 .ar-deck { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
 .ar-deck:first-child { border-top: 0; padding-top: 0; }
 .ar-role { font-size: 12.5px; }
+.connect { border: 1.5px solid var(--accent); display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+.connect h3 { font-size: 18px; }
+.connect ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.connect .later { align-self: flex-start; background: none; border: 0; color: var(--muted); font-size: 13px; cursor: pointer; padding: 0; text-decoration: underline; }
 </style>
 
 <script>(() => { let t = "dark"; try { t = localStorage.getItem("nikke-helper-theme") || "dark"; } catch (e) {} if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; })();</script>
@@ -248,7 +252,7 @@ h1, h2, h3, .big { text-wrap: balance; }
 <header class="bar">
   <div class="wrap">
     <div class="brand"><h1>니케 지휘관 도우미</h1><span class="sub" id="dataDate"></span></div>
-    <div class="save" id="save" data-s="wait"><div class="seg theme" id="themeSeg" role="group" aria-label="화면 밝기"><button type="button" data-v="dark" aria-pressed="false">어둡게</button><button type="button" data-v="light" aria-pressed="false">밝게</button><button type="button" data-v="auto" aria-pressed="false" title="윈도우·휴대폰 설정을 따라가요">자동</button></div><button class="btn small" type="button" id="hdrSync" hidden title="블라블라링크에서 보유 니케·장비·큐브·전투력을 지금 다시 가져와요">↻ 내 정보 새로고침</button><span class="sync" id="hdrSyncAt"></span><span class="dot"></span><span id="saveText">불러오는 중</span></div>
+    <div class="save" id="save" data-s="wait"><div class="seg theme" id="themeSeg" role="group" aria-label="화면 밝기"><button type="button" data-v="dark" aria-pressed="false">어둡게</button><button type="button" data-v="light" aria-pressed="false">밝게</button><button type="button" data-v="auto" aria-pressed="false" title="윈도우·휴대폰 설정을 따라가요">자동</button></div><button class="btn small primary" type="button" id="hdrConnect" hidden title="블라블라링크 계정을 연결해서 내 니케 정보를 채워요">계정 연결</button><button class="btn small" type="button" id="hdrSync" hidden title="블라블라링크에서 보유 니케·장비·큐브·전투력을 지금 다시 가져와요">↻ 내 정보 새로고침</button><span class="sync" id="hdrSyncAt"></span><span class="dot"></span><span id="saveText">불러오는 중</span></div>
     <nav class="tabs" aria-label="메뉴">
       <a href="#dex" data-v="dex">니케 도감</a>
       <a href="#owned" data-v="owned">보유 니케</a>
@@ -264,6 +268,21 @@ h1, h2, h3, .big { text-wrap: balance; }
 </header>
 
 <main class="wrap">
+  <section class="panel connect" id="connectCard" hidden aria-labelledby="connTitle">
+    <div><h3 id="connTitle">먼저 내 계정을 연결하세요</h3>
+      <p class="note" style="margin:4px 0 0">연결하면 보유 니케·장비 옵션·큐브·스킬·전투력이 자동으로 채워지고, 모든 탭이 내 계정 기준으로 바뀌어요. 처음 한 번만 하면 돼요.</p></div>
+    <ol class="note" id="connSteps">
+      <li><a href="https://www.blablalink.com/setting/shiftyspad/private" target="_blank" rel="noopener">ShiftyPad 숨김 설정</a>에서 <b>‘SHIFTYPAD에 나의 니케 표시하기’</b>를 <b>‘모두에게 공개’</b>로 바꿔요.</li>
+      <li><a href="https://www.blablalink.com/" target="_blank" rel="noopener">블라블라링크</a> 오른쪽 위 내 사진 → <b>내 홈</b>을 열고 주소창 주소를 복사해요.</li>
+      <li>아래 칸에 붙여넣고 <b>연결하기</b>를 눌러요.</li>
+    </ol>
+    <div class="row" id="connForm" style="align-items:flex-end">
+      <div class="field grow"><label for="bbLink0">내 블라블라링크 프로필 링크</label><input type="url" id="bbLink0" placeholder="https://www.blablalink.com/user?openid=…" autocomplete="off"></div>
+      <button class="btn primary" id="bbGo0" type="button">연결하기</button>
+    </div>
+    <div id="connStatus" role="status"></div>
+    <button type="button" class="later" id="connLater">나중에 할게요</button>
+  </section>
   <!-- DEX -->
   <section class="view" id="v-dex">
     <div>
@@ -869,7 +888,7 @@ function applyImport(res, how, opts = {}) {
     <span>새로 체크 ${added}명 · 체크 해제 ${removed}명${res.unknown.length ? ` · 이름을 못 찾은 니케: ${res.unknown.map(esc).join(", ")}` : ""}. ${opts.extra || "애장품 체크는 그대로 뒀어요."}</span>
     <span><button class="btn small" id="impUndo">되돌리기</button></span></div>`);
 }
-function impStatus(html) { document.getElementById("impStatus").innerHTML = html; }
+function impStatus(html) { document.getElementById("impStatus").innerHTML = html; const cc = document.getElementById("connectCard"); if (cc && !cc.hidden) document.getElementById("connStatus").innerHTML = html.split('<span><button class="btn small" id="impUndo">되돌리기</button></span>').join(""); }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const payloadText = r => { if (!r) return ""; if (typeof r.payload === "string") return r.payload; const t = (r.content || []).filter(b => b.type === "text").map(b => b.text).join("\n"); return t || (r.payload != null ? JSON.stringify(r.payload) : ""); };
 let impBusy = false;
@@ -1303,7 +1322,7 @@ async function importFromLink(opts = {}) {
     impStatus(`<div class="verdict" data-v="bad"><span class="big">연결이 안 돼요</span><span>인터넷 연결을 확인해 주세요. 이 화면에서 외부 연결이 막혀 있다면 웹 주소(${esc(SITE)})에서 해 주세요.</span></div>`);
   } finally {
     bbBusy = false; btn.disabled = false; btn.textContent = "가져오기";
-    hb.disabled = false; hb.textContent = "↻ 내 정보 새로고침"; syncLabel();
+    hb.disabled = false; hb.textContent = "↻ 내 정보 새로고침"; syncLabel(); syncConnect();
     if (opts.fromHeader) {
       const ok = /반영/.test(document.getElementById("impStatus").innerText);
       document.getElementById("hdrSyncAt").textContent = ok ? "방금 가져왔어요" : "가져오지 못했어요 · ‘보유 니케’ 탭을 확인해 주세요";
@@ -1311,7 +1330,46 @@ async function importFromLink(opts = {}) {
     }
   }
 }
+const CONN_LATER_KEY = "nikke-helper-connect-later";
+function syncConnect() {
+  let ok = false; try { ok = !!localStorage.getItem(BB_AT_KEY); } catch (e) {}
+  const has = !!bbId(savedLink()) && ok; // connected = saved link that has worked at least once
+  let later = false; try { later = localStorage.getItem(CONN_LATER_KEY) === "1"; } catch (e) {}
+  const card = document.getElementById("connectCard");
+  if (!has && !later) card.hidden = false;
+  if (has && card.dataset.done !== "1") card.hidden = true;
+  document.getElementById("hdrConnect").hidden = has || !card.hidden;
+}
+function setupConnect() {
+  const card = document.getElementById("connectCard"), inp = document.getElementById("bbLink0");
+  const go = async () => {
+    document.getElementById("bbLink").value = inp.value;
+    const b = document.getElementById("bbGo0"); b.disabled = true; b.textContent = "연결하는 중…";
+    card.dataset.done = "1"; // keep the card open while importing
+    await importFromLink();
+    delete card.dataset.done;
+    b.disabled = false; b.textContent = "연결하기";
+    if (bbId(savedLink()) && /반영/.test(document.getElementById("connStatus").innerText)) {
+      card.dataset.done = "1";
+      document.getElementById("connTitle").textContent = "연결됐어요";
+      ["connSteps", "connForm"].forEach(id => { document.getElementById(id).hidden = true; });
+      const l = document.getElementById("connLater"); l.textContent = "닫기";
+    }
+  };
+  document.getElementById("bbGo0").addEventListener("click", go);
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  document.getElementById("connLater").addEventListener("click", () => {
+    if (card.dataset.done !== "1") { try { localStorage.setItem(CONN_LATER_KEY, "1"); } catch (e) {} }
+    card.hidden = true; syncConnect();
+  });
+  document.getElementById("hdrConnect").addEventListener("click", () => {
+    try { localStorage.removeItem(CONN_LATER_KEY); } catch (e) {}
+    syncConnect(); window.scrollTo({ top: 0, behavior: "smooth" }); inp.focus();
+  });
+  syncConnect();
+}
 function setupLinkImport() {
+  setupConnect();
   const input = document.getElementById("bbLink");
   input.value = savedLink();
   if (!input.value) document.getElementById("bbHow").open = true;
