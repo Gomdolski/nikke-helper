@@ -9,6 +9,7 @@
 | 새 니케 (이름, 속성, 무기, 버스트, 제조사) | blablalink 니케 도감, Prydwen 캐릭터 목록 | `build/prydwen.json`, `build/src/roster_compact_ko_en.json` |
 | 새 유니온 레이드 시즌 보스 | dildoro.com/union | `build/union_seasons.json` |
 | 새 솔로 레이드 시즌 보스 | 나무위키 ‘승리의 여신: 니케/콘텐츠’, 공식 공지 | `build/solo_seasons.json`, `build/build.js`의 다음 시즌 예정 항목 |
+| 솔로 레이드 상위권 덱 | `node build/update-soloraid.js` 실행 (레츠도로, 한국 서버) | `build/src/soloraid_rank.json` |
 | 새 니케 초상화 | `node build/update-portraits.js` 실행 | `build/src/portraits.json` |
 | 새 니케 별명 | 디시·아카 줄임말 | `build/nicknames.json` |
 | 이상개체 요격전 변경 | Prydwen Anomaly Interception 가이드 | `build/anomaly.json` |

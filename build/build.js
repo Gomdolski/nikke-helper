@@ -170,6 +170,7 @@ const KEYMAP = { 100100: "ele", 100400: "atk", 100300: "ammo", 100800: "cd", 100
 const olLines = ol.lines.map((l) => ({ k: KEYMAP[l.groupId] || String(l.groupId), ko: l.ko, w: l.weightPct, v: l.values }));
 
 // ---- Raids: solo seasons (newest first) and union seasons from dildoro ----
+const RANK = fs.existsSync(path.join(D, "soloraid_rank.json")) ? JSON.parse(fs.readFileSync(path.join(D, "soloraid_rank.json"), "utf8")) : null;
 function buildRaids() {
   const us = JSON.parse(fs.readFileSync(path.join(HERE, "union_seasons.json"), "utf8"));
   const WEAKOF = { Fire: "Water", Water: "Electric", Electric: "Iron", Iron: "Wind", Wind: "Fire" };
@@ -187,8 +188,8 @@ function buildRaids() {
     source: ss.source,
     seasons: [
       { season: 43, when: "2026-11-12 ~ 11-19", note: "예정", bosses: [{
-        id: "s43", ko: "43시즌 보스", en: "", element: "Wind", weak: "Fire", core: null,
-        tips: ["보스 이름과 패턴은 아직 공개 전이에요. 작열 딜러 위주로 준비하세요.", "코어 유무가 공개되면 아래 버튼으로 바꿔 주세요."], teams: [],
+        id: "s43", ko: (RANK && RANK.current && RANK.current.season === 43 && RANK.current.boss) || "43시즌 보스", en: "", element: "Wind", weak: "Fire", core: null,
+        tips: ["작열 딜러 위주로 준비하세요. 시즌이 끝나기 전까지는 같은 작열 약점이었던 지난 시즌 상위권 덱을 참고로 보여줘요.", "코어 유무가 공개되면 아래 버튼으로 바꿔 주세요."], teams: [],
       }] },
       ...past,
     ],
@@ -231,6 +232,24 @@ for (const r of roster) {
 for (const k of Object.keys(NAMES)) NAMES[k].sort((a, b) => (BYS(a).m === "Abnormal") - (BYS(b).m === "Abnormal"));
 function BYS(s) { return baseChars.find((c) => c.s === s) || {}; }
 
+// ---- Solo raid top-50 decks (Korean server, Let's Doro snapshot) -> slugs ----
+function buildSoloRank() {
+  if (!RANK) return null;
+  const miss = new Set();
+  const sl = (ko) => { const h = NAMES[nrmName(ko)]; if (!h) { miss.add(ko); return null; } return h[0]; };
+  const seasons = {};
+  for (const [n, s] of Object.entries(RANK.seasons)) {
+    seasons[n] = {
+      boss: s.boss, weak: s.weak, raidDate: s.raidDate, players: s.players,
+      combos: s.combos.slice(0, 12).map((c) => ({ m: c.m.map(sl), n: c.n, avg: c.avg, best: c.best })).filter((c) => c.m.every(Boolean)),
+      usage: s.usage.slice(0, 30).map(([ko, k]) => [sl(ko), k]).filter((x) => x[0]),
+      top: s.top.slice(0, 3).map((p) => ({ rank: p.rank, total: p.total, sq: p.sq.map((q) => ({ m: q.m.map(sl), d: q.d })) })),
+    };
+  }
+  if (miss.size) console.log("solo rank names not linked:", [...miss].join(", "));
+  return { at: RANK.at, server: RANK.server, current: RANK.current, seasons };
+}
+
 const out = {
   names: NAMES,
   built: new Date().toISOString().slice(0, 10),
@@ -242,6 +261,7 @@ const out = {
   cubes: CUBES,
   ol: { slot: ol.slotChance, tier: ol.tierChancePct, lines: olLines },
   campaign: fs.existsSync(path.join(HERE, "campaign.json")) ? JSON.parse(fs.readFileSync(path.join(HERE, "campaign.json"), "utf8")) : null,
+  soloRank: buildSoloRank(),
   weekly: fs.existsSync(path.join(HERE, "weekly.json")) ? JSON.parse(fs.readFileSync(path.join(HERE, "weekly.json"), "utf8")) : null,
 };
 
