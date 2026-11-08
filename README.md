@@ -9,8 +9,8 @@
 
 연결해 두면 보유 니케, 장비 옵션, 큐브, 스킬, 전투력이 자동으로 채워집니다. 처음 한 번만 하면 됩니다.
 
-1. [ShiftyPad 숨김 설정](https://www.blablalink.com/setting/shiftyspad/private)에서 'SHIFTYPAD에 나의 니케 표시하기'를 '모두에게 공개'로 바꿉니다.
-2. [내 블라블라링크 홈](https://www.blablalink.com/user)을 엽니다. 로그인돼 있으면 내 홈이 바로 열립니다. 주소창 주소(`https://www.blablalink.com/user?openid=...`)를 복사합니다. 주소창이 없는 휴대폰 앱이라면 프로필의 ID 숫자를 복사해도 됩니다.
+1. [ShiftyPad 숨김 설정](https://www.blablalink.com/setting/shiftyspad/private?lang=ko)에서 'SHIFTYPAD에 나의 니케 표시하기'를 '모두에게 공개'로 바꿉니다.
+2. [내 블라블라링크 홈](https://www.blablalink.com/user?lang=ko)을 엽니다. 로그인돼 있으면 내 홈이 바로 열립니다. 주소창 주소(`https://www.blablalink.com/user?openid=...`)를 복사합니다. 주소창이 없는 휴대폰 앱이라면 프로필의 ID 숫자를 복사해도 됩니다.
 3. 도우미 첫 화면 맨 위의 연결 칸에 붙여넣으면 바로 연결됩니다. 나중에 할 때는 위쪽 '계정 연결' 버튼이나 '보유 니케' 탭에서 할 수 있습니다.
 
 이후로는 열 때마다 6시간 간격으로 알아서 다시 가져옵니다. 바로 반영하려면 위쪽 '내 정보 새로고침'을 누르면 됩니다.
