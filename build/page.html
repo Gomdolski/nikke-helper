@@ -41,6 +41,9 @@ header.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; b
 .brand h1 { font-family: var(--font-display); font-weight: 400; font-size: 24px; margin: 0; letter-spacing: 0.01em; }
 .brand .sub { color: var(--muted); font-size: 12px; }
 .save { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.save .sync { white-space: nowrap; }
+.save { flex-wrap: wrap; justify-content: flex-end; row-gap: 4px; min-width: 0; }
+#saveText { white-space: nowrap; }
 .save .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
 .save[data-s="db"] .dot { background: var(--good); }
 .save[data-s="local"] .dot { background: var(--warn); }
@@ -226,7 +229,7 @@ h1, h2, h3, .big { text-wrap: balance; }
 <header class="bar">
   <div class="wrap">
     <div class="brand"><h1>니케 지휘관 도우미</h1><span class="sub" id="dataDate"></span></div>
-    <div class="save" id="save" data-s="wait"><span class="dot"></span><span id="saveText">불러오는 중</span></div>
+    <div class="save" id="save" data-s="wait"><button class="btn small" type="button" id="hdrSync" hidden title="블라블라링크에서 보유 니케·장비·큐브·전투력을 지금 다시 가져와요">↻ 내 정보 새로고침</button><span class="sync" id="hdrSyncAt"></span><span class="dot"></span><span id="saveText">불러오는 중</span></div>
     <nav class="tabs" aria-label="메뉴">
       <a href="#dex" data-v="dex">니케 도감</a>
       <a href="#owned" data-v="owned">보유 니케</a>
@@ -1060,6 +1063,13 @@ function maybeAutoImport() {
   importFromLink({ auto: true });
 }
 const sameLines = (a, b) => { const k = p => p.flat().filter(x => x[0]).map(x => x.join(":")).sort().join(","); return k(a) === k(b); };
+function syncLabel() {
+  const b = document.getElementById("hdrSync"), at = document.getElementById("hdrSyncAt");
+  const has = !!bbId(savedLink());
+  b.hidden = !has;
+  let t = 0; try { t = +localStorage.getItem(BB_AT_KEY) || 0; } catch (e) {}
+  at.textContent = has && t ? `${new Date(t).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" })} 기준` : "";
+}
 async function importFromLink(opts = {}) {
   if (opts instanceof Event) opts = {};
   if (bbBusy) return;
@@ -1071,6 +1081,7 @@ async function importFromLink(opts = {}) {
   if (linkChanged) persist();
   const btn = document.getElementById("bbGo");
   bbBusy = true; btn.disabled = true; btn.textContent = "가져오는 중…";
+  const hb = document.getElementById("hdrSync"); hb.disabled = true; hb.textContent = "가져오는 중…";
   impStatus(`<p class="note" style="margin:0">${opts.auto ? "저장된 링크로 최신 정보를 가져오고 있어요…" : "블라블라링크 정보를 가져오고 있어요…"}</p>`);
   try {
     const r = await fetch(`${NAPI}/api/user/${encodeURIComponent(id)}/nikke-builds?all=1`);
@@ -1129,7 +1140,15 @@ async function importFromLink(opts = {}) {
     });
   } catch (e) {
     impStatus(`<div class="verdict" data-v="bad"><span class="big">연결이 안 돼요</span><span>인터넷 연결을 확인해 주세요. 이 화면에서 외부 연결이 막혀 있다면 웹 주소(${esc(SITE)})에서 해 주세요.</span></div>`);
-  } finally { bbBusy = false; btn.disabled = false; btn.textContent = "가져오기"; }
+  } finally {
+    bbBusy = false; btn.disabled = false; btn.textContent = "가져오기";
+    hb.disabled = false; hb.textContent = "↻ 내 정보 새로고침"; syncLabel();
+    if (opts.fromHeader) {
+      const ok = /반영/.test(document.getElementById("impStatus").innerText);
+      document.getElementById("hdrSyncAt").textContent = ok ? "방금 가져왔어요" : "가져오지 못했어요 · ‘보유 니케’ 탭을 확인해 주세요";
+      setTimeout(syncLabel, 6000);
+    }
+  }
 }
 function setupLinkImport() {
   const input = document.getElementById("bbLink");
@@ -1137,6 +1156,8 @@ function setupLinkImport() {
   if (!input.value) document.getElementById("bbHow").open = true;
   document.getElementById("bbGo").addEventListener("click", () => importFromLink());
   setTimeout(maybeAutoImport, 600);
+  syncLabel();
+  document.getElementById("hdrSync").addEventListener("click", () => importFromLink({ fromHeader: true }));
   input.addEventListener("keydown", e => { if (e.key === "Enter") importFromLink(); });
 }
 
