@@ -421,6 +421,7 @@ h1, h2, h3, .big { text-wrap: balance; }
     <div class="panel" style="display:flex;flex-direction:column;gap:12px">
       <div class="seg" id="raidMode"><button data-v="solo" aria-pressed="true">솔로 레이드</button><button data-v="union" aria-pressed="false">유니온 레이드</button><button data-v="anomaly" aria-pressed="false">이상개체 요격전</button><button data-v="custom" aria-pressed="false">보스 직접 만들기</button></div>
       <div id="raidBosses"></div>
+      <div class="row" style="gap:8px;align-items:center"><button class="btn small" type="button" id="raidMine" aria-pressed="false">가진 니케로 되는 덱만 보기</button><span class="note" id="raidMineNote"></span></div>
     </div>
     <div id="raidInfo"></div>
     <div class="panel teamcard">
@@ -1545,6 +1546,18 @@ function appearances(boss) {
   }
   return out.length ? `<p style="margin:0" class="note">다른 시즌 등장: ${out.join(", ")}</p>` : "";
 }
+const MINE_KEY = "nikke-helper-raid-mine-v1";
+let RAID_MINE = false;
+try { RAID_MINE = localStorage.getItem(MINE_KEY) === "1"; } catch (e) {}
+// owned, or owned as its 애장품 version
+const ownSlug = x => S.owned.has(x) || C.some(c => c.tr && S.owned.has(c.s) && c.en === (get(x) || {}).en + " (Treasure)");
+function syncMineBtn() {
+  const b = document.getElementById("raidMine");
+  b.setAttribute("aria-pressed", RAID_MINE ? "true" : "false");
+  b.classList.toggle("primary", RAID_MINE);
+  b.textContent = RAID_MINE ? "✓ 가진 니케로 되는 덱만 보는 중" : "가진 니케로 되는 덱만 보기";
+  document.getElementById("raidMineNote").textContent = RAID_MINE ? "덱 5명을 모두 가진 것만 보여줘요. 다시 누르면 전체가 나와요." : "";
+}
 const eok = n => (n / 1e8).toFixed(n >= 1e10 ? 0 : 1) + "억";
 function renderRaidRank() {
   const box = document.getElementById("raidRank");
@@ -1559,17 +1572,18 @@ function renderRaidRank() {
   }
   if (!data) { box.hidden = true; return; }
   box.hidden = false;
-  const own = x => S.owned.has(x) || C.some(c => c.tr && S.owned.has(c.s) && c.en === (get(x) || {}).en + " (Treasure)");
-  const combos = data.combos.slice(0, 8).map(c => {
+  const own = ownSlug;
+  const pool = RAID_MINE ? data.combos.filter(c => c.m.every(own)) : data.combos;
+  const combos = pool.slice(0, 8).map(c => {
     const have = c.m.filter(own).length;
     return `<div class="rk-combo"><div class="row" style="gap:6px 10px"><b>${c.n}명 사용</b><span class="note">평균 ${eok(c.avg)} · 최고 ${c.best}위</span><span class="badge ${have === 5 ? "ok" : have >= 3 ? "part" : "no"}">내 니케 ${have}/5</span></div><div class="team">${c.m.map(x => slot(x, "cube")).join("")}</div></div>`;
   }).join("");
-  const use = data.usage.slice(0, 20).map(([x, k]) => { const c = get(x); return c ? `<span class="tn ${own(x) ? "have" : ""}" data-open="${esc(x)}" role="button" tabindex="0">${pfImg(c, "mini")}${esc(c.ko)} <span class="k">${Math.round(k / data.players * 100)}%</span></span>` : ""; }).join("");
+  const use = (RAID_MINE ? data.usage.filter(([x]) => own(x)) : data.usage).slice(0, 20).map(([x, k]) => { const c = get(x); return c ? `<span class="tn ${own(x) ? "have" : ""}" data-open="${esc(x)}" role="button" tabindex="0">${pfImg(c, "mini")}${esc(c.ko)} <span class="k">${Math.round(k / data.players * 100)}%</span></span>` : ""; }).join("");
   box.innerHTML = `<div class="teamhead"><h3>상위권이 실제로 쓴 덱 · ${label} 한국 서버 상위 ${data.players}명</h3><span class="note">${esc(data.raidDate || "")} 기록</span></div>
     ${note ? `<p class="note" style="margin:4px 0 0">${note}</p>` : ""}
     <p class="note" style="margin:4px 0 8px">한 사람이 덱 5개를 쓰니까, 많이 쓴 조합일수록 이번 보스에 잘 맞는다는 뜻이에요. 초록 칸이 가진 니케예요.</p>
-    ${combos}
-    <h3 style="margin-top:12px">상위권 니케 사용률</h3>
+    ${combos || `<div class="empty">가진 니케 5명으로 바로 쓸 수 있는 상위권 조합이 없어요. 버튼을 다시 눌러 전체를 보세요.</div>`}
+    <h3 style="margin-top:12px">상위권 니케 사용률${RAID_MINE ? " (가진 니케만)" : ""}</h3>
     <p class="note" style="margin:4px 0 8px">상위 ${data.players}명 중 몇 %가 쓴 니케인지예요.</p>
     <div class="rk-use">${use}</div>`;
 }
@@ -1613,12 +1627,18 @@ function renderRaid() {
       return `<div class="teamcard"><div class="teamhead"><h3>${i + 1}덱${t.guide ? ` · ${esc(t.guide)}` : ""}</h3><span class="badge ${t.warn ? "part" : "ok"}">${esc(t.why)}</span>${f ? `<span class="badge ${FIT_LABEL[f][0]}">${FIT_LABEL[f][1]}</span>` : ""}</div><div class="team">${t.m.map(c => slot(c.s, "cube")).join("")}</div></div>`; }).join("")
       : `<div class="empty">덱을 짤 만큼 니케가 없어요. 니케를 더 체크해 보세요.</div>`;
   }
-  const ts = teamsFor(el, boss).slice(0, 14);
+  syncMineBtn();
+  const ts = teamsFor(el, boss).filter(t => !RAID_MINE || t.have === t.need).slice(0, 14);
   document.getElementById("raidTeams").innerHTML = ts.length ? ts.map(t => `<div class="panel teamcard"><div class="teamhead"><h3>${esc(t.name)}</h3><span class="note">${esc(t.src)}</span><span class="badge ${t.have === t.need ? "ok" : t.have ? "part" : "no"}">${t.have}/${t.need}명 보유</span>${t.fit ? `<span class="badge ${FIT_LABEL[t.fit][0]}">${FIT_LABEL[t.fit][1]}</span>` : ""}</div>
     <div class="team">${t.m.map(x => slot(x)).join("")}</div>${t.sub ? `<p class="note" style="margin:0">대체: ${esc(t.sub)}</p>` : ""}</div>`).join("")
-    : `<div class="empty">이 속성으로 등록된 추천 덱이 없어요.</div>`;
+    : `<div class="empty">${RAID_MINE ? "가진 니케로 그대로 쓸 수 있는 추천 덱이 없어요. 위의 ‘내 니케로 자동 편성’을 보세요." : "이 속성으로 등록된 추천 덱이 없어요."}</div>`;
   renderRaidRank();
 }
+document.getElementById("raidMine").addEventListener("click", () => {
+  RAID_MINE = !RAID_MINE;
+  try { localStorage.setItem(MINE_KEY, RAID_MINE ? "1" : "0"); } catch (e) {}
+  renderRaid();
+});
 document.addEventListener("click", e => {
   const cs = e.target.closest("#coreSeg button");
   if (cs) {
