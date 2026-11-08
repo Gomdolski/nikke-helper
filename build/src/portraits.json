@@ -1,0 +1,1447 @@
+{
+ "at": "2026-11-08",
+ "list": [
+  {
+   "ko": "네온 : 비전 아이",
+   "en": "Neon: Vision Eye",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/so-39/tz-97/70fb299487aa9bb61a844a4b68e96d89.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bm-59/lm-97/dffb1c487e35ca654f5fcc43a3463cfd.webp"
+  },
+  {
+   "ko": "센티",
+   "en": "Centi",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/vz-77/bn-70/f66c08b26047347b46420a769de04837.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/te-90/ta-70/d57caffda19eb1f86222c8c38856c1c6.webp"
+  },
+  {
+   "ko": "리타",
+   "en": "Liter",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/po-10/wr-03/430fe2319b54b1569064001be1a93641.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ym-30/oe-03/ef1a8ecd993ca9fdd6b1d3967d07d5ab.webp"
+  },
+  {
+   "ko": "라플라스",
+   "en": "Laplace",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/cs-23/ve-03/8dec662c020f93bc1ed3b8c7ead22f8d.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/zx-36/mr-03/8570e243df69efb6b024768b3f7dc68d.webp"
+  },
+  {
+   "ko": "드레이크",
+   "en": "Drake",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/rb-27/lb-08/48e2d0b41848d524f651eee9e81b44da.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/zz-47/co-08/657d665637cb69e6685e151d2f52665d.webp"
+  },
+  {
+   "ko": "맥스웰",
+   "en": "Maxwell",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/wh-55/wl-81/a5c70b677371c1769e79a9bf47232734.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ff-75/ny-81/9f0972d1fdc850e7c54481045add9a3a.webp"
+  },
+  {
+   "ko": "라플라스 : 얼티밋 히어로",
+   "en": "Laplace: Ultimate Hero",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/kq-59/bs-09/01d638b947a3b7aba4ef61342940cb92.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/to-79/dv-86/50f94e79098fc61db5aa5641e4d21dd9.webp"
+  },
+  {
+   "ko": "드레이크 : 그레이트 빌런",
+   "en": "Drake: Great Villain",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/bp-94/rp-14/66ea01789217fa23e288c6235dd29e28.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/yu-08/jc-14/6d06debd40c1c73e7b490077afc1469c.webp"
+  },
+  {
+   "ko": "맥스웰 : 오디너리 미케닉",
+   "en": "Maxwell: Ordinary Mechanic",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/gv-23/ww-41/45f3f8170f2ef393cc130055b8119f78.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/nd-12/yz-19/f04fd6b97d2a39dd1a77a09f43260e0e.webp"
+  },
+  {
+   "ko": "크로우",
+   "en": "Crow",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/bo-11/zj-33/bbea99b61565c9c77f146aca6d80d354.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/km-31/qw-33/97013a641820f9e33eb426edbd22035b.webp"
+  },
+  {
+   "ko": "자칼",
+   "en": "Jackal",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/sn-46/eq-60/be4274244978959e8596a8babc23e044.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/yv-35/gt-38/db98dfc4421259794aebf0648d17f2ec.webp"
+  },
+  {
+   "ko": "N102",
+   "en": "N102",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/md-06/xl-17/a245334be93ef6aeb5afde0e9cd46fb1.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/vb-26/oy-17/68dd4d7968584e7319985498c12a84d9.webp"
+  },
+  {
+   "ko": "앤 : 미라클 페어리",
+   "en": "Anne: Miracle Fairy",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/rj-34/cs-44/6bc26f548dca5048571e8457a2202555.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ah-54/uf-44/5f7ae70cf5a589db981ba3f82535e3c5.webp"
+  },
+  {
+   "ko": "페퍼",
+   "en": "Pepper",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/by-29/au-28/6b4927f89c06bbfbfb5055fe79d63ace.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/kw-49/sh-28/11229815d040f110c82807eab0f3bf65.webp"
+  },
+  {
+   "ko": "율리아",
+   "en": "Julia",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/xa-08/ne-37/6de32e492ff90a95075ec82e9b350fed.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fy-28/er-37/7000e771a4418218373833e8ebb594c2.webp"
+  },
+  {
+   "ko": "유니",
+   "en": "Yuni",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/hp-03/lg-21/b3d5222931553dd92553b2cdbc0970c1.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/qn-23/ct-21/c93daf37219a5d9cd0a4e983407bf1f4.webp"
+  },
+  {
+   "ko": "미하라",
+   "en": "Mihara",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/mv-31/wq-94/b20070d555e20f73ccff4bfa4da33b53.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ew-27/sq-26/6b8536d8e0334609ade525a069143b79.webp"
+  },
+  {
+   "ko": "미하라 : 본딩 체인",
+   "en": "Mihara: Bonding Chain",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/be-35/mn-00/ec51dcc7846a88299df91a31ac5c41c2.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/kc-55/xx-53/0f2752909663009ffa5e82c5863053fc.webp"
+  },
+  {
+   "ko": "애드미",
+   "en": "Admi",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/lt-30/kp-83/9d4ceef56ffabba0e3469fb5fcb18414.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ur-50/cc-83/71c53d4af89feaffa7011daae5c9c76b.webp"
+  },
+  {
+   "ko": "토브",
+   "en": "Tove",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/xu-44/cg-20/971525e4870d57187a646e92b31ee993.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ec-33/yg-51/9844bd23912e56863a9bdaaaab5b6047.webp"
+  },
+  {
+   "ko": "마나",
+   "en": "Mana",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/zg-20/tc-52/51b33eff74c04ceea8a13743c44d360b.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ie-40/em-06/ade297df0d2af14286e096f129b08db0.webp"
+  },
+  {
+   "ko": "에테르",
+   "en": "Ether",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/np-24/yj-79/9e88c446fbc6ab403b3e14dbfa159015.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/wn-44/uj-11/26638ab9c8ff131f62c2e1ae1bffc0d5.webp"
+  },
+  {
+   "ko": "프로덕트 08",
+   "en": "Product 08",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/as-10/jv-33/c82718919f893a304fab61576f780fd9.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ha-98/ly-11/e7ca5f4ce81a8128ac2a81873c28c0a8.webp"
+  },
+  {
+   "ko": "프로덕트 12",
+   "en": "Product 12",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/pb-14/zs-38/bef1374ef6f75307a2bbbc10c4735e6d.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/xz-34/rf-38/ed5c23ce017d6071a3b3814d333bae37.webp"
+  },
+  {
+   "ko": "프로덕트 23",
+   "en": "Product 23",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/ny-85/wd-49/3202f6da10471ce49c8d327b426a09c7.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ld-98/nq-49/1531b4fdf30a8ebe7108af86ef543d28.webp"
+  },
+  {
+   "ko": "킬로",
+   "en": "Kilo",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/aj-61/uq-24/a29ed3443230f12dc7f236e854e6c1c8.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/xo-74/md-24/90eb0ad60a95276b844f4d2876d97907.webp"
+  },
+  {
+   "ko": "아인",
+   "en": "Ein",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/lg-63/kj-44/f0c089e8bb85053339d41b2720f0a900.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ue-83/bw-44/0f8cbab3f3d69f17fb9a7cb144dd1772.webp"
+  },
+  {
+   "ko": "길티",
+   "en": "Guilty",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/ce-85/ar-65/170c0a102305b5f9a292e2599d6ba702.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/lc-06/se-65/b5d07aadd368be41b0d8625185bcee2b.webp"
+  },
+  {
+   "ko": "신",
+   "en": "Sin",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/qn-89/qo-70/2fdf7ae0e0a384c7e84386a0ba6364cb.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/zl-10/ib-70/69cc0bceafd9e89aff5045df25be4a26.webp"
+  },
+  {
+   "ko": "퀀시",
+   "en": "Quency",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/vt-18/by-44/20ff32d808227dace8c756de85b6096e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/er-38/ni-97/3ff22bbbde66a159b152f3f465ed557d.webp"
+  },
+  {
+   "ko": "퀀시 : 이스케이프 퀸",
+   "en": "Quency: Escape Queen",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/vv-29/rv-49/68728960c4e3a4d9e8c9ee0e19ec6398.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ta-42/df-03/74c0560f78d53e935bbe4c5e28b03f95.webp"
+  },
+  {
+   "ko": "길티 : 마이티 바니",
+   "en": "Guilty: Mighty Bunny",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/bb-57/xc-76/bd5e50c4df921c542bb29abf140dee38.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/jz-77/op-76/0fd22335606f43322bf899987cabf469.webp"
+  },
+  {
+   "ko": "신 : 스위프트 바니",
+   "en": "Sin: Swift Bunny",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/pk-61/mz-81/fdf46570eb4df5d306fb9f1d4bdfd8a2.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/yi-81/em-81/de31517a921a517b941b65bf6b8094d2.webp"
+  },
+  {
+   "ko": "플로라",
+   "en": "Flora",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/rz-09/kd-23/becc4bf55ffa66874b39c62a3a2b9771.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ka-05/gd-54/8e930ecb943c25feb20ee1598350edf4.webp"
+  },
+  {
+   "ko": "트리나",
+   "en": "Trina",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/gi-13/aa-28/af22d6d7756efe69915373651b429e11.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pg-33/rn-28/4197d6ea767356525e3b75331dc5c21e.webp"
+  },
+  {
+   "ko": "나가",
+   "en": "Naga",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/if-77/sr-00/755dcf2aea00e99952a84bc6b9771f8a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fk-90/ke-00/aef6a2982f1b2da1ed28503a17b4c641.webp"
+  },
+  {
+   "ko": "티아",
+   "en": "Tia",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/wo-81/io-05/5f04f96984b134bd885b3b473a0efb5f.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/tt-94/ab-05/0bfb9c588835f7803e7cbd35f44805f4.webp"
+  },
+  {
+   "ko": "일레그",
+   "en": "Elegg",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/iy-01/su-76/37f230e17431d0c17a7d07bbc67369b3.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/gd-14/ee-30/4a8d5494a928091db8c7a631653a168e.webp"
+  },
+  {
+   "ko": "트로니",
+   "en": "Trony",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/oe-29/yb-04/9b6e15d798cb4b58c2fdd7277415cd4c.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/gf-25/ub-35/145d515109db1fc5f58a588d08ce13e1.webp"
+  },
+  {
+   "ko": "일레그 : 붐 앤 쇼크",
+   "en": "Elegg: Boom and Shock",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/cn-33/ny-09/7834f83cc5e968ef22c7d96d3ff9e5a7.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ll-53/fl-09/eaefe6a58f1c70621573cee22989302f.webp"
+  },
+  {
+   "ko": "모리",
+   "en": "Mori",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/ys-82/sm-68/cb53be33cd7cc1f979a2a7ca1f2d043c.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/hq-03/jz-68/a92174629552ce4e3ec1199aa4e152c6.webp"
+  },
+  {
+   "ko": "백학",
+   "en": "Snow Crane",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/qa-23/wl-77/268a0bc90310655035f134c253ef98b2.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/yy-43/hv-31/7c9eddbb194ffc280b29c50a240e837c.webp"
+  },
+  {
+   "ko": "라피",
+   "en": "Rapi",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/gn-03/nj-68/48bc957318d19b4d873a9b423d6d51fa.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ds-16/yt-22/67e341816e80e0c1e13903e5de58875b.webp"
+  },
+  {
+   "ko": "네온",
+   "en": "Neon",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/uw-07/dg-73/dd44ddf184f32d90dc07cf95b2795412.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/du-27/oq-27/4bcf958cbdaf70c1073fc04d7861ca57.webp"
+  },
+  {
+   "ko": "네온 : 블루 오션",
+   "en": "Neon: Blue Ocean",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/fk-74/dr-33/33e2bdbc097bfe2ddbe0abd2e1fd02a5.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/cp-87/ve-33/21a5a27c4312098966dc1c45fe8ef01b.webp"
+  },
+  {
+   "ko": "라피 : 레드 후드",
+   "en": "Rapi: Red Hood",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/yz-07/yv-65/d2c988a262dd44579c299337d5658c40.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/hx-27/qi-65/6a0b188c8e3f94adf851f3df06381b32.webp"
+  },
+  {
+   "ko": "델타",
+   "en": "Delta",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/fj-90/ll-52/c323eb897a0788dd888219ce3f8ed0c2.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/oh-11/cy-52/e698e3f6f975e4d7d81882a0c26b68af.webp"
+  },
+  {
+   "ko": "시그널",
+   "en": "Signal",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/kr-30/gp-84/08f91c530da192535d95b79d6c9f580a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/tp-50/yc-84/46501ce3573bb3b4bf48a18aed75141c.webp"
+  },
+  {
+   "ko": "폴리",
+   "en": "Poli",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/py-85/jn-36/2e1ca2791472c8dd9a3109f716b704b2.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/yw-06/ba-36/3e14896a08a2156c0f31e9aebfcb9a2a.webp"
+  },
+  {
+   "ko": "미란다",
+   "en": "Miranda",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/vg-25/er-68/88e9d12d692695aaae54b796a4e3d0a4.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/sl-38/we-68/096df3a3777319b2052b72140d90fc36.webp"
+  },
+  {
+   "ko": "키리",
+   "en": "Quiry",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/am-53/jy-95/1f5c00eb307f6f57ce252d5905a20b22.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/xr-66/bl-95/f6b8125300f3eceaec15efc6f38a5c5f.webp"
+  },
+  {
+   "ko": "D",
+   "en": "D",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/an-80/hp-20/6fdc107538b247f87b46d08c783053b3.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/jl-01/zc-20/a98f3786f038faeb2eeff2461c2c1d9e.webp"
+  },
+  {
+   "ko": "K",
+   "en": "K",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/ft-09/sz-93/aafafd7a73810a9004f575b524a4739a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/or-29/ej-47/2eaf7db2da652f1a27eeb44e476b01aa.webp"
+  },
+  {
+   "ko": "D : 킬러 와이프",
+   "en": "D: Killer Wife",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/zi-41/od-26/a7454375ef26de7ab36031151ab2fe35.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ig-61/fq-26/5020d38f1d8d7cfb995a0fa861a47b8c.webp"
+  },
+  {
+   "ko": "브리드",
+   "en": "Brid",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/lk-82/xi-40/8bd89cef4cf31e38b71035575d91f88b.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ui-03/ov-40/3765d35123965f85bcd984487e0edd03.webp"
+  },
+  {
+   "ko": "솔린",
+   "en": "Soline",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/zt-86/is-14/db85d381d5c624a59c1e4346cf49218f.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ir-07/es-45/fdabd2c14d00a7da6f8f623f087718df.webp"
+  },
+  {
+   "ko": "디젤",
+   "en": "Diesel",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/ez-15/yp-19/c006e5e77a3bd6bca9bd3defad3601b1.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/nx-35/jz-72/d65894d220255968fb4be0b5af9e6d11.webp"
+  },
+  {
+   "ko": "브리드 : 사일런트 트랙",
+   "en": "Brid: Silent Track",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/vy-50/dw-46/830d9d8541fce0c485950e38050b1c6d.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/cg-39/zw-77/e4cf2c53b6e10b0e86b8f9e7ee00de8a.webp"
+  },
+  {
+   "ko": "솔린 : 프로스트 티켓",
+   "en": "Soline: Frost Ticket",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/kh-54/tt-51/8b439391ad93e8bd3ae2a1f73fcd6c49.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/tf-74/lg-51/9b576faee99b9e6b55358195d939e616.webp"
+  },
+  {
+   "ko": "디젤 : 윈터 스위츠",
+   "en": "Diesel: Winter Sweets",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/pn-82/za-78/6bf2f9261d5b41c4659692a6eb78527a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ho-78/bd-56/3d8aaa77890c3f9c489c0065a54cf580.webp"
+  },
+  {
+   "ko": "엠마",
+   "en": "Emma",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/uv-65/zp-54/25d04f8ffc40b3cee148e993c4dcce6e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/dt-85/rc-54/ca3628f9bd5323c29df2e762e7cfd8dd.webp"
+  },
+  {
+   "ko": "베스티",
+   "en": "Vesti",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/lu-01/ew-81/920c4fa237f3c65a3aa1225d9c153b39.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/iz-14/wj-81/67ef63eef0c98905868f86e2bd76f65c.webp"
+  },
+  {
+   "ko": "은화",
+   "en": "Eunhwa",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/ad-05/ut-86/40c1882ed7af26e1623ae2cd90170a26.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/jb-25/mg-86/0aec8646f99d350a3b807b99f5675a4e.webp"
+  },
+  {
+   "ko": "엠마 : 택티컬 업",
+   "en": "Emma: Tactical Upgrade",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/fj-33/aa-14/026cc69b87453686a95c7fae2796dd7f.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/oh-53/rn-14/d6ec0bb1f4becae143497bbaff00fe67.webp"
+  },
+  {
+   "ko": "베스티 : 택티컬 업",
+   "en": "Vesti: Tactical Upgrade",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/ts-37/px-19/75b8663dc471b8aa915c55edebca32cf.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/cq-57/hk-19/d9e647e72e107a7102dc2dadf4b6e044.webp"
+  },
+  {
+   "ko": "은화 : 택티컬 업",
+   "en": "Eunhwa: Tactical Upgrade",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/yy-65/ve-46/634d5cd7414565af77d70eec5d57e9f8.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/hw-85/mr-46/99003d19b0312bba18d0b01d303d194f.webp"
+  },
+  {
+   "ko": "E.H.",
+   "en": "E.H.",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/mc-78/zu-92/363d6ec11668234f35c4e2fa7616f846.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ed-74/bx-70/f18cd57798332ec61be2d4a32f73bba0.webp"
+  },
+  {
+   "ko": "프리바티",
+   "en": "Privaty",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/se-97/pl-51/b901c8f631bb2bfc2f59022ab3c785ce.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pj-11/av-05/5727ddaeae336667d91e1b548bed984e.webp"
+  },
+  {
+   "ko": "길로틴",
+   "en": "Guillotine",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/ra-85/nn-35/a4c7c2cb8fa0b965c4fd69fd76af2783.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/zy-06/fa-35/3a09cfd338a2dae4b9151a6a935659a9.webp"
+  },
+  {
+   "ko": "메이든",
+   "en": "Maiden",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/hz-21/su-62/43630f7a549ce000225c8c9896f92ee0.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fe-34/kh-62/350e4ad933b7b758f001230606f0fc88.webp"
+  },
+  {
+   "ko": "길로틴 : 윈터 슬레이어",
+   "en": "Guillotine: Winter Slayer",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/nf-49/yb-89/3010423589d6dc5b92f97cbc1cd14053.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fg-45/ae-67/7285abef0700b831c936f5c7d9f6d361.webp"
+  },
+  {
+   "ko": "메이든 : 아이스 로즈",
+   "en": "Maiden: Ice Rose",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/bo-53/ny-94/9163759961bd6052bca348f719138ebe.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/km-73/fl-94/cab8cea6f21268397b0a6b69e86ea350.webp"
+  },
+  {
+   "ko": "로산나",
+   "en": "Rosanna",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/or-25/ox-22/b24c71eb0f4824d4c7aefb379d4067e4.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/xp-45/gk-22/929b0170cedda4265a4dbcae9f48db5a.webp"
+  },
+  {
+   "ko": "솔져 E.G.",
+   "en": "Soldier EG",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/vk-70/or-01/0e0dffc7ddb90f3765cd08e0cafb8f27.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/nl-66/qu-78/440091c5ffb11d31b3519e2a643431ad.webp"
+  },
+  {
+   "ko": "솔져 F.A.",
+   "en": "Soldier FA",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/jt-74/eo-06/844efc3365f45226b7ab2764c251d48f.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/sr-94/wb-06/2222991899ba88a337469c22ad54c3f9.webp"
+  },
+  {
+   "ko": "솔져 O.W.",
+   "en": "Soldier OW",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/nw-74/gg-44/caf1158e8a40cf8609620360df7205a4.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fx-70/cg-75/2b8ee0780f7ce18a1e4a51ccc9d27c3f.webp"
+  },
+  {
+   "ko": "프리바티 : 언카인드 메이드",
+   "en": "Privaty: Unkind Maid",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/zq-09/dx-68/f7fbdbf68251d8464c7d5c171ff23d9e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/wv-22/ph-22/ddcf4c573c63d5cd750b3599068ab604.webp"
+  },
+  {
+   "ko": "마르차나",
+   "en": "Marciana",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/ex-64/gv-20/fa34347a9112fef4a27188b0cfd64e2b.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/nv-84/yi-20/f4f463f5907ee37ebe18613da88a39d4.webp"
+  },
+  {
+   "ko": "마르차나 : 마린 스터디",
+   "en": "Marciana: Marine Study",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/kd-92/mc-47/22358e5b13dda043a42cca169356c875.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/tb-13/dp-47/1d831aa94896c99ebb671562f5ee99dd.webp"
+  },
+  {
+   "ko": "마스트",
+   "en": "Mast",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/bl-62/gr-35/ff70ed8ba2e63090b39c68c61e23cf49.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ht-51/cr-66/9ee6ed09cc197f55a11a49f2329cf487.webp"
+  },
+  {
+   "ko": "앵커",
+   "en": "Anchor",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/pu-66/wo-40/b6b57b79ef36e06939705002fd672a44.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ys-86/ob-40/cca09adeeaf5d0ca05c297b0b8cff164.webp"
+  },
+  {
+   "ko": "헬름",
+   "en": "Helm",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/va-94/bv-67/b6bd2f152e9a7e05b72e65323e039063.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/nb-90/dy-45/dedbb554eb7eaf6c3e251cc77d146f5b.webp"
+  },
+  {
+   "ko": "헬름 : 아쿠아마린",
+   "en": "Helm: Aquamarine",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/jj-98/rs-72/e9a7c3d1ab9791731978c1cdc8a4fdff.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/sh-19/jf-72/325254bb4dcd42604d22f11ea9429e61.webp"
+  },
+  {
+   "ko": "마스트 : 로망틱 메이드",
+   "en": "Mast: Romantic Maid",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/ai-34/wz-00/ce3b833cd35960c9bf06fce4351e8812.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/gq-23/zc-77/fda1b87ec4fdb9e34135e9be99293216.webp"
+  },
+  {
+   "ko": "앵커 : 이노센트 메이드",
+   "en": "Anchor: Innocent Maid",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/or-38/mw-05/d79376caa8148ed88ae6daea0c3c8146.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/xp-58/ej-05/b134044273e168242de939b80f6cded3.webp"
+  },
+  {
+   "ko": "츠바이",
+   "en": "Zwei",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/ga-35/fc-17/46f4ce5a484ae76c99a7d1d8b268c518.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/df-48/wp-17/e1f0ea2ea43964c33ff1d341d6f4ae59.webp"
+  },
+  {
+   "ko": "아비스타",
+   "en": "Avistar",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/lz-86/km-21/58b75af1692e868b117ffa876a0ece43.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ux-07/bz-21/f8b4f30c7d06db91d119c0b33f69f04c.webp"
+  },
+  {
+   "ko": "소라",
+   "en": "Sora",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/nk-35/dr-29/abc35cf08ccbbb51f7403606cd19c231.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/wi-55/ve-29/b524321235dcceaccb01178d0134a855.webp"
+  },
+  {
+   "ko": "팬텀",
+   "en": "Phantom",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/zw-94/uk-84/895f63fea88f4f6e6a248ef7007286bf.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ge-83/wn-62/d3128ae36f1e533946978c228c8f920b.webp"
+  },
+  {
+   "ko": "아르카나",
+   "en": "Arcana",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/of-98/kh-89/2a8b1a833483ca6aaef103f3ce487f0b.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/lk-12/bu-89/da08dddb35b09202e069b1dab0d825ec.webp"
+  },
+  {
+   "ko": "레이블",
+   "en": "Label",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/tl-27/po-17/af2657ff5ffb44f70ed2db8d5de8985a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/cj-47/hb-17/1386ae63cf48e82ad99314f5e50f955b.webp"
+  },
+  {
+   "ko": "아르카나 : 포츈 메이트",
+   "en": "Arcana: Fortune Mate",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/hu-31/fl-22/81a33cc568f575e1ed6fdf904a4ac7d6.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/qs-51/wy-22/2e432a8f27bd25a294183785b1bad827.webp"
+  },
+  {
+   "ko": "아니스",
+   "en": "Anis",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ac-35/in-01/7f8156284db920fa5a836bcac92f6629.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ja-55/aa-01/a889989b035b19ba06a3943ca69764b5.webp"
+  },
+  {
+   "ko": "아니스 : 스파클링 서머",
+   "en": "Anis: Sparkling Summer",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/tt-78/to-38/3870984ac10047733bc6b57502f3378c.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/qy-91/lb-38/aafd750fc87ae293aeb10569f02bf736.webp"
+  },
+  {
+   "ko": "아니스 : 스타",
+   "en": "Anis: Star",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ni-11/os-70/cfc1f77baa6c70c165d42601357899cd.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/wg-31/gf-70/52af6fd068474dc40652c72edd3315ae.webp"
+  },
+  {
+   "ko": "벨로타",
+   "en": "Belorta",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/av-87/zg-56/c7c102300d1cb6a9640cc97a9a095b38.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/jt-08/qt-56/71486e06b7eed896e61c261b23dc2a43.webp"
+  },
+  {
+   "ko": "미카",
+   "en": "Mica",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/pe-91/pd-61/29099e5790a79002eb8feeea3170fe36.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/yc-12/gq-61/795903dcf94a765f7fb2191b64e922c9.webp"
+  },
+  {
+   "ko": "미카 : 스노우 버디",
+   "en": "Mica: Snow Buddy",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/gd-27/uk-88/17e1e7994a98fa31e7aa380526d2051f.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/di-40/lx-88/fc5e0de41ed07356349d8ed6232d2db5.webp"
+  },
+  {
+   "ko": "벨로타 : 펌킨 위치",
+   "en": "Belorta: Pumpkin Witch",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/um-31/kh-93/41db1f3d95047751256a1d3bbea7bd6f.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/dk-51/bu-93/d05e46471cc8ba52a2514a137d89a054.webp"
+  },
+  {
+   "ko": "바이퍼",
+   "en": "Viper",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/gw-50/un-65/197f8fba001f911b5fe69f5473e909ab.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pu-70/ma-65/03ee7d40334c3ce266a58075992ca37c.webp"
+  },
+  {
+   "ko": "메어리",
+   "en": "Mary",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/np-25/ra-69/9bf3d2d8cf18479d4d98f1370d90bcf1.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fq-21/na-01/e175938771ac6b757fb1becfaa17e7bb.webp"
+  },
+  {
+   "ko": "메어리 : 베이 갓데스",
+   "en": "Mary: Bay Goddess",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/he-57/me-02/4df5ddeb01a3a24cd8a251f3b47222c8.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/zf-53/ie-33/922164e43aa66d593eb6f4e27d03fd62.webp"
+  },
+  {
+   "ko": "슈가",
+   "en": "Sugar",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ye-20/pc-53/b8231297ba3db5cc1150f08c049e4baa.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/em-09/lc-84/8df8e8c8c6a136bacc49c1d65a5b59f6.webp"
+  },
+  {
+   "ko": "밀크",
+   "en": "Milk",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/mn-24/ez-58/a9472edc3aa3bfab46898c208d0b8f26.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/js-37/wm-58/e36d7259a95e2e09b7f71b0263b6b3cb.webp"
+  },
+  {
+   "ko": "프림",
+   "en": "Frima",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/rt-52/kg-85/75cd454109aa4e98bba1ce0c26354234.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ar-72/bt-85/713c5e1f55b98c0882b0058f92501a5f.webp"
+  },
+  {
+   "ko": "밀크 : 블루밍 바니",
+   "en": "Milk: Blooming Bunny",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/gc-56/ad-90/ff44690f97cd69303f35e110c88858d5.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pa-76/rq-90/e4d447cdfab84aa03bb671c67db609e4.webp"
+  },
+  {
+   "ko": "율하",
+   "en": "Yulha",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/xk-26/us-78/5ee44c9e8591369d60be8eca023eaf36.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/gi-46/mf-78/46d234a1e76f5d937a09bee9199997f5.webp"
+  },
+  {
+   "ko": "루드밀라",
+   "en": "Ludmilla",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/sm-05/az-41/ebd75daa73b72b386036b713f2598a3c.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/kn-01/dc-19/af682749dc90bebea213d17707a1c383.webp"
+  },
+  {
+   "ko": "앨리스",
+   "en": "Alice",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/gv-09/qw-46/75b345c5e360f78e886b7daa5697e434.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pt-29/ij-46/962293c26e61c938785ef1cdf75165cf.webp"
+  },
+  {
+   "ko": "네베",
+   "en": "Neve",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/md-48/sd-25/b305c9953c964f8761cee8a736a425b4.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/vb-68/dn-78/a1ce13bca62216fabb7c90bfe306cfdd.webp"
+  },
+  {
+   "ko": "루드밀라 : 윈터 오너",
+   "en": "Ludmilla: Winter Owner",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/rj-76/xk-52/8503f8fcdf40b4c8051ff93f064ce511.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ah-96/ox-52/11e567882102c775bd351972118467ff.webp"
+  },
+  {
+   "ko": "앨리스 : 원더랜드 바니",
+   "en": "Alice: Wonderland Bunny",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/fs-80/nh-57/d2050eed5ccc0192bbcb0e0cdcac2c3a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/oq-01/eu-57/bd2122645c383fc0ffb840c1d3875619.webp"
+  },
+  {
+   "ko": "루피",
+   "en": "Rupee",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/xt-31/nh-14/dc00138f7a4ea67c6e202155aca3441d.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/gr-51/eu-14/36e3fea4735cc1d125a7556aba991832.webp"
+  },
+  {
+   "ko": "얀",
+   "en": "Yan",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/os-66/so-41/3daf068e85df1185adc13e8f14c268e9.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/lx-79/kb-41/13f61aa0b8f84d1ae378913947f22cc5.webp"
+  },
+  {
+   "ko": "도라",
+   "en": "Dolla",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/db-70/il-46/64a8d9fdfb64325afbf67d1e30373bd7.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/lz-90/zy-46/4099a0fe948e59b3a0462c006ad78fdf.webp"
+  },
+  {
+   "ko": "루피 : 윈터 쇼퍼",
+   "en": "Rupee: Winter Shopper",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ih-98/ns-73/f4f5cc42403e89ce1b967f354674c4bb.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/rf-19/ff-73/50a4b43e06bbcb739a73f7028c4b53fd.webp"
+  },
+  {
+   "ko": "엑시아",
+   "en": "Exia",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ii-26/lj-97/b511b0f11e0ee358ee6b4f7a995d83db.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/rg-46/cw-97/4f4d5f94b50763ee14ad3308b4a81dbd.webp"
+  },
+  {
+   "ko": "노벨",
+   "en": "Novel",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/nq-65/gn-30/30e5c7aff5e85ae4a8ddc8c3601eb88e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/kv-78/ya-30/53042cf95e57024509eddcf4d48f412b.webp"
+  },
+  {
+   "ko": "루마니",
+   "en": "Rumani",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/tf-28/bc-18/9d174d6412a2d7f22bb51b3204e3f3f4.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/cd-48/sp-18/497c03beea8140362d51b26450fdd2e8.webp"
+  },
+  {
+   "ko": "에피넬",
+   "en": "Epinel",
+   "corp": "MISSILIS",
+   "icon": "https://sg-tools-cdn.blablalink.com/ke-63/gj-45/898472d4a2f6e8d729f69908a44efa29.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/qm-52/im-23/042fde51182ae51d56e54aacb98ee965.webp"
+  },
+  {
+   "ko": "폴크방",
+   "en": "Folkwang",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/yn-67/wg-50/937028410bf5d7c8fa5c81000e140ee5.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/vs-80/nt-50/a84141b22b7f22626d7be0cc0c081690.webp"
+  },
+  {
+   "ko": "블랑",
+   "en": "Blanc",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/pv-37/qv-38/2884d487616b8dbbc109232437e67eeb.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/wd-26/sy-16/7872356d4de999b2de89ba83f84ce1cf.webp"
+  },
+  {
+   "ko": "누아르",
+   "en": "Noir",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ee-41/gs-43/b6c6f46752e61434f7bcbed790db025b.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bj-54/yf-43/c575a7c99dfaa1a61db090d9b87f70bf.webp"
+  },
+  {
+   "ko": "루주",
+   "en": "Rouge",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/jk-69/lz-70/8ce431b15458c35f7382e7d7d9d213b7.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bl-65/oc-48/c62799d0ba47a9a58813fcab22948321.webp"
+  },
+  {
+   "ko": "목단",
+   "en": "Moran",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/da-29/eu-27/4d82ca28d037c4aefecea57f554654aa.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ly-49/wh-27/4e099b3818543f9c79440a3c76a2b223.webp"
+  },
+  {
+   "ko": "사쿠라",
+   "en": "Sakura",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/tz-64/kb-54/081e41c54055e51dbc0c5c230c712b7b.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/re-77/bo-54/c725d0c614734d4dc9b101ba696f79ae.webp"
+  },
+  {
+   "ko": "로산나 : 시크 오션",
+   "en": "Rosanna: Chic Ocean",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ii-68/zy-59/46550f6fe0747bcbaf1b40fbf92fcd7e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/rg-88/rl-59/9b4b1ac7372dfec62d0bd60011ecebfa.webp"
+  },
+  {
+   "ko": "사쿠라 : 블룸 인 서머",
+   "en": "Sakura: Bloom in Summer",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/no-96/li-33/5c70abdad0741004f49c7a76cc9b515c.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/wm-17/cv-33/55bac4d18b1174d1465952b85ece47ee.webp"
+  },
+  {
+   "ko": "iDoll 플라워",
+   "en": "iDoll Flower",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/uh-42/lc-12/19cef1da48c6d59394592ad7c4837bb3.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/mi-38/hc-43/8e09c33ceef34fee83133206137b67f9.webp"
+  },
+  {
+   "ko": "iDoll 오션",
+   "en": "iDoll Ocean",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/iq-46/az-17/a582218e40e3d4f754688ee6f61e5c28.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ro-66/mj-70/c9940bc83a7e4247036309f88c31d1fa.webp"
+  },
+  {
+   "ko": "iDoll 썬",
+   "en": "iDoll Sun",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/te-14/bk-76/3ea9123882be130c7bfd4ea1524bd645.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/lf-10/sx-76/4f0aa7d55fa2bd6a88fd10eed25f106f.webp"
+  },
+  {
+   "ko": "에이드",
+   "en": "Ade",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/fz-65/mt-84/2de03955874647e6b64b8363018bc2d9.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ox-85/eg-84/3a606c8edda3ff7e519c2b5c647ccc0e.webp"
+  },
+  {
+   "ko": "코코아",
+   "en": "Cocoa",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ui-69/cq-89/0c68334ef72cd441e0590a6ec8423264.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/dg-89/ud-89/0535d5dc13aef2cfcff14a5525398792.webp"
+  },
+  {
+   "ko": "소다",
+   "en": "Soda",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/zo-97/oa-63/91dc439091b6a061b3438f400135929e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/im-18/zk-17/aaadc4d50ec59a6f1d84d410a9b7fd80.webp"
+  },
+  {
+   "ko": "소다 : 트윙클링 바니",
+   "en": "Soda: Twinkling Bunny",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ew-37/je-95/d91ddff1491b924598d3804e6f811c92.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/cb-50/ar-95/b569e2b452e046be79f642764a4fc009.webp"
+  },
+  {
+   "ko": "에이드 : 에이전트 바니",
+   "en": "Ade: Agent Bunny",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/tf-41/zb-01/4844e4d5e35257607e7dfb58f7a666a9.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/cd-61/qo-01/45892e7be638237db3f25e297f4a646d.webp"
+  },
+  {
+   "ko": "벨벳",
+   "en": "Velvet",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/yl-69/ei-28/03d1fd97b534b7adbcc378694be6e25e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/hj-89/vv-28/09010453f6d5975ad812f265491851d5.webp"
+  },
+  {
+   "ko": "네로",
+   "en": "Nero",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/vl-40/ha-33/9fbbec4a75195062b97900bb07ffd9df.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ej-60/sk-86/e960fb1ee3a28546edea49ed965708a5.webp"
+  },
+  {
+   "ko": "비스킷",
+   "en": "Biscuit",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ar-68/mh-60/322310e800c000f9f2d2635e15361782.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ss-64/ih-91/304dc723137113cfac711b929ad9f8b1.webp"
+  },
+  {
+   "ko": "레오나",
+   "en": "Leona",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/pa-72/ce-65/1675c806cc8f0bb7244a0d19b136d7e5.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/xy-92/tr-65/fb475580a80d1c9dc933c02b4ef15383.webp"
+  },
+  {
+   "ko": "라이",
+   "en": "Rei",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/zp-67/ag-49/78e29ec0dc4dc0b4a4baa2a01d875c3e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/in-87/rt-49/050a53feb8286a773f3a3ed6124f5138.webp"
+  },
+  {
+   "ko": "노이즈",
+   "en": "Noise",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/we-63/ba-63/b1a57e981b57f124ccd51646f15be164.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fc-83/sn-63/95f0d5b71fc3c60eaf4d4928ca42d47e.webp"
+  },
+  {
+   "ko": "볼륨",
+   "en": "Volume",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/bk-91/gh-90/ea134d0cd6c02ed9d3a02cec91d87dbd.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ki-12/xu-90/add2fb308eb66b428b1207b78eb59765.webp"
+  },
+  {
+   "ko": "아리아",
+   "en": "Aria",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/pt-95/rr-64/fdcbe4c90a314bb81ec130b4c825a06c.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/yr-16/nr-95/0be9690ed3bc510d8721b885e09f66b4.webp"
+  },
+  {
+   "ko": "브래디",
+   "en": "Bready",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/jg-08/ei-66/39336b080022522940a3de9209efa776.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bh-04/gl-44/daf7038890811d43758645134a83241d.webp"
+  },
+  {
+   "ko": "크러스트",
+   "en": "Crust",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/xp-12/uf-71/a7ee606492bb922a060c2c336bd43872.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/gn-32/ls-71/3d82aab03543347d0a1a5130f93bf5b7.webp"
+  },
+  {
+   "ko": "베이",
+   "en": "Bay",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/dg-85/er-64/f2342f4e5fa1d04157b5630e8267611a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/me-06/we-64/adf2fa380321b19ad5d72b59a751c4e9.webp"
+  },
+  {
+   "ko": "클레이",
+   "en": "Clay",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/uf-21/jy-91/620397b71778b8c8884d0fe83a61b9d3.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/an-10/mb-69/498bc80d5fbb7d010d497d71da0888d3.webp"
+  },
+  {
+   "ko": "아크레인저 블랙",
+   "en": "Ark Ranger Black",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/ph-00/wi-01/ebd5bfb8f5ad5847eb8a2db2dbebf228.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/vp-88/yl-78/33c21ecadf384c0742f6755ac336e88a.webp"
+  },
+  {
+   "ko": "민트",
+   "en": "Mint",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/dz-09/ue-63/31caa32129469999a8c011eba7fc1bac.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/mx-29/wh-41/ef8630b5faf7042b1cf34801ce162292.webp"
+  },
+  {
+   "ko": "프리카",
+   "en": "Prika",
+   "corp": "TETRA",
+   "icon": "https://sg-tools-cdn.blablalink.com/uy-44/kb-68/c4ba87906faff8cfc78af5ba6429e5be.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/sd-57/bo-68/9276a7be7f3a1914b6fce1752a3ee3d5.webp"
+  },
+  {
+   "ko": "마리안 : 퀸",
+   "en": "Marian: Queen",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/jn-74/zg-25/f5ce0f0aa4328238613af76c6de49a84.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pv-63/bj-03/a447f201daaa56f38a438779cc967c77.webp"
+  },
+  {
+   "ko": "스노우 화이트",
+   "en": "Snow White",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/ju-45/yv-04/b53ce55899781fc6401c2920e502ce90.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bv-41/ay-81/94a873b7bb8d725729dd19ed2c78e0c3.webp"
+  },
+  {
+   "ko": "라푼젤",
+   "en": "Rapunzel",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/yd-49/os-09/056e329e585ac334c1d13996bddd2e40.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/hb-69/gf-09/16bab1e1c404b462e912ee4b83fd258d.webp"
+  },
+  {
+   "ko": "홍련",
+   "en": "Scarlet",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/dj-77/ac-82/a26102dc0f5816931c09c85040b11993.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/vk-73/wc-14/f2893c4a2cea98400821874523de5dcf.webp"
+  },
+  {
+   "ko": "나유타",
+   "en": "Nayuta",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/dl-88/pz-87/e3532447b3ca028770c2a5ee149e746e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/aq-02/hm-87/eaa4d6abe7cbe2f9eb42947f9142f299.webp"
+  },
+  {
+   "ko": "스노우 화이트 : 이노센트 데이즈",
+   "en": "Snow White: Innocent Days",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/ir-17/vg-15/b8d876f051c25480985c999da5ae838a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/oz-06/mt-15/9f2f4fb7ee8254836ccde51677fb0a0c.webp"
+  },
+  {
+   "ko": "홍련 : 흑영",
+   "en": "Scarlet: Black Shadow",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/xa-21/ld-20/6e3b8dbfd367f6b1c0977866c27cd40b.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fy-41/cq-20/18788bf1096282ce5f3d8f2d7d8851c7.webp"
+  },
+  {
+   "ko": "라푼젤 : 퓨어 그레이스",
+   "en": "Rapunzel: Pure Grace",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/cg-49/qk-47/395234037855a411afde71194af7edee.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/le-69/hx-47/5b2c391ac334e9ebcae454d3dab9256e.webp"
+  },
+  {
+   "ko": "하란",
+   "en": "Harran",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/uj-40/da-34/be88a23813da7d2a84e6ea0c1380626e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ro-53/un-34/a99b6140b06facc05f70c355dbdd49e4.webp"
+  },
+  {
+   "ko": "이사벨",
+   "en": "Isabel",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/is-44/sx-39/7e26188409a095e0ddb74a7199f352a3.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/rq-64/kk-39/0ee20b8c0278f9fa30d249437c17f554.webp"
+  },
+  {
+   "ko": "노아",
+   "en": "Noah",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/ny-72/ye-66/25105efed0f5f34106c41096571b9ccd.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ww-92/pr-66/8d25baf8288574c75a9f807d69a67756.webp"
+  },
+  {
+   "ko": "도로시",
+   "en": "Dorothy",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/ch-76/ob-71/d96d3a6d5c55ef7dd76f83181da11869.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/lf-96/fo-71/8bbc7ab3edd9b45c64e97f570c04f62d.webp"
+  },
+  {
+   "ko": "도로시 : 세렌디피티",
+   "en": "Dorothy: Serendipity",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/hn-05/ti-98/8eb1e9dd804ca8ac6788859d45a21432.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ql-25/kv-98/77625e5de4c3008ec3db11b9d3d509e3.webp"
+  },
+  {
+   "ko": "모더니아",
+   "en": "Modernia",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/oj-18/dj-32/f4d49f875b1e112f42c2daf410aa7aac.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/lo-31/ot-85/3446827ab13559809f688640e7b5a378.webp"
+  },
+  {
+   "ko": "니힐리스타",
+   "en": "Nihilister",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/tp-46/iq-59/2af46ebcae9e0510ebecb7dc93de412b.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/cn-66/ad-59/ef64beec2ddf594dd9b935f2db2efeef.webp"
+  },
+  {
+   "ko": "리버렐리오",
+   "en": "Liberalio",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/hy-50/yn-64/6045c557bca29bcd35a65c8c99745ff0.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/qw-70/qa-64/0f87bd202582cc8fc6d7388fc6de4cd4.webp"
+  },
+  {
+   "ko": "크라운",
+   "en": "Crown",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/pk-48/pa-98/04a73cd1bfa43f3a1078564107ad8336.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/yi-68/gn-98/ef70f7c236a986f12cbaf9ae4ffd44b6.webp"
+  },
+  {
+   "ko": "차임",
+   "en": "Chime",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/gj-83/uh-26/240c18e28ea45d1f83b765a3666863b1.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/mr-72/wk-04/6857cb52fda8540c7c7d1911e6234f4d.webp"
+  },
+  {
+   "ko": "레드 후드",
+   "en": "Red Hood",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/rq-60/ov-67/17f2cf990b5e85cef98eb8abc8db3c41.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ao-80/gi-67/2c49234120cb1a3f5ed0634f9f7a5049.webp"
+  },
+  {
+   "ko": "스노우 화이트 : 헤비암즈",
+   "en": "Snow White: Heavy Arms",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/ww-88/af-41/627884de8e4628efd7dbcb7a9e4ecf53.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ox-84/rs-41/f279c65cb20780116d55aa06f4c73bab.webp"
+  },
+  {
+   "ko": "홍련 : 신살",
+   "en": "Scarlet: Goddeath",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/lf-92/qc-46/866dd4f535bab41a136438dc0aae9b33.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ud-13/hp-46/2668d4ae685fe7ec154f20f2301120d3.webp"
+  },
+  {
+   "ko": "라푼젤 : 생츄어리",
+   "en": "Rapunzel: Sanctuary",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/ce-28/vj-73/55a116ef43a3023c354d7f4d1b40847d.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/zj-41/mw-73/352fc04b8a69cec22aea5f10fbe5a404.webp"
+  },
+  {
+   "ko": "신데렐라",
+   "en": "Cinderella",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/yt-24/wd-87/86a69907ae0feeb218eb98d10eb9a131.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/vy-37/nq-87/17602f0ce49d38a4a53823023b072d6c.webp"
+  },
+  {
+   "ko": "리틀 머메이드",
+   "en": "Little Mermaid",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/si-56/rh-20/2b99cf6d141638788d640b64cb84bf66.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bg-76/iu-20/660754578e376a64468a4f5f775a5add.webp"
+  },
+  {
+   "ko": "그레이브",
+   "en": "Grave",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/gr-60/he-25/d53975fb3ddd520d13aa07e5614ad59e.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pp-80/yr-25/e1c012a6cb0024dce39a43446824b7cf.webp"
+  },
+  {
+   "ko": "신데렐라 : 크리스탈 웨이브",
+   "en": "Cinderella: Crystal Wave",
+   "corp": "PILGRIM",
+   "icon": "https://sg-tools-cdn.blablalink.com/lx-88/ml-52/9a54283cdd0c15a9b554810488563775.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/uv-09/dy-52/a6c0d496f4d6d3acef7477095ff3fed4.webp"
+  },
+  {
+   "ko": "델타 : 닌자 시프",
+   "en": "Delta: Ninja Thief",
+   "corp": "ELYSION",
+   "icon": "https://sg-tools-cdn.blablalink.com/px-58/lw-12/26016d784ba7271f57ef417fea7b5fc1.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/hy-54/nz-89/cf0193c108c0ca257fa5ce1b76710f4d.webp"
+  },
+  {
+   "ko": "마키마",
+   "en": "Makima",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/ik-63/se-92/0b17bb8415d0511ab45546f94cf8e39d.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ri-83/jr-92/d833edf0b3f4b28a9b3cef51806fbab6.webp"
+  },
+  {
+   "ko": "파워",
+   "en": "Power",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/nq-91/do-66/9d4c0daa156ea3d9d5f979677802fe37.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fr-87/zo-97/7df4f5cb49aa6e549aae558e926f6123.webp"
+  },
+  {
+   "ko": "히메노",
+   "en": "Himeno",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/bz-95/tl-71/f925089f1a559c84ba672ffa02cf9276.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/kx-16/ky-71/9087bc88b06f80ebb418330c8d16627b.webp"
+  },
+  {
+   "ko": "2B",
+   "en": "2B",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/sz-58/wj-23/04e83950cb81d486177ec7e63f5a5024.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/qe-71/nw-23/f6c63b0ef750afc7b8ab946c56e9ed3c.webp"
+  },
+  {
+   "ko": "A2",
+   "en": "A2",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/yf-86/bq-50/0ab0b87b5b5493f50f6eee73ee67a413.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/hd-07/td-50/63aabaa7a12abfd2cfe09757fbe028fb.webp"
+  },
+  {
+   "ko": "파스칼",
+   "en": "Pascal",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/mo-90/rn-55/0d767ab4d3578ce4d34130d52ce5ae6c.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/vm-11/ja-55/15d6d81bae12faf9ab117064296e8e2a.webp"
+  },
+  {
+   "ko": "렘",
+   "en": "Rem",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/rv-46/jv-29/90809e84cd523f7543a0af5525641219.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/at-66/ly-07/0553cb35e2ea249f9b8c19e721752b38.webp"
+  },
+  {
+   "ko": "에밀리아",
+   "en": "Emilia",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/iu-81/zs-34/8826ec03f4ef59e4c7d5efc1d0b580bc.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/fz-94/rf-34/f87b895ec91df7aadddd73936f17ad25.webp"
+  },
+  {
+   "ko": "람",
+   "en": "Ram",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/oa-10/ez-61/0677003794a7634753de11d029de2140.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ui-98/hc-39/17fc64b714b47a8074980e976594e773.webp"
+  },
+  {
+   "ko": "아스카",
+   "en": "Asuka",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/th-65/oa-59/dae1a6a26022ebe8de729df65b7b1a78.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/li-61/ka-90/fd2b6166c3e448f90c4d555f77f5f93b.webp"
+  },
+  {
+   "ko": "레이",
+   "en": "Rei",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/hq-69/xu-18/0077b0ff94f14da0b36953942e755b77.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/qo-89/ph-18/40eebe20f957d113512aba8d778f39b0.webp"
+  },
+  {
+   "ko": "마리",
+   "en": "Mari",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/yp-05/je-91/091b8ced66cbf8012b34b4750afcbf08.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ex-93/ar-91/c8a3d41dcf9a1ebaee8fd013181253b6.webp"
+  },
+  {
+   "ko": "미사토",
+   "en": "Misato",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/my-09/zb-96/44454e67ed1fcdfecf1bb0e07f7254cd.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/kd-22/qo-96/0df9ead46b0d8eb2f60fa3afcda8461a.webp"
+  },
+  {
+   "ko": "레이 (가칭)",
+   "en": "Rei (Tentative Name)",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/se-37/ei-24/657220f742f62cf80b454f2574c18b54.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bc-57/vv-24/0cb1772b01fbc9f624cba7a14c82ef77.webp"
+  },
+  {
+   "ko": "아스카 : WILLE",
+   "en": "Asuka: WILLE",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/gn-41/uf-29/0664c6b8c1367369612868307a225530.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pl-61/ls-29/6826233ef47df509c3af49bc414f0d08.webp"
+  },
+  {
+   "ko": "사쿠라",
+   "en": "Sakura",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/lt-69/zm-56/9f80c3e51c4cccbbc8e8e4fe584cf963.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ur-89/qz-56/960b9f87a34c6593c9759704cf1f3988.webp"
+  },
+  {
+   "ko": "에이다",
+   "en": "Ada",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/dw-60/mc-43/9770466ef17196f2489b791a7cd17207.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/mu-80/dp-43/bcb358201edbd4c77c7960a3c72ff9c8.webp"
+  },
+  {
+   "ko": "질",
+   "en": "Jill",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/sf-64/bz-48/3a57bb50f4d982a0d98f68283de629ee.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bd-84/tm-48/c83210170631c36481cad19cc8b27a14.webp"
+  },
+  {
+   "ko": "클레어",
+   "en": "Claire",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/xl-92/hg-75/4a084e37c2d8bf650bd149de23ad692a.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/gj-13/yt-75/bb291ae8345ca912cf893d36e4698e85.webp"
+  },
+  {
+   "ko": "이브",
+   "en": "EVE",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/ol-55/ke-27/b8c1242d8acfa0f29e89a76f58417af4.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/lq-68/br-27/d44555db404c15e07f079625d130e8d6.webp"
+  },
+  {
+   "ko": "레이븐",
+   "en": "Raven",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/tr-83/pl-54/140184abd98aeb95a03860bd312949f8.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/zz-72/ro-32/0fead0c2bb542a8a48a95fecec8c9698.webp"
+  },
+  {
+   "ko": "릴리",
+   "en": "Lily",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/ia-87/fi-59/19c32db15d70f448b07b45f9691aad98.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/qy-08/wv-59/be1cc9e0ca0c800c1a07223ecb192882.webp"
+  },
+  {
+   "ko": "치사토",
+   "en": "Chisato",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/nh-43/ig-11/e4bc33b9c6f01f42e9b1ee8ddbabacb5.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/wf-63/zt-11/666ccdf5e2ad7d292e099715d123f5e3.webp"
+  },
+  {
+   "ko": "타키나",
+   "en": "Takina",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/eg-78/tq-84/7a0c48465473578ff4ed2c707d49eff9.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/bl-91/fa-38/f5b3b1e8598d4160f7da6b7784abf7d5.webp"
+  },
+  {
+   "ko": "쿠루미",
+   "en": "Kurumi",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/sp-82/jn-89/8d1ff5d7bd09253e43b2f22df1f09a0d.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/pu-95/ux-43/fe6107da9b9b679efec8a6f9a4a69835.webp"
+  },
+  {
+   "ko": "퀸(마코토)",
+   "en": "Queen (Makoto)",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/xw-38/ml-41/d91c9e7b57e98a6a5106f35e84c3b262.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/gu-58/xv-94/b84adc04beb824a3f168b1ac946dd2b5.webp"
+  },
+  {
+   "ko": "유키코",
+   "en": "Yukiko",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/dc-66/rs-68/f1d8b577b90446d610a577a5d7610811.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/ma-86/jf-68/6582f3f0d598ea5d17c49294f8afa78c.webp"
+  },
+  {
+   "ko": "아이기스",
+   "en": "Aigis",
+   "corp": "ABNORMAL",
+   "icon": "https://sg-tools-cdn.blablalink.com/rl-70/wz-95/299445690a5ae3849c194e4ee25eaa17.webp",
+   "medium": "https://sg-tools-cdn.blablalink.com/aj-90/zc-73/13da2c6a20061d835568332663e7953a.webp"
+  }
+ ]
+}

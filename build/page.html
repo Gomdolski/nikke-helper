@@ -87,13 +87,13 @@ input[type=number] { font-family: var(--font-mono); }
 .count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
 /* dex list */
 .dex { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
-.card { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; width: 100%; min-width: 0; }
+.card { display: grid; grid-template-columns: auto auto 1fr auto; gap: 4px 10px; align-items: center; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; width: 100%; min-width: 0; }
 .card:hover { border-color: var(--accent); }
 .card .stripe { grid-row: span 2; width: 4px; align-self: stretch; border-radius: 2px; background: var(--muted); }
 .card .stripe[data-e="Fire"] { background: var(--fire); } .card .stripe[data-e="Water"] { background: var(--water); }
 .card .stripe[data-e="Wind"] { background: var(--wind); } .card .stripe[data-e="Electric"] { background: var(--elec); } .card .stripe[data-e="Iron"] { background: var(--iron); }
 .card .nm { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.card .meta { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 4px; }
+.card .meta { grid-column: 3 / 5; display: flex; flex-wrap: wrap; gap: 4px; }
 .own { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--line); display: inline-grid; place-items: center; font-size: 13px; background: var(--surface); }
 .own[aria-pressed="true"] { background: var(--good); border-color: var(--good); color: #fff; }
 .card.owned { background: color-mix(in srgb, var(--good-soft) 55%, var(--surface)); }
@@ -204,6 +204,12 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .brand h1 { white-space: nowrap; }
 p, li, .note, .lead, td, .why { text-wrap: pretty; }
 h1, h2, h3, .big { text-wrap: balance; }
+.pf { grid-row: span 2; width: 48px; height: 48px; border-radius: 8px; object-fit: cover; background: var(--sunk); display: block; }
+.mini { width: 22px; height: 22px; border-radius: 5px; object-fit: cover; background: var(--sunk); vertical-align: middle; flex: none; }
+.slot .n { display: flex; align-items: center; gap: 5px; }
+.slot .n .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.drawer .dpf { width: 72px; height: 72px; border-radius: 12px; object-fit: cover; background: var(--sunk); flex: none; }
+.tn .mini { width: 20px; height: 20px; border-radius: 4px; margin-left: -2px; }
 </style>
 
 <div class="upd" id="upd" hidden><div class="wrap"><p id="updText"></p><span id="updAct"></span></div></div>
@@ -232,7 +238,7 @@ h1, h2, h3, .big { text-wrap: balance; }
       <p class="lead">이름을 누르면 추천 큐브, 오버로드 옵션, 스킬 레벨, 같이 쓰는 덱이 나와요. 오른쪽 체크 칸을 누르면 보유 니케로 표시돼요.</p>
     </div>
     <div class="panel filters" id="dexFilters">
-      <div class="field" style="grid-column: 1 / -1"><label for="q">이름 검색 (한글·영문)</label><input type="search" id="q" placeholder="예: 홍련, 리타, 레드 후드"></div>
+      <div class="field" style="grid-column: 1 / -1"><label for="q">이름 검색 (한글·영문·별명)</label><input type="search" id="q" placeholder="예: 홍련, 흑련, 레후, 애헬름"></div>
     </div>
     <div class="row"><span class="count" id="dexCount"></span><span class="grow"></span>
       <div class="field" style="flex-direction:row;align-items:center;gap:8px"><label for="sort">정렬</label>
@@ -554,11 +560,14 @@ async function initStore() {
 function toggleOwn(s) { S.owned.has(s) ? S.owned.delete(s) : S.owned.add(s); persist(); renderAll(); }
 
 // ---------- shared bits ----------
+// Portraits are linked from the official blablalink CDN (not copied); a missing image just leaves an empty box.
+const pfImg = (c, cls) => c && c.img ? `<img class="${cls}" src="${esc(c.img)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.removeAttribute('src')">` : `<span class="${cls}"></span>`;
 const chips = c => `<span class="chip r-${esc(c.r)}">${esc(c.r)}</span><span class="chip el" data-e="${esc(c.e)}">${esc(EL[c.e] || c.e)}</span><span class="chip burst">${bursts(c).map(esc).join("/")}</span><span class="chip">${esc(CLS[c.c] || c.c)}</span><span class="chip">${esc(c.w)}</span>`;
 function card(c, opts = {}) {
   const own = S.owned.has(c.s);
   return `<div class="card ${own ? "owned" : ""}" data-open="${esc(c.s)}" role="button" tabindex="0">
     <span class="stripe" data-e="${esc(c.e)}"></span>
+    ${pfImg(c, "pf")}
     <span class="nm" title="${esc(c.en)}">${esc(c.ko)}</span>
     <button class="own" data-own="${esc(c.s)}" aria-pressed="${own}" aria-label="${esc(c.ko)} 보유">${own ? "✓" : ""}</button>
     <span class="meta">${chips(c)}${opts.tier ? `<span class="tier" data-t="${esc(c.rb)}" title="보스전 평가">${esc(c.rb || "-")}</span>` : ""}</span>
@@ -572,7 +581,7 @@ function slot(s, slotLabel) {
   }
   const have = S.owned.has(c.s);
   return `<div class="slot ${have ? "have" : "miss"}" data-open="${esc(c.s)}" role="button" tabindex="0" title="${esc(c.en)}">
-    <span class="n">${have ? "✓ " : ""}${esc(c.ko)}</span>
+    <span class="n">${pfImg(c, "mini")}<span class="t">${have ? "✓ " : ""}${esc(c.ko)}</span></span>
     <span class="s"><span>${esc(bursts(c).join("/"))}</span><span>${esc(EL[c.e])}</span><span>${esc(c.w)}</span></span>${slotLabel === "cube" && c.cu ? `<span class="s" title="추천 큐브">큐브 · ${esc(c.cu[0].replace(/ 큐브$/, ""))}</span>` : ""}</div>`;
 }
 const olTag = (x, cls) => `<span class="ol-tag ${cls || ""}">${esc(OLSHORT[x[0]] || x[0])}${x[1] ? `<b>${esc(x[1])}개</b>` : ""}</span>`;
@@ -599,9 +608,10 @@ function openChar(s) {
   D.teams.forEach(t => { if (teams.length < 8 && t[2].some(x => get(x)?.s === c.s)) teams.push([`${t[1] === "B" ? "보스전" : "레이드"} 덱`, t[2]]); });
   const html = `<div class="scrim" data-close></div>
   <aside class="drawer" role="dialog" aria-modal="true" aria-label="${esc(c.ko)} 정보">
-    <div class="top"><div style="flex:1;min-width:0"><h2>${esc(c.ko)}</h2><div class="en">${esc(c.en)}</div></div>
+    <div class="top">${pfImg(c, "dpf")}<div style="flex:1;min-width:0"><h2>${esc(c.ko)}</h2><div class="en">${esc(c.en)}</div></div>
       <button class="btn small" data-close>닫기</button></div>
     <div class="row">${chips(c)}</div>
+    ${c.nk && c.nk.length ? `<p class="note" style="margin:0">별명: ${c.nk.map(esc).join(", ")}</p>` : ""}
     ${SKIN[c.s] ? `<p class="note" style="margin:0">지금 입은 스킨: <b>${esc(SKIN[c.s])}</b></p>` : ""}
     <button class="btn ${own ? "" : "primary"}" data-own="${esc(c.s)}">${own ? "보유 해제" : "보유 니케로 표시"}</button>
     <dl class="kv">
@@ -648,7 +658,13 @@ function buildFilters() {
     renderDex();
   });
 }
-function matchQ(c, q) { if (!q) return true; q = q.toLowerCase().replace(/\s/g, ""); return c.ko.replace(/\s/g, "").toLowerCase().includes(q) || c.en.toLowerCase().replace(/\s/g, "").includes(q); }
+const nq = v => String(v || "").toLowerCase().replace(/\s/g, "");
+function matchQ(c, q) { if (!q) return true; q = nq(q); return nq(c.ko).includes(q) || nq(c.en).includes(q) || (c.nk || []).some(n => nq(n).includes(q)); }
+// exact name, English name or community nickname -> character
+function findName(v) {
+  const q = nq(v); if (!q) return null;
+  return C.find(x => nq(x.ko) === q) || C.find(x => nq(x.en) === q) || C.find(x => (x.nk || []).some(n => nq(n) === q)) || null;
+}
 function renderDex() {
   document.querySelectorAll("#dexFilters .seg").forEach(seg => seg.querySelectorAll("button").forEach(b => {
     const k = seg.dataset.f; b.setAttribute("aria-pressed", k === "mine" ? S.f.mine : S.f[k].has(b.dataset.v));
@@ -1173,7 +1189,7 @@ document.getElementById("olPieces").addEventListener("click", e => {
 function buildOLTable() {
   const cols = [1, 5, 6, 10, 11, 15];
   document.getElementById("olTable").innerHTML = `<thead><tr><th>옵션</th>${cols.map(t => `<th>${t}단계</th>`).join("")}<th>나올 비중</th></tr></thead><tbody>${D.ol.lines.map(l => `<tr><td>${esc(l.ko)}</td>${cols.map(t => `<td>${l.v[t - 1]}%</td>`).join("")}<td>${l.w}%</td></tr>`).join("")}</tbody>`;
-  document.getElementById("olNames").innerHTML = C.map(c => `<option value="${esc(c.ko)}">${esc(c.en)}</option>`).join("");
+  document.getElementById("olNames").innerHTML = C.map(c => `<option value="${esc(c.ko)}">${esc(c.en)}</option>`).join("") + C.flatMap(c => (c.nk || []).map(n => `<option value="${esc(n)}">${esc(c.ko)}</option>`)).join("");
 }
 
 // ---------- CUBE ----------
@@ -1255,7 +1271,7 @@ function renderTier() {
     vars.forEach(v => { const t = v[TIER.mode]; if (grid[t] && grid[t][v.b]) grid[t][v.b].push({ c, multi: !!c.tv }); });
   });
   const cell = list => `<div class="tl">${list.sort((a, b) => (CLS_ORDER[a.c.c] ?? 3) - (CLS_ORDER[b.c.c] ?? 3) || a.c.ko.localeCompare(b.c.ko, "ko")).map(({ c, multi }) =>
-    `<span class="tn ${S.owned.has(c.s) ? "have" : ""}" data-open="${esc(c.s)}" role="button" tabindex="0" title="${esc(c.en)} · ${esc(CLS[c.c] || c.c)} · ${esc(c.w)}"><span class="d" data-e="${esc(c.e)}"></span>${esc(c.ko)}${multi ? `<span class="k">유동</span>` : ""}</span>`).join("")}</div>`;
+    `<span class="tn ${S.owned.has(c.s) ? "have" : ""}" data-open="${esc(c.s)}" role="button" tabindex="0" title="${esc(c.en)} · ${esc(CLS[c.c] || c.c)} · ${esc(c.w)}"><span class="d" data-e="${esc(c.e)}"></span>${pfImg(c, "mini")}${esc(c.ko)}${multi ? `<span class="k">유동</span>` : ""}</span>`).join("")}</div>`;
   const rows = TIERS.filter(t => cols.some(b => grid[t][b].length));
   document.getElementById("tierTable").innerHTML = `<thead><tr><th></th>${cols.map(b => `<th>버스트 ${b}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map(t =>
     `<tr><th><span class="tier" data-t="${t}">${t}</span></th>${cols.map(b => `<td>${cell(grid[t][b])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="4"><div class="empty">조건에 맞는 니케가 없어요.</div></td></tr>`}</tbody>`;
@@ -1662,12 +1678,12 @@ document.getElementById("q").addEventListener("input", renderDex);
 document.getElementById("sort").addEventListener("change", renderDex);
 document.getElementById("oq").addEventListener("input", renderOwned);
 document.getElementById("olq").addEventListener("input", e => {
-  const v = e.target.value.trim(); const c = C.find(x => x.ko === v) || C.find(x => x.en.toLowerCase() === v.toLowerCase());
+  const c = findName(e.target.value);
   if (c && c !== OLS.char) { OLS.char = c; OLS.loaded = null; renderOL(); }
 });
 document.getElementById("cubeSort").addEventListener("change", renderCube);
 document.getElementById("cubeQ").addEventListener("input", e => {
-  const v = e.target.value.trim(); const c = C.find(x => x.ko === v) || C.find(x => x.en.toLowerCase() === v.toLowerCase());
+  const c = findName(e.target.value);
   if (c && c !== CUBE_PICK) { CUBE_PICK = c; renderCubePick(); }
 });
 ["autoN", "autoHeal"].forEach(id => document.getElementById(id).addEventListener("change", renderRaid));

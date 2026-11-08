@@ -121,6 +121,36 @@ const chars = pry.chars.map((p) => {
 });
 // Treasure variants share a Korean name with the base unit; that's fine.
 
+// ---- Community nicknames (build/nicknames.json: { "공식이름": ["별명", "애장품 전용 별명*"] }) ----
+{
+  const nf = path.join(HERE, "nicknames.json");
+  const nick = fs.existsSync(nf) ? JSON.parse(fs.readFileSync(nf, "utf8")).names || {} : {};
+  let n = 0;
+  for (const c of chars) {
+    const base = c.ko.replace(/ \(애장품\)$/, "");
+    const list = (nick[base] || []).filter((x) => c.tr ? /\*$/.test(x) : !/\*$/.test(x)).map((x) => x.replace(/\*$/, "").trim());
+    if (c.tr) list.push("애" + base.replace(/\s+/g, ""), "애장품" + base.replace(/\s+/g, ""));
+    const uniq = [...new Set(list.filter(Boolean))];
+    if (uniq.length) { c.nk = uniq; n += uniq.length; }
+  }
+  console.log("nicknames", n);
+}
+
+// ---- Portraits (blablalink CDN links via nikke-api; refresh with update-portraits.js) ----
+{
+  const pf = path.join(D, "portraits.json");
+  const list = fs.existsSync(pf) ? JSON.parse(fs.readFileSync(pf, "utf8")).list : [];
+  const key = (s) => String(s || "").toLowerCase().replace(/\s+/g, "").replace(/：/g, ":");
+  const noImg = [];
+  for (const c of chars) {
+    const baseKo = c.ko.replace(/ \((애장품|스즈하라)\)$/, "");
+    const cands = list.filter((p) => key(p.ko) === key(baseKo) || key(p.en) === key(c.en.replace(/ \(Treasure\)$/, "")));
+    const hit = cands.find((p) => String(p.corp).toLowerCase() === String(c.m).toLowerCase()) || cands[0];
+    if (hit) { c.img = hit.icon; if (hit.medium) c.imgm = hit.medium; } else noImg.push(c.ko);
+  }
+  console.log("portraits matched", chars.length - noImg.length, "/", chars.length, noImg.length ? "missing: " + noImg.join(", ") : "");
+}
+
 // ---- Levels: record L = cost to go from L to L+1 ----
 const lv = lvRaw.records.sort((a, b) => a.level - b.level).map((r) => [r.gold, r.character_exp, r.character_exp_2]);
 
