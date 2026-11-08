@@ -184,6 +184,11 @@ footer.src a { color: inherit; }
 .tn .d[data-e="Fire"] { background: var(--fire); } .tn .d[data-e="Water"] { background: var(--water); } .tn .d[data-e="Wind"] { background: var(--wind); } .tn .d[data-e="Electric"] { background: var(--elec); } .tn .d[data-e="Iron"] { background: var(--iron); }
 .tn.have { border-color: var(--good); background: var(--good-soft); }
 .tn .k { color: var(--muted); font-size: 11px; }
+.cubelv { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px 12px; }
+.cubelv label { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; }
+.cubelv select { width: auto; }
+.lv { font-family: var(--font-mono); font-size: 12px; padding: 0 6px; border-radius: 6px; background: var(--sunk); color: var(--muted); white-space: nowrap; }
+.lv.on { background: var(--accent-soft); color: var(--accent); }
 </style>
 
 <div class="upd" id="upd" hidden><div class="wrap"><p id="updText"></p><span id="updAct"></span></div></div>
@@ -311,6 +316,11 @@ footer.src a { color: inherit; }
       <div class="field"><label for="cubeQ">니케</label><input type="search" id="cubeQ" list="olNames" placeholder="이름을 입력하고 목록에서 고르세요"></div>
       <div id="cubePick"></div>
     </div>
+    <details class="panel" id="cubeLvBox">
+      <summary style="cursor:pointer"><b>내 큐브 레벨 입력</b> <span class="note" id="cubeLvSum"></span></summary>
+      <p class="note" style="margin:8px 0 10px">게임의 큐브 화면이나 ShiftyPad 니케 상세 → ‘큐브’ 탭에서 레벨을 보고 넣어 주세요. 이 브라우저에만 저장돼요. 넣으면 아래 추천에 내 레벨이 같이 나와요.</p>
+      <div class="cubelv" id="cubeLv"></div>
+    </details>
     <div class="panel">
       <h3>먼저 키울 큐브</h3>
       <p class="note" style="margin:4px 0 12px">가진 니케들이 1순위로 추천받는 큐브일수록, 보스전 평가가 높은 니케가 쓸수록 위에 와요. 큐브 레벨을 올리면 같은 큐브를 여러 니케가 같이 낄 수 있어요.</p>
@@ -859,18 +869,40 @@ function buildOLTable() {
 // ---------- CUBE ----------
 const CUBE_BY = new Map(D.cubes.map(c => [c.ko, c]));
 const cubeEff = ko => CUBE_BY.get(ko)?.eff || "";
+const CUBE_LV_KEY = "nikke-helper-cube-lv-v1";
+let CUBE_LV = {};
+try { CUBE_LV = JSON.parse(localStorage.getItem(CUBE_LV_KEY) || "{}") || {}; } catch (e) {}
+const cubeLv = ko => CUBE_LV[ko] || 0;
+const lvTag = ko => Object.keys(CUBE_LV).length ? `<span class="lv ${cubeLv(ko) ? "on" : ""}">${cubeLv(ko) ? "Lv." + cubeLv(ko) : "Lv.-"}</span>` : "";
+function buildCubeLv() {
+  const host = document.getElementById("cubeLv");
+  const opts = `<option value="0">없음·모름</option>` + Array.from({ length: 15 }, (_, i) => `<option value="${i + 1}">Lv.${i + 1}</option>`).join("");
+  host.innerHTML = D.cubes.map((c, i) => `<label for="clv${i}"><span>${esc(c.ko)}</span><select id="clv${i}" data-cube="${esc(c.ko)}">${opts}</select></label>`).join("");
+  host.querySelectorAll("select").forEach(sel => { sel.value = String(cubeLv(sel.dataset.cube)); });
+  host.addEventListener("change", e => {
+    const sel = e.target.closest("select[data-cube]"); if (!sel) return;
+    const v = +sel.value; if (v) CUBE_LV[sel.dataset.cube] = v; else delete CUBE_LV[sel.dataset.cube];
+    try { localStorage.setItem(CUBE_LV_KEY, JSON.stringify(CUBE_LV)); } catch (err) {}
+    renderCube();
+  });
+}
+function cubeLvSummary() {
+  const n = Object.keys(CUBE_LV).length;
+  document.getElementById("cubeLvSum").textContent = n ? `${n}종 입력됨` : "아직 안 넣었어요";
+}
 let CUBE_PICK = null;
 function renderCubePick() {
   const host = document.getElementById("cubePick");
   const c = CUBE_PICK;
   if (!c) { host.innerHTML = `<div class="note">니케를 고르면 보스전·아레나에서 낄 큐브를 순서대로 보여줘요.</div>`; return; }
   const users = k => [...S.owned].map(get).filter(x => x && x !== c && x.cu && x.cu[0] === k).map(x => x.ko);
-  const row = (k, i) => { const u = users(k); return `<tr><td>${i + 1}순위</td><td style="text-align:left"><b>${esc(k)}</b><div class="note">${esc(cubeEff(k))}</div></td><td style="text-align:left;white-space:normal">${u.length ? esc(u.slice(0, 5).join(", ")) + (u.length > 5 ? ` 외 ${u.length - 5}명` : "") : "<span class='note'>없음</span>"}</td></tr>`; };
+  const row = (k, i) => { const u = users(k); return `<tr><td>${i + 1}순위</td><td style="text-align:left"><b>${esc(k)}</b> ${lvTag(k)}<div class="note">${esc(cubeEff(k))}</div></td><td style="text-align:left;white-space:normal">${u.length ? esc(u.slice(0, 5).join(", ")) + (u.length > 5 ? ` 외 ${u.length - 5}명` : "") : "<span class='note'>없음</span>"}</td></tr>`; };
   const table = (title, list) => list && list.length ? `<div><div class="lbl" style="margin-bottom:6px">${title}</div><div class="scroll"><table class="data"><thead><tr><th>순서</th><th style="text-align:left">큐브</th><th style="text-align:left">이 큐브를 1순위로 쓰는 내 다른 니케</th></tr></thead><tbody>${list.slice(0, 3).map(row).join("")}</tbody></table></div></div>` : "";
   const body = table("보스전 (레이드·요격전)", c.cu) + table("아레나", c.cp);
   host.innerHTML = `<div class="row" style="gap:8px">${card(c, { tier: true })}</div>${body || `<div class="note">${esc(c.ko)}는 추천 큐브 정보가 없어요. 아무 큐브나 껴도 괜찮아요.</div>`}<p class="note" style="margin:0">같은 큐브는 레벨을 올리면 여러 니케가 나눠 낄 수 있어요. 1순위 큐브가 다른 니케와 겹치면 2순위를 써도 손해가 크지 않아요.</p>`;
 }
 function renderCube() {
+  cubeLvSummary();
   renderCubePick();
   const have = [...S.owned].map(get).filter(c => c && c.cu && c.cu.length);
   const rankHost = document.getElementById("cubeRank");
@@ -887,14 +919,15 @@ function renderCube() {
       });
     });
     const ranked = [...score.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
-    rankHost.innerHTML = `<div class="scroll"><table class="data"><thead><tr><th>순위</th><th style="text-align:left">큐브</th><th style="text-align:left">효과</th><th>1순위로 쓰는 내 니케</th></tr></thead><tbody>${ranked.map(([k], i) => {
+    const lowTop = Object.keys(CUBE_LV).length ? ranked.slice(0, 4).filter(([k]) => cubeLv(k) < 7).map(([k]) => k) : [];
+    rankHost.innerHTML = (lowTop.length ? `<p class="note" style="margin:0 0 10px">많이 쓰는데 레벨이 낮은 큐브: <b>${lowTop.map(esc).join(", ")}</b>. 이것부터 올리면 좋아요.</p>` : "") + `<div class="scroll"><table class="data"><thead><tr><th>순위</th><th style="text-align:left">큐브</th><th style="text-align:left">효과</th><th>1순위로 쓰는 내 니케</th></tr></thead><tbody>${ranked.map(([k], i) => {
       const us = (users.get(k) || []).sort((a, b) => tScore(b.rb) - tScore(a.rb));
-      return `<tr><td>${i + 1}</td><td style="text-align:left"><b>${esc(k)}</b></td><td style="text-align:left">${esc(cubeEff(k))}</td><td style="text-align:left;white-space:normal">${us.length ? us.slice(0, 6).map(c => esc(c.ko)).join(", ") + (us.length > 6 ? ` 외 ${us.length - 6}명` : "") : "<span class='note'>2·3순위로만 추천</span>"}</td></tr>`;
+      return `<tr><td>${i + 1}</td><td style="text-align:left"><b>${esc(k)}</b> ${lvTag(k)}</td><td style="text-align:left">${esc(cubeEff(k))}</td><td style="text-align:left;white-space:normal">${us.length ? us.slice(0, 6).map(c => esc(c.ko)).join(", ") + (us.length > 6 ? ` 외 ${us.length - 6}명` : "") : "<span class='note'>2·3순위로만 추천</span>"}</td></tr>`;
     }).join("")}</tbody></table></div>`;
     const mode = document.getElementById("cubeSort").value;
     const list = have.slice().sort((a, b) => mode === "cube" ? a.cu[0].localeCompare(b.cu[0], "ko") || tScore(b.rb) - tScore(a.rb) : tScore(b.rb) - tScore(a.rb) || a.ko.localeCompare(b.ko, "ko"));
     mineHost.innerHTML = `<div class="scroll"><table class="data"><thead><tr><th>니케</th><th>보스전</th><th style="text-align:left">1순위</th><th style="text-align:left">2순위</th><th style="text-align:left">3순위</th></tr></thead><tbody>${list.map(c =>
-      `<tr><td><a href="#cube" data-open="${esc(c.s)}" style="color:inherit">${esc(c.ko)}</a></td><td><span class="tier" data-t="${esc(c.rb)}">${esc(c.rb || "-")}</span></td>${[0, 1, 2].map(i => `<td style="text-align:left">${c.cu[i] ? `${esc(c.cu[i])}<div class="note">${esc(cubeEff(c.cu[i]))}</div>` : "-"}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+      `<tr><td><a href="#cube" data-open="${esc(c.s)}" style="color:inherit">${esc(c.ko)}</a></td><td><span class="tier" data-t="${esc(c.rb)}">${esc(c.rb || "-")}</span></td>${[0, 1, 2].map(i => `<td style="text-align:left">${c.cu[i] ? `${esc(c.cu[i])} ${lvTag(c.cu[i])}<div class="note">${esc(cubeEff(c.cu[i]))}</div>` : "-"}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
   }
   document.getElementById("cubeTable").innerHTML = `<thead><tr><th>큐브</th><th style="text-align:left">주 효과</th><th style="text-align:left">영문 이름</th></tr></thead><tbody>${D.cubes.map(c => `<tr><td>${esc(c.ko)}</td><td style="text-align:left">${esc(c.eff)}</td><td style="text-align:left" class="note">${esc(c.en)}</td></tr>`).join("")}</tbody>`;
 }
@@ -1221,7 +1254,7 @@ window.addEventListener("hashchange", route);
 // ---------- boot ----------
 document.getElementById("dataDate").textContent = `니케 ${C.length}명 · 데이터 ${D.src.prydwen} 기준 · 버전 ${APP_V.slice(0, 10)}`;
 document.getElementById("srcFoot").innerHTML = `캐릭터 평가·추천 옵션·추천 덱: <a href="https://www.prydwen.gg/nikke" target="_blank" rel="noopener">Prydwen</a> (${esc(D.src.prydwen)} 갱신분). 한국어 이름·레벨 비용: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a>. 오버로드 수치: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a>. 유니온 레이드 보스 목록: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지). 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌, 솔로 추천 덱은 솔로 ${D.raids.solo.seasons[1].season}시즌 기준이에요. 역대 솔로 레이드 보스: 나무위키. 게임 저작권은 SHIFT UP에 있어요. SHIFT UP·Level Infinite와 관계없는 비공식 비영리 팬 페이지예요. 평가와 추천은 각 출처의 의견을 요약한 거예요. 항상 최신 버전: <a href="${SITE}" target="_blank" rel="noopener">${SITE}</a>`;
-buildFilters(); buildOLTable(); buildLevel(); setupImport();
+buildFilters(); buildOLTable(); buildLevel(); setupImport(); buildCubeLv();
 OLS.char = get("scarlet") || C[0];
 document.getElementById("olq").value = OLS.char.ko;
 OLS.slots = [["atk", 11], ["def", 4], ["ele", 6]];
