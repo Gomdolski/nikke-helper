@@ -206,6 +206,7 @@ footer.src a { color: inherit; }
       <a href="#cube" data-v="cube">하모니 큐브</a>
       <a href="#tier" data-v="tier">티어표</a>
       <a href="#raid" data-v="raid">레이드 덱</a>
+      <a href="#camp" data-v="camp">캠페인</a>
       <a href="#level" data-v="level">레벨 계산기</a>
     </nav>
   </div>
@@ -405,6 +406,35 @@ footer.src a { color: inherit; }
     <div style="display:flex;flex-direction:column;gap:10px">
       <h3>추천 덱 (가진 니케가 많은 순)</h3>
       <div id="raidTeams" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </section>
+
+  <!-- CAMPAIGN -->
+  <section class="view" id="v-camp" hidden>
+    <div>
+      <h2>캠페인 스테이지</h2>
+      <p class="lead">내 진행도와 다음 스테이지 권장 전투력을 비교하고, 챕터 보스에 맞춰 가진 니케로 스토리 덱을 짜줘요.</p>
+    </div>
+    <div class="panel" id="campProg"></div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+      <div class="row" style="gap:12px 18px">
+        <div class="field"><span class="lbl">모드</span><div class="seg" id="campMode"><button data-v="normal" aria-pressed="true">노멀</button><button data-v="hard" aria-pressed="false">하드</button></div></div>
+        <div class="field"><label for="campCh">챕터</label><select id="campCh" style="width:auto"></select></div>
+        <div class="field"><label for="campEl">데려갈 속성(우월코드)</label><select id="campEl" style="width:auto"></select></div>
+      </div>
+      <div id="campInfo"></div>
+    </div>
+    <div class="panel teamcard">
+      <div class="teamhead"><h3>내 니케로 스토리 덱</h3><span class="note" id="campNote"></span></div>
+      <div id="campDeck"></div>
+    </div>
+    <div class="panel">
+      <h3>이 챕터 스테이지 권장 전투력</h3>
+      <div id="campStages" style="margin-top:8px"></div>
+    </div>
+    <div class="panel">
+      <h3>막힐 때 팁</h3>
+      <ul id="campTips" class="note" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px"></ul>
     </div>
   </section>
 
@@ -960,6 +990,14 @@ async function importFromLink() {
       if (p.some(sl => sl.some(x => x[0]))) gear[slug] = { p, n: PART.map(x => x[1]), at: today, src: "link" };
       [n.cube, n.arenaCube].forEach(cu => { const ko = cu && cu.name && cu.name.ko; if (ko && CUBE_BY.has(ko)) cubes[ko] = Math.max(cubes[ko] || 0, cu.level || 0); });
     }
+    // profile (campaign progress, squad power) + per-nikke combat for the campaign tab
+    try {
+      const pr = await fetch(`${NAPI}/api/user/${encodeURIComponent(id)}`).then(x => x.ok ? x.json() : null);
+      if (pr && pr.profile) { PROFILE = { campaign: pr.profile.campaign, teamCombat: pr.profile.teamCombat, towers: pr.profile.towers, at: today }; localStorage.setItem(PROFILE_KEY, JSON.stringify(PROFILE)); }
+    } catch (e) {}
+    COMBAT = {};
+    for (const n of j.nikkes) { const sl = slugFromApi(n.character || {}); if (sl && n.combat) COMBAT[sl] = n.combat; }
+    try { localStorage.setItem(COMBAT_KEY, JSON.stringify(COMBAT)); } catch (e) {}
     // gear + cube levels
     Object.assign(GEAR, gear);
     try { localStorage.setItem(GEAR_KEY, JSON.stringify(GEAR)); } catch (e) {}
@@ -1176,6 +1214,120 @@ function segPick(id, fn) {
 segPick("tierMode", v => TIER.mode = v);
 segPick("tierRar", v => TIER.rar = v);
 document.getElementById("tierMine").addEventListener("change", e => { TIER.mine = e.target.checked; renderTier(); });
+
+// ---------- CAMPAIGN ----------
+const PROFILE_KEY = "nikke-helper-profile-v1", COMBAT_KEY = "nikke-helper-combat-v1";
+let PROFILE = null, COMBAT = {};
+try { PROFILE = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null"); COMBAT = JSON.parse(localStorage.getItem(COMBAT_KEY) || "{}") || {}; } catch (e) {}
+const CAMP = { mode: "normal", ch: null, el: "", stages: {} };
+const CAMPD = D.campaign || { chapters: [], tips: [] };
+const campChapter = n => CAMPD.chapters.find(c => c.ch === n) || null;
+const fmt = n => Number(n || 0).toLocaleString("ko-KR");
+// nikke-api stage "chapter" is the shown chapter + 1 (chapter 0 is the prologue)
+async function campStages(mode, ch) {
+  const k = mode + ch;
+  if (!CAMP.stages[k]) CAMP.stages[k] = fetch(`${NAPI}/api/stages?chapter=${ch + 1}&mode=${mode}&limit=200`).then(r => r.json()).then(j => (j.stages || []).filter(x => x.battlePower > 0)).catch(() => null);
+  return CAMP.stages[k];
+}
+function storyDeck(el) {
+  const pool = [...S.owned].map(get).filter(Boolean);
+  const tre = new Set(pool.filter(c => c.tr).map(c => c.en.replace(/ \(Treasure\)/, "")));
+  const avail = pool.filter(c => !(!c.tr && tre.has(c.en)));
+  const maxCp = Math.max(1, ...avail.map(c => COMBAT[c.s] || 0));
+  const heal = c => c.sp.some(x => ["Healer", "Shielder", "Cover Heal"].includes(x));
+  const score = c => {
+    let v = tScore(c.rs) * 1.6;
+    if (c.c === "Attacker" && el) v += c.e === el ? 4 : 0;
+    if (c.sp.includes("Screen Wipe")) v += 1.5;
+    if (c.sp.includes("Burst CD Reduction")) v += 2;
+    if (c.sp.includes("Buffer")) v += 1;
+    if (COMBAT[c.s]) v += (COMBAT[c.s] / maxCp) * 5; // prefer units that are actually built
+    return v;
+  };
+  const used = new Set(), m = [];
+  const pick = pred => avail.filter(c => !used.has(c.s) && pred(c)).sort((a, b) => score(b) - score(a))[0];
+  const take = c => { if (c) { used.add(c.s); m.push(c); } return c; };
+  take(pick(c => bursts(c).includes("I") && heal(c)) || pick(c => bursts(c).includes("I")));
+  take(pick(c => bursts(c).includes("II")));
+  take(pick(c => bursts(c).includes("III") && c.c === "Attacker"));
+  take(pick(c => bursts(c).includes("III") && c.c === "Attacker"));
+  if (!m.some(heal)) take(pick(heal));
+  while (m.length < 5) { if (!take(pick(() => true))) break; }
+  const order = c => (bursts(c).includes("I") && !bursts(c).includes("III") ? 0 : bursts(c).includes("II") ? 1 : 2);
+  m.sort((a, b) => order(a) - order(b));
+  return m;
+}
+function nextStage(list, clearedId) {
+  const i = list.findIndex(x => x.id === clearedId);
+  return i >= 0 ? list[i + 1] || null : null;
+}
+async function renderCampProg() {
+  const host = document.getElementById("campProg");
+  if (!PROFILE || !PROFILE.campaign) { host.innerHTML = `<div class="note">‘보유 니케’ 탭에서 블라블라링크 링크로 가져오면 내 진행도와 다음 스테이지 권장 전투력이 여기 나와요.</div>`; return; }
+  const my = PROFILE.teamCombat || 0;
+  const row = async (mode, label) => {
+    const p = PROFILE.campaign[mode]; if (!p) return "";
+    const ch = (p.chapter || 1) - 1;
+    let list = await campStages(mode, ch);
+    let nx = list && nextStage(list, p.stageId);
+    if (list && !nx) { const l2 = await campStages(mode, ch + 1); nx = l2 && l2[0] ? l2[0] : null; }
+    const name = s => String(s || "").replace(/ (HARD )?STAGE$/, "");
+    if (!nx) return `<tr><td>${label}</td><td>${esc(name(p.stage))}</td><td colspan="2">지금 나온 스테이지는 다 깼어요</td></tr>`;
+    const ratio = my / nx.battlePower;
+    const b = ratio >= 1 ? "ok" : ratio >= 0.85 ? "part" : "no";
+    return `<tr><td>${label}</td><td>${esc(name(p.stage))}</td><td>${esc(name(nx.name))} · 권장 ${fmt(nx.battlePower)}</td><td><span class="badge ${b}">${Math.round(ratio * 100)}%</span></td></tr>`;
+  };
+  host.innerHTML = `<div class="teamhead"><h3>내 진행도</h3><span class="note">스쿼드 전투력 ${fmt(my)} · ${esc(PROFILE.at || "")} 기준</span></div>
+    <div class="scroll"><table class="data"><thead><tr><th>모드</th><th>마지막으로 깬 곳</th><th>다음 스테이지</th><th>내 전투력 / 권장</th></tr></thead><tbody>${await row("normal", "노멀")}${await row("hard", "하드")}</tbody></table></div>
+    <p class="note" style="margin:8px 0 0">100% 이상이면 대부분 그냥 깨져요. 조금 모자라도 덱과 컨트롤로 깰 수 있지만, 많이 모자라면 레벨·장비를 먼저 올리는 게 빨라요.</p>`;
+}
+async function renderCampStages() {
+  const host = document.getElementById("campStages");
+  host.innerHTML = `<span class="note">불러오는 중…</span>`;
+  const list = await campStages(CAMP.mode, CAMP.ch);
+  if (!list) { host.innerHTML = `<span class="note">스테이지 정보를 불러오지 못했어요 (nikke-api 연결).</span>`; return; }
+  if (!list.length) { host.innerHTML = `<span class="note">이 챕터는 아직 없어요.</span>`; return; }
+  const my = PROFILE?.teamCombat || 0;
+  const cleared = PROFILE?.campaign?.[CAMP.mode]?.stageId || 0;
+  host.innerHTML = `<div class="scroll"><table class="data"><thead><tr><th>스테이지</th><th>권장 전투력</th>${my ? "<th>내 전투력 대비</th>" : ""}</tr></thead><tbody>${list.map(x => {
+    const r = my ? my / x.battlePower : 0;
+    const done = cleared && x.id <= cleared;
+    return `<tr><td>${esc(x.name.replace(/ (HARD )?STAGE$/, ""))}${done ? ' <span class="note">· 깸</span>' : ""}</td><td>${fmt(x.battlePower)}</td>${my ? `<td><span class="badge ${r >= 1 ? "ok" : r >= 0.85 ? "part" : "no"}">${Math.round(r * 100)}%</span></td>` : ""}</tr>`;
+  }).join("")}</tbody></table></div>`;
+}
+function renderCamp() {
+  const chs = CAMPD.chapters.length ? CAMPD.chapters.map(c => c.ch) : Array.from({ length: 50 }, (_, i) => i + 1);
+  if (CAMP.ch == null) {
+    const p = PROFILE?.campaign?.[CAMP.mode];
+    CAMP.ch = p ? Math.min(Math.max(...chs), Math.max(1, (p.chapter || 2) - 1)) : 1;
+  }
+  const sel = document.getElementById("campCh");
+  sel.innerHTML = chs.map(n => { const c = campChapter(n); return `<option value="${n}">${n}장${c && c.boss ? " · " + esc(c.boss) : ""}</option>`; }).join("");
+  sel.value = String(CAMP.ch);
+  const c = campChapter(CAMP.ch);
+  const elSel = document.getElementById("campEl");
+  if (!elSel.dataset.ready) { elSel.innerHTML = `<option value="">모름·상관없음</option>` + ELS.map(e => `<option value="${e}">${EL[e]}</option>`).join(""); elSel.dataset.ready = 1; }
+  if (!CAMP.elTouched) CAMP.el = c && c.adv ? c.adv : "";
+  elSel.value = CAMP.el;
+  const weak = CAMP.el || "";
+  document.getElementById("campInfo").innerHTML = c
+    ? `<div class="row" style="gap:6px 12px;align-items:center"><b>${CAMP.ch}장${c.title ? " · " + esc(c.title) : ""}</b>${c.boss ? `<span>보스 ${esc(c.boss)}</span>` : ""}${c.adv ? `<span class="chip el" data-e="${esc(c.adv)}">${EL[c.adv]} 데려가기</span>` : ""}${c.est ? `<span class="note">추정</span>` : ""}${c.core === true ? '<span class="chip">코어 있음</span>' : c.core === false ? '<span class="chip">코어 없음</span>' : ""}</div>${c.note ? `<p class="note" style="margin:6px 0 0">${esc(c.note)}</p>` : ""}<p class="note" style="margin:6px 0 0">커뮤니티 정리 기준이라 틀릴 수 있어요. 게임의 스테이지 정보창에 뜨는 코드 아이콘이 가장 정확해요. 하드도 보스는 같아요.</p>`
+    : `<span class="note">이 챕터의 보스 정보는 아직 없어요. 보스 속성을 알면 위에서 골라 주세요.</span>`;
+  const m = storyDeck(weak);
+  document.getElementById("campNote").textContent = weak ? `${EL[weak]} 딜러 우선` : "스토리 평가가 높은 순";
+  document.getElementById("campDeck").innerHTML = m.length
+    ? `<div class="team">${m.map(x => slot(x.s, "cube")).join("")}</div><p class="note" style="margin:8px 0 0">스토리 평가(Prydwen)와 ${Object.keys(COMBAT).length ? "내 니케 전투력, " : ""}광역 처리·버스트 쿨감·힐러를 보고 골랐어요. 버스트 I → II → III 순서로 돌도록 짰어요.</p>`
+    : `<div class="empty">‘보유 니케’ 탭에서 가진 니케를 체크하면 덱을 짜줘요.</div>`;
+  document.getElementById("campTips").innerHTML = (CAMPD.tips || []).map(t => `<li>${esc(t)}</li>`).join("") || "<li>정보를 모으는 중이에요.</li>";
+  renderCampProg(); renderCampStages();
+}
+document.getElementById("campMode").addEventListener("click", e => {
+  const b = e.target.closest("button[data-v]"); if (!b) return;
+  b.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  CAMP.mode = b.dataset.v; CAMP.ch = null; CAMP.elTouched = false; renderCamp();
+});
+document.getElementById("campCh").addEventListener("change", e => { CAMP.ch = +e.target.value; CAMP.elTouched = false; renderCamp(); });
+document.getElementById("campEl").addEventListener("change", e => { CAMP.el = e.target.value; CAMP.elTouched = true; renderCamp(); });
 
 // ---------- RAID ----------
 // Core: hitting a core doubles normal-attack damage, so accurate weapons gain the most.
@@ -1412,7 +1564,7 @@ function buildLevel() {
 }
 
 // ---------- routing + events ----------
-const VIEWS = ["dex", "owned", "ol", "cube", "tier", "raid", "level"];
+const VIEWS = ["dex", "owned", "ol", "cube", "tier", "raid", "camp", "level"];
 function route() {
   const h = location.hash.slice(1);
   S.view = VIEWS.includes(h) ? h : "dex";
@@ -1427,6 +1579,7 @@ function renderAll() {
   if (S.view === "cube") renderCube();
   if (S.view === "tier") renderTier();
   if (S.view === "raid") renderRaid();
+  if (S.view === "camp") renderCamp();
   if (S.view === "level") renderLevel();
   const host = document.getElementById("drawerHost");
   if (host.dataset.s) { const btn = host.querySelector(".drawer [data-own]"); const own = S.owned.has(host.dataset.s); if (btn) { btn.textContent = own ? "보유 해제" : "보유 니케로 표시"; btn.classList.toggle("primary", !own); } }

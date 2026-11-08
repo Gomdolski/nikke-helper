@@ -200,6 +200,7 @@ const out = {
   lv,
   cubes: CUBES,
   ol: { slot: ol.slotChance, tier: ol.tierChancePct, lines: olLines },
+  campaign: fs.existsSync(path.join(HERE, "campaign.json")) ? JSON.parse(fs.readFileSync(path.join(HERE, "campaign.json"), "utf8")) : null,
 };
 
 const json = JSON.stringify(out);
