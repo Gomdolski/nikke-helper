@@ -134,6 +134,14 @@ const chars = pry.chars.map((p) => {
   console.log("ol notes", Object.keys(notes).length - miss.length, miss.length ? "not found: " + miss.join(", ") : "");
 }
 
+// ---- Arena overload / cube notes (build/arena_ol.json from make-arena-ol.js) ----
+const AOL = fs.existsSync(path.join(HERE, "arena_ol.json")) ? JSON.parse(fs.readFileSync(path.join(HERE, "arena_ol.json"), "utf8")) : { rules: [], units: {} };
+for (const [name, u] of Object.entries(AOL.units)) {
+  const c = chars.find((x) => x.ko === name);
+  if (c) c.aol = { prio: u.prio, keys: u.keys, ban: u.ban, low: u.low ? 1 : 0, cubes: u.cubes, why: u.why, sure: u.sure };
+  else console.log("arena OL name not found:", name);
+}
+
 // ---- Community nicknames (build/nicknames.json: { "공식이름": ["별명", "애장품 전용 별명*"] }) ----
 {
   const nf = path.join(HERE, "nicknames.json");
@@ -249,6 +257,23 @@ for (const r of roster) {
 for (const k of Object.keys(NAMES)) NAMES[k].sort((a, b) => (BYS(a).m === "Abnormal") - (BYS(b).m === "Abnormal"));
 function BYS(s) { return baseChars.find((c) => c.s === s) || {}; }
 
+// ---- Arena (build/arena.json from make-arena.js): official Korean names -> slugs ----
+function buildArena() {
+  const af = path.join(HERE, "arena.json");
+  if (!fs.existsSync(af)) return null;
+  const A = JSON.parse(fs.readFileSync(af, "utf8"));
+  const bySlugKo = (ko) => { const c = chars.find((x) => x.ko === ko); return c ? c.s : null; };
+  const roles = {}, burst = {};
+  for (const [ko, r] of Object.entries(A.roles)) { const s = bySlugKo(ko); if (s) roles[s] = r; }
+  for (const [ko, v] of Object.entries(A.burst)) { const s = bySlugKo(ko); if (s) burst[s] = v; }
+  return {
+    at: A.at, rules: A.rules, notes: A.notes,
+    meta: A.meta.map((d) => ({ ...d, m: d.m.map(bySlugKo) })),
+    counters: A.counters.map((c) => ({ ...c, use: c.use.map(bySlugKo).filter(Boolean) })),
+    roles, burst,
+  };
+}
+
 // ---- Solo raid top-50 decks (Korean server, Let's Doro snapshot) -> slugs ----
 function buildSoloRank() {
   if (!RANK) return null;
@@ -279,6 +304,8 @@ const out = {
   ol: { slot: ol.slotChance, tier: ol.tierChancePct, lines: olLines },
   campaign: fs.existsSync(path.join(HERE, "campaign.json")) ? JSON.parse(fs.readFileSync(path.join(HERE, "campaign.json"), "utf8")) : null,
   soloRank: buildSoloRank(),
+  arena: buildArena(),
+  arenaOlRules: AOL.rules,
   weekly: fs.existsSync(path.join(HERE, "weekly.json")) ? JSON.parse(fs.readFileSync(path.join(HERE, "weekly.json"), "utf8")) : null,
 };
 

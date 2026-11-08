@@ -12,6 +12,8 @@
 | 솔로 레이드 상위권 덱 | `node build/update-soloraid.js` 실행 (레츠도로, 한국 서버) | `build/src/soloraid_rank.json` |
 | 니케별 오버로드 메모·목표 수치 | 아카 공략글, beomtachi, nikke.gg, Prydwen | `build/ol_notes.json` |
 | 유니온 보스 코어 여부 | 아카라이브 시즌별 보스 특성 정리 | `build/union_core.json` |
+| 아레나 메타 덱·카운터·역할 | 워커로 조사 후 `node build/make-arena.js A.txt B.txt C.txt` | `build/arena.json` |
+| 아레나 오버로드·큐브 | 워커로 조사 후 `node build/make-arena-ol.js 결과.txt` | `build/arena_ol.json` |
 | 새 니케 초상화 | `node build/update-portraits.js` 실행 | `build/src/portraits.json` |
 | 새 니케 별명 | 디시·아카 줄임말 | `build/nicknames.json` |
 | 이상개체 요격전 변경 | Prydwen Anomaly Interception 가이드 | `build/anomaly.json` |

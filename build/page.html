@@ -223,6 +223,11 @@ h1, h2, h3, .big { text-wrap: balance; }
 .rk-use { display: flex; flex-wrap: wrap; gap: 4px; }
 .olnote { margin-top: 10px; padding: 10px 12px; border-radius: var(--r); background: var(--accent-soft); }
 .olgoals { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.enemy { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.enemy .field input { width: 100%; }
+.ar-deck { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+.ar-deck:first-child { border-top: 0; padding-top: 0; }
+.ar-role { font-size: 12.5px; }
 </style>
 
 <div class="upd" id="upd" hidden><div class="wrap"><p id="updText"></p><span id="updAct"></span></div></div>
@@ -238,6 +243,7 @@ h1, h2, h3, .big { text-wrap: balance; }
       <a href="#tier" data-v="tier">티어표</a>
       <a href="#raid" data-v="raid">레이드 덱</a>
       <a href="#camp" data-v="camp">캠페인</a>
+      <a href="#arena" data-v="arena">아레나</a>
       <a href="#level" data-v="level">레벨 계산기</a>
     </nav>
   </div>
@@ -346,6 +352,7 @@ h1, h2, h3, .big { text-wrap: balance; }
         <div class="field grow"><label for="olq">니케</label><input type="search" id="olq" list="olNames" placeholder="이름을 입력하고 목록에서 고르세요"><datalist id="olNames"></datalist></div>
         <div class="field grow" id="gearPick" hidden><label for="gearSel" id="gearPickLbl">내 니케</label><select id="gearSel"></select></div>
       </div>
+      <div class="row" style="gap:8px;align-items:center"><span class="lbl">판정 기준</span><div class="seg" id="olMode"><button data-v="boss" aria-pressed="true">보스전</button><button data-v="arena" aria-pressed="false">아레나</button></div><span class="note" id="olModeNote"></span></div>
       <div id="olWant"></div>
       <div id="gearMsg" role="status"></div>
     </div>
@@ -388,6 +395,7 @@ h1, h2, h3, .big { text-wrap: balance; }
     </details>
     <div class="panel">
       <h3>먼저 키울 큐브</h3>
+      <p class="note" style="margin:4px 0 0">아레나만 보면 큐브 강화 순서는 템퍼링 → 퀀텀 → 비고르 → 인듀어가 무난해요.</p>
       <p class="note" style="margin:4px 0 12px">가진 니케들이 1순위로 추천받는 큐브일수록, 보스전 평가가 높은 니케가 쓸수록 위에 와요. 큐브 레벨을 올리면 같은 큐브를 여러 니케가 같이 낄 수 있어요.</p>
       <div id="cubeRank"></div>
     </div>
@@ -471,6 +479,36 @@ h1, h2, h3, .big { text-wrap: balance; }
       <h3>막힐 때 팁</h3>
       <ul id="campTips" class="note" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px"></ul>
     </div>
+  </section>
+
+  <!-- ARENA -->
+  <section class="view" id="v-arena" hidden>
+    <div>
+      <h2>아레나</h2>
+      <p class="lead">상대 덱을 넣으면 어떤 메타 덱인지와 대응법을 알려주고, 요즘 많이 쓰는 덱과 내 니케로 짤 수 있는 덱을 보여줘요.</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+      <div class="teamhead"><h3>상대 덱 보고 대응하기</h3><span class="note">상대 니케를 슬롯 순서대로 넣어 주세요 (별명도 돼요)</span></div>
+      <div class="enemy" id="arEnemy"></div>
+      <div id="arCounter"></div>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+      <div class="row" style="gap:10px 16px;align-items:flex-end">
+        <h3 class="grow" style="margin:0">요즘 많이 쓰는 덱</h3>
+        <div class="seg" id="arSide"><button data-v="all" aria-pressed="true">전체</button><button data-v="공격" aria-pressed="false">공격</button><button data-v="방어" aria-pressed="false">방어</button></div>
+        <button class="btn small" type="button" id="arMine" aria-pressed="false">가진 니케로 되는 덱만</button>
+      </div>
+      <div id="arMeta" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div class="panel teamcard">
+      <div class="teamhead"><h3>내 니케로 아레나 덱</h3><span class="note" id="arAutoNote"></span></div>
+      <div class="row"><div class="field"><label for="arN">아레나</label><select id="arN" style="width:auto"><option value="1">루키 (1덱)</option><option value="3" selected>스페셜 (3덱)</option><option value="5">챔피언스 (5덱)</option></select></div></div>
+      <div id="arAuto" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+    <details class="panel">
+      <summary style="cursor:pointer"><b>아레나 기본 규칙</b> <span class="note">슬롯·타겟팅·버스트 속도·무적과 불굴</span></summary>
+      <ul class="note" id="arRules" style="margin:10px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px"></ul>
+    </details>
   </section>
 
   <!-- LEVEL -->
@@ -633,6 +671,8 @@ function openChar(s) {
       <button class="btn small" data-close>닫기</button></div>
     <div class="row">${chips(c)}</div>
     ${c.nk && c.nk.length ? `<p class="note" style="margin:0">별명: ${c.nk.map(esc).join(", ")}</p>` : ""}
+    ${c.aol ? `<p class="note" style="margin:0">아레나 오버로드: <b>${esc(c.aol.prio)}</b>${c.aol.cubes.length ? ` · 큐브 ${c.aol.cubes.map(esc).join(", ")}` : ""}</p>` : ""}
+    ${D.arena && D.arena.roles[c.s] ? `<p class="note" style="margin:0">아레나: <b>${esc(D.arena.roles[c.s].role)}</b> · ${esc(D.arena.roles[c.s].side)} · 자주 쓰는 슬롯 ${esc(D.arena.roles[c.s].slot)}${D.arena.burst[c.s] ? ` · 버스트 게이지 ${esc(D.arena.burst[c.s])}` : ""}</p>` : ""}
     ${SKIN[c.s] ? `<p class="note" style="margin:0">지금 입은 스킨: <b>${esc(SKIN[c.s])}</b></p>` : ""}
     <button class="btn ${own ? "" : "primary"}" data-own="${esc(c.s)}">${own ? "보유 해제" : "보유 니케로 표시"}</button>
     <dl class="kv">
@@ -869,7 +909,8 @@ function setupImport() {
 // ---------- OVERLOAD ----------
 const PNAME = ["머리", "몸통", "팔", "다리"];
 const emptyPieces = () => PNAME.map(() => [["", 1], ["", 1], ["", 1]]);
-const OLS = { char: null, pieces: emptyPieces(), loaded: null, src: "", at: "" };
+const OLS = { char: null, pieces: emptyPieces(), loaded: null, src: "", at: "", mode: "boss" };
+try { if (localStorage.getItem("nikke-helper-ol-mode") === "arena") OLS.mode = "arena"; } catch (e) {}
 // Korean community consensus (DC 니케 갤, arca 니케 채널, fmkorea, 2025-2026):
 // - 우월코드 + 공격력 are the core pair for attackers; stop at 2 good lines per piece (8줄작).
 // - Slots 2/3 only appear 50%/30% of the time, so a good line there is locked whatever its tier.
@@ -879,7 +920,22 @@ const NO_AMMO = new Set(["dorothy", "pepper", "sparkling-summer-anis", "exia"]);
 const noAmmo = c => !!c && (NO_AMMO.has(c.s) || !!(c.oln && c.oln.noAmmo));
 const olnBox = c => c && c.oln ? `<div class="olnote"><div class="row" style="gap:6px;align-items:center"><b>${esc(c.ko)} 메모</b><span class="badge ${c.oln.sure ? "ok" : "part"}">${c.oln.sure ? "많이 쓰는 기준" : "참고"}</span></div><p style="margin:4px 0 0"><b>${esc(c.oln.key)}</b></p><p class="note" style="margin:2px 0 0">${esc(c.oln.why)}</p></div>` : "";
 const OL_CUT = { ele: [9, 10, 12], atk: [7, 9, 12], ammo: [7, 9, 12] }; // tier: 타협 / 권장 / 종결(파랑)
-function olPrefs(c) {
+function olPrefs(c) { return OLS.mode === "arena" ? olPrefsArena(c) : olPrefsBoss(c); }
+// Arena: burst speed (차속/장탄) and survival first; 공격력 over 우월코드; 명중 useless.
+function olPrefsArena(c) {
+  if (!c) return { main: [], core: [], sub: [], generic: true };
+  const a = c.aol;
+  let core = [], sub = [], main = [];
+  if (a && a.low) { sub = a.keys.slice(); }
+  else if (a && a.keys.length) { core = a.keys.slice(); main = a.keys.slice(0, 2).filter(k => ["atk", "cs", "ele", "ammo"].includes(k)); }
+  else if (c.c === "Attacker") { main = ["atk"]; core = ["atk"].concat(["RL", "SR"].includes(c.w) ? ["cs"] : []); sub = ["ammo", "ele"]; }
+  else if (["RL", "SR"].includes(c.w)) { core = ["cs"]; main = ["cs"]; sub = ["atk"]; }
+  else { sub = ["def"]; }
+  const ban = new Set([...(a ? a.ban : []), "hit", ...(noAmmo(c) ? ["ammo"] : [])]);
+  core = core.filter(k => !ban.has(k)); main = main.filter(k => !ban.has(k)); sub = sub.filter(k => !ban.has(k) && !core.includes(k));
+  return { main, core, sub, generic: !a, arena: true };
+}
+function olPrefsBoss(c) {
   if (!c) return { main: [], core: [], sub: [], generic: true };
   const pry = (c.oi || []).map(x => x[0]), pf = (c.of || []).map(x => x[0]);
   const core = new Set(pry), sub = new Set(pf);
@@ -912,7 +968,8 @@ function olJudge(c, slots) {
   const good = filled.filter(r => r.kind === "main" || r.kind === "core");
   const mains = filled.filter(r => r.kind === "main");
   const empties = res.filter(r => r.empty).length;
-  const done = !!c && (mains.length >= 2 || (good.length >= 2 && !P.main.length));
+  const needMain = Math.min(2, P.main.length);
+  const done = !!c && (P.main.length ? mains.length >= needMain && good.length >= 2 : good.length >= 2);
   // once 우월코드+공격력 are in, only their values matter
   const lowCut = r => OL_CUT[r.k] && r.t < OL_CUT[r.k][0] && (!done || !P.main.length || P.main.includes(r.k));
   res.forEach(r => {
@@ -960,8 +1017,11 @@ function olSave() {
   try { localStorage.setItem(GEAR_KEY, JSON.stringify(GEAR)); } catch (e) {}
 }
 const OL_TARGET = { ele: 10, atk: 9 }; // 줄당 권장 단계 (8줄작 기준: 우월코드 4줄 + 공격력 4줄)
+const aolBox = c => c && c.aol ? `<div class="olnote"><div class="row" style="gap:6px;align-items:center"><b>${esc(c.ko)} 아레나 메모</b><span class="badge ${c.aol.sure >= 2 ? "ok" : "part"}">${c.aol.sure >= 2 ? "많이 쓰는 기준" : "참고"}</span></div><p style="margin:4px 0 0"><b>${esc(c.aol.prio)}</b></p><p class="note" style="margin:2px 0 0">${esc(c.aol.why)}${c.aol.cubes.length ? ` · 아레나 큐브: ${c.aol.cubes.map(esc).join(", ")}` : ""}</p></div>` : "";
 function renderOL() {
   const c = OLS.char;
+  document.querySelectorAll("#olMode button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === OLS.mode ? "true" : "false"));
+  document.getElementById("olModeNote").textContent = OLS.mode === "arena" ? "버스트를 먼저 쓰는 차지 속도·장탄과 생존이 우선이에요. 우월코드보다 공격력, 명중률은 효과 없어요." : "레이드·요격전·캠페인 기준이에요.";
   if (c && OLS.loaded !== c.s) olLoad(c);
   const P = olPrefs(c);
   const tag = (k, cls) => olTag([k], cls);
@@ -969,8 +1029,8 @@ function renderOL() {
     ? `${COMBAT[c.s] ? `<p style="margin:0 0 8px"><b>${esc(c.ko)}</b> · 내 전투력 <b>${fmt(COMBAT[c.s])}</b></p>` : ""}<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 무기·클래스 기준)" : ""}</div>
        <div class="ol-list">${P.core.map(k => tag(k, "core")).join("")}${P.sub.map(k => tag(k, "sub")).join("")}${!P.core.length && !P.sub.length ? `<span class="note">옵션작보다 장비 강화가 먼저예요. 아무 옵션이나 괜찮아요.</span>` : ""}</div>
        ${noAmmo(c) && !c.oln ? `<p class="note" style="margin:6px 0 0">${esc(c.ko)}는 최대 장탄이 오히려 손해예요(마지막 탄·장탄 기믹).</p>` : ""}
-       ${olnBox(c)}
-       ${c.c !== "Attacker" && P.core.length ? `<p class="note" style="margin:6px 0 0">지원형·방어형은 옵션작보다 장비 강화 레벨이 더 중요해요.</p>` : ""}`
+       ${OLS.mode === "arena" ? aolBox(c) : olnBox(c)}
+       ${OLS.mode !== "arena" && c.c !== "Attacker" && P.core.length ? `<p class="note" style="margin:6px 0 0">지원형·방어형은 옵션작보다 장비 강화 레벨이 더 중요해요.</p>` : ""}`
     : `<div class="note">니케를 고르면 노려야 할 옵션이 나와요.</div>`;
   // picker: every owned nikke (base units; 애장품 gear lives on the base), strongest first by my combat power
   const mine = new Set([...S.owned].map(get).filter(Boolean).map(x => x.tr ? (C.find(b => !b.tr && b.en === x.en.replace(/ \(Treasure\)$/, "")) || x).s : x.s));
@@ -1013,13 +1073,13 @@ function renderOL() {
   document.getElementById("olSum").innerHTML = `<h3>장비 4개 합계</h3>
     <p class="note" style="margin:4px 0 10px">${c ? `완성 장비 <b>${done.length}/${filledN}</b>${OLS.at ? ` · ${esc(OLS.at)} ${OLS.src === "link" ? "링크로 가져옴" : OLS.src === "edited" ? "가져온 뒤 고침" : "직접 넣음"}` : ""}` : "니케를 고르면 합계가 나와요."}</p>
     <div class="scroll"><table class="data"><thead><tr><th style="text-align:left">옵션</th><th>줄 수</th><th>합계</th><th style="text-align:left">기준</th></tr></thead><tbody>${rows.length ? rows.map(({ l, n, sum }) => {
-      const tg = OL_TARGET[l.k] && P.main.includes(l.k);
+      const tg = OLS.mode !== "arena" && OL_TARGET[l.k] && P.main.includes(l.k);
       const goal = tg ? `4줄 · 줄당 ${OL_TARGET[l.k]}단계면 ${(l.v[OL_TARGET[l.k] - 1] * 4).toFixed(1)}%` : `<span class="note">${kindTxt[kindOf(l.k)]}</span>`;
       const b = tg ? (n >= 4 && sum >= l.v[OL_TARGET[l.k] - 1] * 4 ? "ok" : n >= 3 ? "part" : "no") : "";
       return `<tr><td style="text-align:left">${esc(l.ko)}</td><td>${b ? `<span class="badge ${b}">${n}줄</span>` : `${n}줄`}</td><td>${sum.toFixed(2)}%</td><td style="text-align:left">${goal}</td></tr>`;
     }).join("") : `<tr><td colspan="4"><span class="note">아직 넣은 옵션이 없어요.</span></td></tr>`}</tbody></table></div>
     ${c && c.oln && c.oln.goals ? `<div class="olgoals"><b>${esc(c.ko)} 목표</b>${c.oln.goals.map(g => { const r = rows.find(x => x.l.k === g.k) || { n: 0, sum: 0 }; const ok = g.min != null ? r.sum >= g.min : r.n >= (g.lines || 1); return `<div class="gline"><span class="badge ${ok ? "ok" : "no"}">${ok ? "달성" : "아직"}</span><span>${esc(g.label)} <span class="note">· 지금 ${r.n}줄 ${r.sum.toFixed(2)}%</span></span></div>`; }).join("")}</div>` : ""}
-    ${P.main.length ? `<p class="note" style="margin:8px 0 0">딜러는 장비마다 우월코드·공격력 2줄씩, 모두 합쳐 8줄이면 완성(8줄작)이에요.</p>` : ""}
+    ${P.main.length && OLS.mode !== "arena" ? `<p class="note" style="margin:8px 0 0">딜러는 장비마다 우월코드·공격력 2줄씩, 모두 합쳐 8줄이면 완성(8줄작)이에요.</p>` : ""}
     ${OLS.src === "link" || OLS.src === "edited" ? `<p class="note" style="margin:6px 0 0">링크로 가져온 장비는 빈 줄 위치를 몰라서 옵션이 1~2줄이면 위에서부터 채웠어요. 실제와 다르면 칸을 고쳐 주세요.</p>` : ""}`;
   // odds + value cuts
   const W = D.ol.lines.reduce((a, l) => a + l.w, 0);
@@ -1031,6 +1091,7 @@ function renderOL() {
     <div class="scroll"><table class="data"><thead><tr><th>칸</th><th>옵션 변경 1번에 ${P.main.length ? "우월코드·공격력" : "좋은 옵션"}이 뜰 확률</th></tr></thead><tbody>
     ${D.ol.slot.map((x, i) => `<tr><td>${i + 1}번</td><td>${pct(x * pMain)}</td></tr>`).join("")}
     </tbody></table></div>
+    ${OLS.mode === "arena" ? `<h3 style="margin-top:14px">아레나 오버로드 기준</h3><ul class="note" style="margin:6px 0 0;padding-left:18px">${(D.arenaOlRules || []).map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : ""}
     <h3 style="margin-top:14px">이 정도 수치면 충분해요 (한 줄 기준)</h3>
     <div class="scroll"><table class="data"><thead><tr><th>옵션</th><th>타협</th><th>권장</th><th>종결(파랑)</th></tr></thead><tbody>${["ele", "atk", "ammo"].map(cutRow).join("")}</tbody></table></div>
     <p class="note" style="margin:8px 0 0">처음 오버로드하면 모든 줄이 11단계로 떠서 함부로 버리지 마세요. 12단계부터 파란색이에요.</p>`;
@@ -1222,6 +1283,11 @@ function importGear(text) {
   if (S.view !== "ol") location.hash = "#ol"; else renderOL();
   return true;
 }
+document.getElementById("olMode").addEventListener("click", e => {
+  const b = e.target.closest("button[data-v]"); if (!b) return;
+  OLS.mode = b.dataset.v; try { localStorage.setItem("nikke-helper-ol-mode", OLS.mode); } catch (err) {}
+  renderOL();
+});
 document.getElementById("gearSel").addEventListener("change", e => {
   const c = get(e.target.value); if (!c) return;
   OLS.char = c; OLS.loaded = null; document.getElementById("olq").value = c.ko; renderOL();
@@ -1282,7 +1348,7 @@ function renderCubePick() {
   const users = k => [...S.owned].map(get).filter(x => x && x !== c && x.cu && x.cu[0] === k).map(x => x.ko);
   const row = (k, i) => { const u = users(k); return `<tr><td>${i + 1}순위</td><td style="text-align:left"><b>${esc(k)}</b> ${lvTag(k)}<div class="note">${esc(cubeEff(k))}</div></td><td style="text-align:left;white-space:normal">${u.length ? esc(u.slice(0, 5).join(", ")) + (u.length > 5 ? ` 외 ${u.length - 5}명` : "") : "<span class='note'>없음</span>"}</td></tr>`; };
   const table = (title, list) => list && list.length ? `<div><div class="lbl" style="margin-bottom:6px">${title}</div><div class="scroll"><table class="data"><thead><tr><th>순서</th><th style="text-align:left">큐브</th><th style="text-align:left">이 큐브를 1순위로 쓰는 내 다른 니케</th></tr></thead><tbody>${list.slice(0, 3).map(row).join("")}</tbody></table></div></div>` : "";
-  const body = table("보스전 (레이드·요격전)", c.cu) + table("아레나", c.cp);
+  const body = table("보스전 (레이드·요격전)", c.cu) + (c.aol && c.aol.cubes.length ? table("아레나 (커뮤니티 기준)", c.aol.cubes) : table("아레나", c.cp));
   host.innerHTML = `<div class="row" style="gap:8px">${card(c, { tier: true })}</div>${body || `<div class="note">${esc(c.ko)}는 추천 큐브 정보가 없어요. 아무 큐브나 껴도 괜찮아요.</div>`}<p class="note" style="margin:0">같은 큐브는 레벨을 올리면 여러 니케가 나눠 낄 수 있어요. 1순위 큐브가 다른 니케와 겹치면 2순위를 써도 손해가 크지 않아요.</p>`;
 }
 function renderCube() {
@@ -1460,6 +1526,93 @@ document.getElementById("campMode").addEventListener("click", e => {
 });
 document.getElementById("campCh").addEventListener("change", e => { CAMP.ch = +e.target.value; CAMP.elTouched = false; renderCamp(); });
 document.getElementById("campEl").addEventListener("change", e => { CAMP.el = e.target.value; CAMP.elTouched = true; renderCamp(); });
+
+// ---------- ARENA ----------
+const AR = { side: "all", mine: false, enemy: ["", "", "", "", ""] };
+try { AR.mine = localStorage.getItem("nikke-helper-arena-mine") === "1"; } catch (e) {}
+const ARD = D.arena || { meta: [], counters: [], roles: {}, burst: {}, rules: [], notes: [] };
+const SURE = ["참고", "중간", "많이 쓰는 기준"];
+const sureBadge = n => `<span class="badge ${n >= 2 ? "ok" : n === 1 ? "part" : "no"}">${SURE[n] || "참고"}</span>`;
+function arEnemySlugs() { return AR.enemy.map(v => { const c = findName(v); return c ? c.s : null; }); }
+function renderArenaEnemy() {
+  const host = document.getElementById("arEnemy");
+  if (!host.dataset.ready) {
+    host.innerHTML = AR.enemy.map((_, i) => `<div class="field"><label for="are${i}">${i + 1}번</label><input type="search" id="are${i}" list="olNames" placeholder="니케 이름"></div>`).join("") + `<div class="field" style="justify-content:flex-end"><button class="btn small" type="button" id="arClear">비우기</button></div>`;
+    host.dataset.ready = 1;
+    host.addEventListener("input", e => { const m = e.target.id.match(/^are(\d)$/); if (!m) return; AR.enemy[+m[1]] = e.target.value; renderArenaCounter(); });
+    document.getElementById("arClear").addEventListener("click", () => { AR.enemy = ["", "", "", "", ""]; AR.enemy.forEach((_, i) => document.getElementById("are" + i).value = ""); renderArenaCounter(); });
+  }
+}
+function renderArenaCounter() {
+  const host = document.getElementById("arCounter");
+  const en = arEnemySlugs().filter(Boolean);
+  if (!en.length) { host.innerHTML = `<p class="note" style="margin:0">상대 니케를 하나라도 넣으면 비슷한 메타 덱과 대응법이 나와요.</p>`; return; }
+  const enemyChars = en.map(get);
+  const words = enemyChars.flatMap(c => [c.ko, c.ko.replace(/ \(애장품\)$/, ""), ...(c.nk || [])]).map(nq);
+  // which meta deck does it look like
+  const like = ARD.meta.map(d => ({ d, n: d.m.filter(x => en.includes(x)).length })).filter(x => x.n >= 2).sort((a, b) => b.n - a.n).slice(0, 2);
+  const likeNames = like.map(x => nq(x.d.name.split(/[(（]/)[0]));
+  const hits = ARD.counters.filter(c => { const v = nq(c.vs); return words.some(w => w.length >= 2 && v.includes(w)) || likeNames.some(w => w.length >= 2 && (v.includes(w) || w.includes(v))); });
+  const roleRows = enemyChars.map(c => { const r = ARD.roles[c.s]; return r ? `<li><b>${esc(c.ko)}</b> · ${esc(r.role)}${r.note ? ` <span class="note">— ${esc(r.note)}</span>` : ""}</li>` : ""; }).join("");
+  host.innerHTML = (like.length ? like.map(({ d, n }) => `<div class="verdict" data-v="ok"><span class="lbl">상대 덱</span><span class="big">‘${esc(d.name)}’와 ${n}/5 같아요</span><span>약점: ${esc(d.minus)}</span></div>`).join("") : `<p class="note" style="margin:0">알려진 메타 덱과 크게 겹치지 않아요. 아래 니케별 대응을 참고하세요.</p>`)
+    + (hits.length ? `<h4 style="margin:6px 0 0">이렇게 상대해요</h4>` + hits.map(c => `<div class="ar-deck"><div class="row" style="gap:6px 10px"><b>vs ${esc(c.vs)}</b>${sureBadge(c.sure)}</div><p style="margin:0">${esc(c.how)}</p>${c.use.length ? `<div class="team">${c.use.map(x => slot(x)).join("")}</div>` : ""}</div>`).join("") : "")
+    + (roleRows ? `<h4 style="margin:10px 0 4px">상대 니케 역할</h4><ul class="ar-role" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px">${roleRows}</ul>` : "");
+}
+function renderArenaMeta() {
+  const own = ownSlug;
+  document.querySelectorAll("#arSide button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === AR.side ? "true" : "false"));
+  const mb = document.getElementById("arMine"); mb.setAttribute("aria-pressed", AR.mine ? "true" : "false"); mb.classList.toggle("primary", AR.mine);
+  const list = ARD.meta.filter(d => AR.side === "all" || d.side === AR.side || d.side === "둘다").filter(d => !AR.mine || d.m.every(own));
+  document.getElementById("arMeta").innerHTML = list.length ? list.map(d => { const have = d.m.filter(own).length; return `<div class="ar-deck">
+    <div class="row" style="gap:6px 10px"><b>${esc(d.name)}</b><span class="chip">${esc(d.side)}</span>${sureBadge(d.sure)}<span class="badge ${have === 5 ? "ok" : have >= 3 ? "part" : "no"}">내 니케 ${have}/5</span><span class="note">${esc(d.when || "")}</span></div>
+    <div class="team">${d.m.map(x => slot(x)).join("")}</div>
+    <p class="note" style="margin:0">강점: ${esc(d.plus)} · 약점: ${esc(d.minus)}</p></div>`; }).join("") : `<div class="empty">조건에 맞는 덱이 없어요.</div>`;
+}
+// my decks: fully owned meta decks first, then fill by arena rating + role mix
+function arenaAutoBuild(n) {
+  const pool = [...S.owned].map(get).filter(Boolean);
+  const tre = new Set(pool.filter(c => c.tr).map(c => c.en.replace(/ \(Treasure\)/, "")));
+  const avail = pool.filter(c => !(!c.tr && tre.has(c.en)));
+  const used = new Set(), out = [];
+  const realSlug = x => { const c = get(x); if (!c) return x; if (!c.tr && tre.has(c.en)) { const t = C.find(y => y.tr && y.en === c.en + " (Treasure)"); return t ? t.s : x; } return x; };
+  for (const d of ARD.meta) {
+    if (out.length >= n) break;
+    const m = d.m.map(realSlug);
+    if (m.every(x => ownSlug(x) && !used.has(x))) { m.forEach(x => used.add(x)); out.push({ m, why: `메타 덱 그대로 · ${d.name}` }); }
+  }
+  const role = c => (ARD.roles[c.s] || {}).role || "";
+  const maxCp = Math.max(1, ...avail.map(c => COMBAT[c.s] || COMBAT[(C.find(b => !b.tr && b.en === c.en.replace(/ \(Treasure\)$/, "")) || {}).s] || 0));
+  const score = c => tScore(c.rp) * 1.6 + (ARD.roles[c.s] ? 1 : 0) + ((COMBAT[c.s] || 0) / maxCp) * 3;
+  const pick = pred => avail.filter(c => !used.has(c.s) && pred(c)).sort((a, b) => score(b) - score(a))[0];
+  while (out.length < n) {
+    const m = []; const take = c => { if (c) { used.add(c.s); m.push(c.s); } return c; };
+    take(pick(c => /버충|버스트 게이지/.test(role(c))) || pick(c => c.w === "RL"));
+    take(pick(c => /무적|불굴|도발|실드|부활|피해분담|회복|힐/.test(role(c))));
+    take(pick(c => /핵딜|누크|광역/.test(role(c))) || pick(c => c.c === "Attacker"));
+    for (const b of ["I", "II", "III"]) if (!m.some(x => bursts(get(x)).includes(b))) take(pick(c => bursts(c).includes(b)));
+    while (m.length < 5) { if (!take(pick(() => true))) break; }
+    if (m.length < 3) break;
+    const order = x => { const c = get(x), r = ARD.roles[x]; const sl = r && /^(\d)/.exec(r.slot); return sl ? +sl[1] : c.c === "Defender" ? 1 : c.c === "Supporter" ? 3 : 5; };
+    m.sort((a, b) => order(a) - order(b));
+    out.push({ m, why: "아레나 평가·역할·내 전투력으로 짠 덱" });
+  }
+  return out;
+}
+function renderArenaAuto() {
+  const n = +document.getElementById("arN").value;
+  const decks = arenaAutoBuild(n);
+  document.getElementById("arAutoNote").textContent = `${n}덱 · 같은 니케는 한 번만 써요`;
+  document.getElementById("arAuto").innerHTML = decks.length ? decks.map((d, i) => `<div class="teamcard"><div class="teamhead"><h3>${i + 1}덱</h3><span class="badge ok">${esc(d.why)}</span></div><div class="team">${d.m.map(x => slot(x)).join("")}</div></div>`).join("")
+    + `<p class="note" style="margin:0">자동으로 짠 덱은 출발점이에요. 슬롯은 아레나에서 자주 쓰는 자리 순서로 놓았어요(앞이 1번).</p>`
+    : `<div class="empty">‘보유 니케’ 탭에서 가진 니케를 체크하면 덱을 짜줘요.</div>`;
+}
+function renderArena() {
+  renderArenaEnemy(); renderArenaCounter(); renderArenaMeta(); renderArenaAuto();
+  document.getElementById("arRules").innerHTML = [...(ARD.rules || []), ...(ARD.notes || [])].map(r => `<li>${esc(r)}</li>`).join("");
+}
+document.getElementById("arSide").addEventListener("click", e => { const b = e.target.closest("button[data-v]"); if (!b) return; AR.side = b.dataset.v; renderArenaMeta(); });
+document.getElementById("arMine").addEventListener("click", () => { AR.mine = !AR.mine; try { localStorage.setItem("nikke-helper-arena-mine", AR.mine ? "1" : "0"); } catch (e) {} renderArenaMeta(); });
+document.getElementById("arN").addEventListener("change", renderArenaAuto);
 
 // ---------- RAID ----------
 // Core: hitting a core doubles normal-attack damage, so accurate weapons gain the most.
@@ -1774,7 +1927,7 @@ function buildLevel() {
 }
 
 // ---------- routing + events ----------
-const VIEWS = ["dex", "owned", "ol", "cube", "tier", "raid", "camp", "level"];
+const VIEWS = ["dex", "owned", "ol", "cube", "tier", "raid", "camp", "arena", "level"];
 function route() {
   const h = location.hash.slice(1);
   S.view = VIEWS.includes(h) ? h : "dex";
@@ -1790,6 +1943,7 @@ function renderAll() {
   if (S.view === "tier") renderTier();
   if (S.view === "raid") renderRaid();
   if (S.view === "camp") renderCamp();
+  if (S.view === "arena") renderArena();
   if (S.view === "level") renderLevel();
   const host = document.getElementById("drawerHost");
   if (host.dataset.s) { const btn = host.querySelector(".drawer [data-own]"); const own = S.owned.has(host.dataset.s); if (btn) { btn.textContent = own ? "보유 해제" : "보유 니케로 표시"; btn.classList.toggle("primary", !own); } }
@@ -1849,6 +2003,8 @@ document.getElementById("srcFoot").innerHTML = `<div class="srclist"><b>출처</
   <li>한국어 이름·레벨 비용·초상화·계정 가져오기·스테이지 권장 전투력: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a> (블라블라링크 공개 자료 기반)</li>
   <li>오버로드 옵션 수치·확률: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a></li>
   <li>오버로드 잠금·수치 기준: 디시인사이드 니케 마이너 갤러리, 아카라이브 니케 채널, 에펨코리아 공략 글</li>
+  <li>아레나 메타 덱·카운터·니케별 역할: 디시인사이드 니케 마이너 갤러리, 아카라이브 니케 채널, nikke.beomtachi.com, 에펨코리아 / 아레나 규칙·버스트 게이지: Prydwen, nikke.gg, NIKKE Synergy</li>
+  <li>아레나 오버로드·큐브: nikke.beomtachi.com, Prydwen, nikke.gg, Vortex Gaming(메가니케) 가이드</li>
   <li>니케별 오버로드 메모: 아카라이브 니케 채널, nikke.beomtachi.com, nikke.gg, Prydwen, 나무위키</li>
   <li>유니온 레이드 보스 코어 여부: 아카라이브 니케 채널 시즌별 보스 특성·조합 정리글, Prydwen, nikke.gg</li>
   <li>유니온 레이드 보스: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지) · 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌 기준</li>
