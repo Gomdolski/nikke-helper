@@ -238,7 +238,7 @@ h1, h2, h3, .big { text-wrap: balance; }
       <p class="lead">이름을 누르면 추천 큐브, 오버로드 옵션, 스킬 레벨, 같이 쓰는 덱이 나와요. 오른쪽 체크 칸을 누르면 보유 니케로 표시돼요.</p>
     </div>
     <div class="panel filters" id="dexFilters">
-      <div class="field" style="grid-column: 1 / -1"><label for="q">이름 검색 (한글·영문·별명)</label><input type="search" id="q" placeholder="예: 홍련, 흑련, 레후, 애헬름"></div>
+      <div class="field" style="grid-column: 1 / -1"><label for="q">검색 (이름·영문·별명·콜라보·스쿼드·기업)</label><input type="search" id="q" placeholder="예: 흑련, 레후, 애헬름, 에게리, 카운터스"></div>
     </div>
     <div class="row"><span class="count" id="dexCount"></span><span class="grow"></span>
       <div class="field" style="flex-direction:row;align-items:center;gap:8px"><label for="sort">정렬</label>
@@ -659,7 +659,8 @@ function buildFilters() {
   });
 }
 const nq = v => String(v || "").toLowerCase().replace(/\s/g, "");
-function matchQ(c, q) { if (!q) return true; q = nq(q); return nq(c.ko).includes(q) || nq(c.en).includes(q) || (c.nk || []).some(n => nq(n).includes(q)); }
+// name, English name, nickname or group word, squad, manufacturer
+function matchQ(c, q) { if (!q) return true; q = nq(q); return nq(c.ko).includes(q) || nq(c.en).includes(q) || (c.nk || []).some(n => nq(n).includes(q)) || (c.sq && nq(c.sq).includes(q)) || (q.length >= 2 && nq(MAN[c.m] || "").includes(q)); }
 // exact name, English name or community nickname -> character
 function findName(v) {
   const q = nq(v); if (!q) return null;
@@ -1189,7 +1190,7 @@ document.getElementById("olPieces").addEventListener("click", e => {
 function buildOLTable() {
   const cols = [1, 5, 6, 10, 11, 15];
   document.getElementById("olTable").innerHTML = `<thead><tr><th>옵션</th>${cols.map(t => `<th>${t}단계</th>`).join("")}<th>나올 비중</th></tr></thead><tbody>${D.ol.lines.map(l => `<tr><td>${esc(l.ko)}</td>${cols.map(t => `<td>${l.v[t - 1]}%</td>`).join("")}<td>${l.w}%</td></tr>`).join("")}</tbody>`;
-  document.getElementById("olNames").innerHTML = C.map(c => `<option value="${esc(c.ko)}">${esc(c.en)}</option>`).join("") + C.flatMap(c => (c.nk || []).map(n => `<option value="${esc(n)}">${esc(c.ko)}</option>`)).join("");
+  document.getElementById("olNames").innerHTML = C.map(c => `<option value="${esc(c.ko)}">${esc(c.en)}</option>`).join("") + (() => { const cnt = {}; C.forEach(c => (c.nk || []).forEach(n => cnt[n] = (cnt[n] || 0) + 1)); return C.flatMap(c => (c.nk || []).filter(n => cnt[n] === 1).map(n => `<option value="${esc(n)}">${esc(c.ko)}</option>`)).join(""); })();
 }
 
 // ---------- CUBE ----------

@@ -124,11 +124,22 @@ const chars = pry.chars.map((p) => {
 // ---- Community nicknames (build/nicknames.json: { "공식이름": ["별명", "애장품 전용 별명*"] }) ----
 {
   const nf = path.join(HERE, "nicknames.json");
-  const nick = fs.existsSync(nf) ? JSON.parse(fs.readFileSync(nf, "utf8")).names || {} : {};
+  const nj = fs.existsSync(nf) ? JSON.parse(fs.readFileSync(nf, "utf8")) : {};
+  const nick = nj.names || {};
+  // groups: one search word -> several nikkes (e.g. 에게리 -> every Evangelion collab unit)
+  const groupOf = new Map();
+  for (const g of nj.groups || []) {
+    const members = g.members.flatMap((m) => m.startsWith("*") ? chars.filter((c) => c.m === m.slice(1) && !c.tr).map((c) => c.ko) : [m]);
+    for (const m of members) {
+      if (!chars.some((c) => c.ko === m)) console.log("group member not found:", m);
+      groupOf.set(m, [...(groupOf.get(m) || []), ...g.names]);
+    }
+  }
   let n = 0;
   for (const c of chars) {
     const base = c.ko.replace(/ \(애장품\)$/, "");
     const list = (nick[base] || []).filter((x) => c.tr ? /\*$/.test(x) : !/\*$/.test(x)).map((x) => x.replace(/\*$/, "").trim());
+    if (!c.tr) list.push(...(groupOf.get(c.ko) || []));
     if (c.tr) list.push("애" + base.replace(/\s+/g, ""), "애장품" + base.replace(/\s+/g, ""));
     const uniq = [...new Set(list.filter(Boolean))];
     if (uniq.length) { c.nk = uniq; n += uniq.length; }
