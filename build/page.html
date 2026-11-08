@@ -1726,10 +1726,7 @@ async function checkUpdate() {
     if (!j.v || j.v === APP_V) return;
     updShown = true;
     const onSite = location.href.startsWith(SITE);
-    const note = j.note ? ` (${esc(j.note)})` : "";
-    document.getElementById("updText").innerHTML = onSite
-      ? `<b>새 버전이 나왔어요</b>${note}. 새로고침하면 바로 적용돼요.`
-      : `<b>새 버전이 나왔어요</b>${note}. 웹 주소로 열면 앞으로 항상 최신이에요. 보유 목록은 거기서 한 번만 다시 가져오면 돼요.`;
+    document.getElementById("updText").innerHTML = `<b>새 버전이 나왔어요</b>`;
     document.getElementById("updAct").innerHTML = onSite
       ? `<button class="btn primary" type="button" id="updGo">새로고침</button>`
       : `<a class="btn primary" href="${SITE}" target="_blank" rel="noopener">웹에서 열기</a>`;
