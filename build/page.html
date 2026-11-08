@@ -644,7 +644,11 @@ function skillBox(c) {
   const n = c.skn, base = c.tr ? (C.find(b => !b.tr && b.en === c.en.replace(/ \(Treasure\)$/, "")) || c) : c;
   const mine = typeof SKILL !== "undefined" ? SKILL[base.s] : null;
   const lv = t => String(t || "").split("/").map(Number);
-  const gap = (cur, goal) => { const g = lv(goal); if (g.length !== 3 || g.some(isNaN)) return null; const d = g.map((v, i) => Math.max(0, v - (cur[i] || 0))); return d.every(x => !x) ? "" : ["1스", "2스", "버스트"].map((k, i) => d[i] ? `${k} +${d[i]}` : "").filter(Boolean).join(", "); };
+  const gap = (cur, goal) => {
+    const g = lv(goal); if (g.length !== 3 || g.some(isNaN)) return null;
+    const by = new Map(); ["1스", "2스", "버스트"].forEach((k, i) => { if ((cur[i] || 0) < g[i]) by.set(g[i], [...(by.get(g[i]) || []), k]); });
+    return [...by].map(([to, ks]) => `${ks.length === 3 ? "전부" : ks.join("·")} → ${to}`).join(", ");
+  };
   let html = "";
   if (n) {
     html += `<div class="row" style="gap:6px 12px;margin-top:6px;align-items:center"><span>가성비 <b class="num">${esc(n.cheap)}</b></span><span>종결 <b class="num">${esc(n.end)}</b></span><span class="badge ${n.sure >= 2 ? "ok" : "part"}">${n.sure >= 2 ? "많이 쓰는 기준" : "참고"}</span></div>
@@ -656,9 +660,9 @@ function skillBox(c) {
   if (mine) {
     const goalA = n ? n.cheap : c.sk && c.sk.rc, goalB = n ? n.end : c.sk && c.sk.hi;
     const a = goalA ? gap(mine, goalA) : null, b = goalB ? gap(mine, goalB) : null;
-    html += `<p style="margin:6px 0 0">지금 내 스킬 <b class="num">${mine.join("/")}</b>${a === "" ? ` · <span class="badge ok">${n ? "가성비" : "추천"} 달성</span>` : a ? ` · ${n ? "가성비" : "추천"}까지 ${a}` : ""}${b === "" ? ` · <span class="badge ok">${n ? "종결" : "최대"} 달성</span>` : b ? ` · ${n ? "종결" : "최대"}까지 ${b}` : ""}</p>`;
+    html += `<p style="margin:6px 0 0">지금 내 스킬 <b class="num">${mine.join("/")}</b>${a === "" ? ` · <span class="badge ok">${n ? "가성비" : "추천"} 달성</span>` : a ? ` · ${n ? "가성비" : "추천"}: ${a}` : ""}${b === "" ? ` · <span class="badge ok">${n ? "종결" : "최대"} 달성</span>` : b ? ` · ${n ? "종결" : "최대"}: ${b}` : ""}</p>`;
   }
-  return html + `<p class="note" style="margin:2px 0 0">1스 / 2스 / 버스트 순서예요.</p>`;
+  return html;
 }
 // Portraits are linked from the official blablalink CDN (not copied); a missing image just leaves an empty box.
 const pfImg = (c, cls) => c && c.img ? `<img class="${cls}" src="${esc(c.img)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.removeAttribute('src')">` : `<span class="${cls}"></span>`;
@@ -728,7 +732,7 @@ function openChar(s) {
       : `<p class="note" style="margin:6px 0 0">따로 노릴 옵션이 없어요. 오버로드는 전투력 올리는 용도로만 하면 돼요.</p>`}
       ${olnBox(c)}</div>
     <div><h3>추천 하모니 큐브</h3>${c.cu ? `<ol style="margin:6px 0 0;padding-left:20px">${c.cu.map(x => `<li><b>${esc(x)}</b> <span class="note">${esc(cubeEff(x))}</span></li>`).join("")}</ol>` : `<p style="margin:6px 0 0">-</p>`}${c.cp ? `<p class="note" style="margin:2px 0 0">PvP: ${c.cp.map(esc).join(" → ")}</p>` : ""}</div>
-    <div><h3>스킬 추천</h3>${skillBox(c)}</div>
+    <div><h3>스킬 추천 <span class="note" style="font-weight:400;font-size:12px">1스/2스/버스트</span></h3>${skillBox(c)}</div>
     <div style="display:flex;flex-direction:column;gap:8px"><h3>같이 쓰는 덱</h3>
       ${teams.length ? teams.slice(0, 8).map(t => `<div><div class="note" style="margin-bottom:4px">${esc(t[0])}</div><div class="team">${t[1].map(x => slot(x)).join("")}</div></div>`).join("") : `<p class="note">등록된 덱이 없어요.</p>`}
     </div>
