@@ -273,13 +273,14 @@ h1, h2, h3, .big { text-wrap: balance; }
       <p class="note" style="margin:4px 0 0">연결하면 보유 니케·장비 옵션·큐브·스킬·전투력이 자동으로 채워지고, 모든 탭이 내 계정 기준으로 바뀌어요. 처음 한 번만 하면 돼요.</p></div>
     <ol class="note" id="connSteps">
       <li><a href="https://www.blablalink.com/setting/shiftyspad/private" target="_blank" rel="noopener">ShiftyPad 숨김 설정</a>에서 <b>‘SHIFTYPAD에 나의 니케 표시하기’</b>를 <b>‘모두에게 공개’</b>로 바꿔요.</li>
-      <li><a href="https://www.blablalink.com/" target="_blank" rel="noopener">블라블라링크</a> 오른쪽 위 내 사진 → <b>내 홈</b>을 열고 주소창 주소를 복사해요.</li>
-      <li>아래 칸에 붙여넣고 <b>연결하기</b>를 눌러요.</li>
+      <li><a class="btn small" href="https://www.blablalink.com/user" target="_blank" rel="noopener">내 블라블라링크 홈 열기</a> 를 눌러요. 로그인돼 있으면 내 홈이 바로 열려요. 그 탭의 <b>주소창 주소를 복사</b>해요.</li>
+      <li>아래 칸에 붙여넣으면 바로 연결돼요.</li>
     </ol>
     <div class="row" id="connForm" style="align-items:flex-end">
-      <div class="field grow"><label for="bbLink0">내 블라블라링크 프로필 링크</label><input type="url" id="bbLink0" placeholder="https://www.blablalink.com/user?openid=…" autocomplete="off"></div>
+      <div class="field grow"><label for="bbLink0">내 블라블라링크 프로필 링크</label><input type="text" inputmode="url" id="bbLink0" placeholder="https://www.blablalink.com/user?openid=…" autocomplete="off"></div>
       <button class="btn primary" id="bbGo0" type="button">연결하기</button>
     </div>
+    <p class="note" style="margin:-4px 0 0">휴대폰 블라블라링크 앱처럼 주소창이 없으면, 내 홈의 <b>ID 숫자</b>를 복사해 넣어도 돼요.</p>
     <div id="connStatus" role="status"></div>
     <button type="button" class="later" id="connLater">나중에 할게요</button>
   </section>
@@ -320,7 +321,7 @@ h1, h2, h3, .big { text-wrap: balance; }
         <summary style="cursor:pointer;color:var(--muted);font-size:13px">처음 한 번만 하면 돼요 · 링크 찾는 법</summary>
         <ol class="note" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
           <li><a href="https://www.blablalink.com/setting/shiftyspad/private" target="_blank" rel="noopener">ShiftyPad 숨김 설정</a>에서 <b>‘SHIFTYPAD에 나의 니케 표시하기’</b>를 <b>‘모두에게 공개’</b>로 바꿔요. 비공개면 가져올 수 없어요.</li>
-          <li>블라블라링크 오른쪽 위 내 사진을 눌러 <b>내 홈</b>을 열고, 주소창의 주소(<code>blablalink.com/user?openid=…</code>)를 복사해서 위 칸에 붙여넣어요.</li>
+          <li><a href="https://www.blablalink.com/user" target="_blank" rel="noopener">내 블라블라링크 홈</a>을 열고(로그인돼 있으면 바로 열려요), 주소창의 주소(<code>blablalink.com/user?openid=…</code>)를 복사해서 위 칸에 붙여넣어요.</li>
           <li>링크는 이 브라우저에 저장돼요. 다음부터는 페이지를 열면 알아서 최신 정보로 바뀌어요(6시간마다). 바로 바꾸고 싶으면 ‘가져오기’를 누르세요.</li>
         </ol>
         <p class="note" style="margin:8px 0 0">외부 공개 서버를 거쳐서 가져와요. 니케 목록을 공개로 두면 내 프로필 링크를 아는 사람은 누구나 볼 수 있어요.</p>
@@ -1214,6 +1215,8 @@ const OL_TYPE = { "05": "ele", "06": "hit", "07": "ammo", "08": "atk", "09": "cd
 const PART = [["head", "머리"], ["body", "몸통"], ["arm", "팔"], ["leg", "다리"]];
 function bbId(v) {
   v = String(v || "").trim();
+  const m = v.match(/openid=([^&\s#]+)/); if (m) { try { return decodeURIComponent(m[1]); } catch (e) { return m[1]; } }
+  const num = v.replace(/^ID\s*[:：]\s*/i, ""); if (/^\d{12,24}$/.test(num)) return btoa("29080-" + num);
   try { const u = new URL(v); return u.searchParams.get("openid") || u.searchParams.get("blablaid") || ""; } catch (e) {}
   return /^[\w-]{10,}$/.test(v) ? v : "";
 }
@@ -1358,6 +1361,7 @@ function setupConnect() {
   };
   document.getElementById("bbGo0").addEventListener("click", go);
   inp.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  inp.addEventListener("paste", () => setTimeout(() => { if (bbId(inp.value) && !bbBusy) go(); }, 0));
   document.getElementById("connLater").addEventListener("click", () => {
     if (card.dataset.done !== "1") { try { localStorage.setItem(CONN_LATER_KEY, "1"); } catch (e) {} }
     card.hidden = true; syncConnect();
