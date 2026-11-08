@@ -235,14 +235,27 @@ footer.src a { color: inherit; }
       <p class="lead">가진 니케를 체크해 두면 레이드 덱 편성과 키울 순서 추천에 쓰여요. 체크한 목록은 이 페이지를 연 사람마다 따로 저장돼요.</p>
     </div>
     <div class="panel" id="importPanel" style="display:flex;flex-direction:column;gap:10px">
-      <div class="teamhead"><h3>블라블라링크에서 가져오기</h3><span class="note">ShiftyPad의 ‘나의 니케’ 목록으로 보유 니케를 한 번에 체크해요</span></div>
+      <div class="teamhead"><h3>블라블라링크에서 가져오기</h3><span class="note">보유 니케·애장품·장비 옵션·큐브 레벨을 한 번에 가져와요</span></div>
+      <div class="row" style="align-items:flex-end">
+        <div class="field grow"><label for="bbLink">내 블라블라링크 프로필 링크</label><input type="url" id="bbLink" placeholder="https://www.blablalink.com/user?openid=…" autocomplete="off"></div>
+        <button class="btn primary" id="bbGo" type="button">가져오기</button>
+      </div>
+      <details id="bbHow">
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px">처음 한 번만 하면 돼요 · 링크 찾는 법</summary>
+        <ol class="note" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+          <li><a href="https://www.blablalink.com/setting/shiftyspad/private" target="_blank" rel="noopener">ShiftyPad 숨김 설정</a>에서 <b>‘SHIFTYPAD에 나의 니케 표시하기’</b>를 <b>‘모두에게 공개’</b>로 바꿔요. 비공개면 가져올 수 없어요.</li>
+          <li>블라블라링크 오른쪽 위 내 사진을 눌러 <b>내 홈</b>을 열고, 주소창의 주소(<code>blablalink.com/user?openid=…</code>)를 복사해서 위 칸에 붙여넣어요.</li>
+          <li>링크는 이 브라우저에 저장돼요. 다음부터는 ‘가져오기’만 누르면 최신 정보로 바뀌어요.</li>
+        </ol>
+        <p class="note" style="margin:8px 0 0">비공식 공개 서버 <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a>를 거쳐서 가져와요. 니케 목록을 공개로 두면 내 프로필 링크를 아는 사람은 누구나 볼 수 있어요.</p>
+      </details>
       <div class="row" id="impAutoRow">
         <button class="btn primary" id="impAuto">블라블라링크에서 바로 가져오기</button>
         <span class="note" id="impAutoHint">Claude 데스크톱 앱에서 이 페이지를 열었을 때 쓸 수 있어요. 앱 안 브라우저에 블라블라링크 로그인이 돼 있어야 해요.</span>
       </div>
       <div id="impStatus" role="status"></div>
       <details id="impManual">
-        <summary style="cursor:pointer;color:var(--muted);font-size:13px">크롬·엣지에서 북마크로 가져오기</summary>
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px">다른 방법: 북마크로 가져오기 (링크가 안 될 때)</summary>
         <div class="steps">
           <div class="step once"><span class="no">처음<br>한 번</span><div class="body">
             <b>북마크 만들기</b>
@@ -291,9 +304,9 @@ footer.src a { color: inherit; }
       <p class="lead">니케를 고르고 장비에 뜬 옵션과 단계(1~15)를 넣으면, 유지할지 다시 돌릴지 알려줘요. 옵션은 장비 한 개 기준으로 넣으세요.</p>
     </div>
     <div class="panel" id="gearPanel" style="display:flex;flex-direction:column;gap:10px">
-      <div class="teamhead"><h3>내 장비 점검</h3><span class="note">ShiftyPad 니케 화면의 장비 4개를 한 번에 판정해요</span></div>
+      <div class="teamhead"><h3>내 장비 점검</h3><span class="note">‘보유 니케’ 탭에서 링크로 가져오면 모든 니케 장비가 여기 들어와요</span></div>
       <details id="gearHow">
-        <summary style="cursor:pointer;color:var(--muted);font-size:13px">가져오는 법</summary>
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px">한 명씩 가져오는 법 (북마크)</summary>
         <ol class="note" style="margin:8px 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
           <li><a href="https://www.blablalink.com/shiftyspad/nikke-list" target="nikke_shiftypad">ShiftyPad ‘나의 니케’</a>를 열고 점검할 니케를 눌러요.</li>
           <li>북마크바의 <b>‘★ 니케 도우미로 보내기’</b>를 눌러요. 북마크가 없으면 ‘보유 니케’ 탭에서 만들 수 있어요.</li>
@@ -664,7 +677,7 @@ function parseShifty(text) {
   return { slugs, count: names.length, matched: names.length - unknown.length, unknown, loginNeeded: /로그인하여|log ?in/i.test(String(text)) && !names.length };
 }
 let lastImportBackup = null;
-function applyImport(res, how) {
+function applyImport(res, how, opts = {}) {
   if (res.matched < res.count * 0.6) {
     impStatus(`<div class="verdict" data-v="bad"><span class="big">이름을 거의 못 알아봤어요</span><span>목록 ${res.count}명 중 ${res.matched}명만 알아봐서 반영하지 않았어요. 기존 체크는 그대로예요.</span><span class="note">못 알아본 이름 예: ${res.unknown.slice(0, 8).map(esc).join(", ")}</span></div>`);
     return;
@@ -672,13 +685,13 @@ function applyImport(res, how) {
   const before = new Set(S.owned);
   const next = new Set(res.slugs);
   // keep 애장품 checks for units still owned
-  for (const s of before) { const c = get(s); if (c && c.tr) { const base = C.find(x => !x.tr && x.en === c.en.replace(/ \(Treasure\)/, "")); if (!base || next.has(base.s)) next.add(s); } }
+  if (!opts.exactTreasure) for (const s of before) { const c = get(s); if (c && c.tr) { const base = C.find(x => !x.tr && x.en === c.en.replace(/ \(Treasure\)/, "")); if (!base || next.has(base.s)) next.add(s); } }
   const added = [...next].filter(s => !before.has(s)).length;
   const removed = [...before].filter(s => !next.has(s)).length;
   lastImportBackup = [...before];
   S.owned = next; persist(); renderAll();
   impStatus(`<div class="verdict" data-v="good"><span class="lbl">${esc(how)}</span><span class="big">보유 니케 ${res.matched}명 반영</span>
-    <span>새로 체크 ${added}명 · 체크 해제 ${removed}명${res.unknown.length ? ` · 이름을 못 찾은 니케: ${res.unknown.map(esc).join(", ")}` : ""}. 애장품 체크는 그대로 뒀어요.</span>
+    <span>새로 체크 ${added}명 · 체크 해제 ${removed}명${res.unknown.length ? ` · 이름을 못 찾은 니케: ${res.unknown.map(esc).join(", ")}` : ""}. ${opts.extra || "애장품 체크는 그대로 뒀어요."}</span>
     <span><button class="btn small" id="impUndo">되돌리기</button></span></div>`);
 }
 function impStatus(html) { document.getElementById("impStatus").innerHTML = html; }
@@ -769,7 +782,8 @@ function setupImport() {
   ta.addEventListener("paste", () => setTimeout(run, 0));
   ta.addEventListener("change", run);
   document.addEventListener("click", e => { if (e.target.id === "impUndo" && lastImportBackup) { S.owned = new Set(lastImportBackup); lastImportBackup = null; persist(); renderAll(); impStatus(`<p class="note" style="margin:0">가져오기 전으로 되돌렸어요.</p>`); } });
-  if (!window.claude) { document.getElementById("impAutoRow").hidden = true; document.getElementById("impManual").open = true; }
+  if (!window.claude) document.getElementById("impAutoRow").hidden = true;
+  setupLinkImport();
 }
 
 // ---------- OVERLOAD ----------
@@ -889,6 +903,86 @@ function renderOL() {
     <p class="note" style="margin:8px 0 0">처음 오버로드하면 모든 줄이 11단계로 떠서 함부로 버리지 마세요. 12단계부터 파란색이에요. 출처: 디시 니케 갤, 아카라이브 니케 채널, 에펨코리아 공략 글 정리.</p>`;
 }
 
+// ---------- LINK IMPORT (nikke-api, blablalink share link) ----------
+const BB_KEY = "nikke-helper-bblink-v1";
+const NAPI = "https://nikke-api.pages.dev";
+const OL_TYPE = { "05": "ele", "06": "hit", "07": "ammo", "08": "atk", "09": "cdc", "10": "cs", "11": "cr", "12": "cd", "13": "def" };
+const PART = [["head", "머리"], ["body", "몸통"], ["arm", "팔"], ["leg", "다리"]];
+function bbId(v) {
+  v = String(v || "").trim();
+  try { const u = new URL(v); return u.searchParams.get("openid") || u.searchParams.get("blablaid") || ""; } catch (e) {}
+  return /^[\w-]{10,}$/.test(v) ? v : "";
+}
+function slugFromApi(ch) {
+  const cands = [...new Set([...(D.names[nrm(ch.name.ko || "")] || []), ...(D.names[nrm(ch.name.en || "")] || [])])].map(get).filter(c => c && !c.tr);
+  if (cands.length <= 1) return cands[0] ? cands[0].s : null;
+  const corp = String(ch.corporation || "").toLowerCase();
+  return (cands.find(c => String(c.m).toLowerCase() === corp) || cands[0]).s;
+}
+let bbBusy = false;
+async function importFromLink() {
+  if (bbBusy) return;
+  const input = document.getElementById("bbLink");
+  const id = bbId(input.value);
+  if (!id) { impStatus(`<div class="verdict" data-v="bad"><span class="big">링크를 확인해 주세요</span><span>블라블라링크 내 홈 주소처럼 <code>https://www.blablalink.com/user?openid=…</code> 형태여야 해요.</span></div>`); document.getElementById("bbHow").open = true; return; }
+  try { localStorage.setItem(BB_KEY, input.value.trim()); } catch (e) {}
+  const btn = document.getElementById("bbGo");
+  bbBusy = true; btn.disabled = true; btn.textContent = "가져오는 중…";
+  impStatus(`<p class="note" style="margin:0">블라블라링크 정보를 가져오고 있어요…</p>`);
+  try {
+    const r = await fetch(`${NAPI}/api/user/${encodeURIComponent(id)}/nikke-builds?all=1`);
+    let j = null; try { j = await r.json(); } catch (e) {}
+    if (!r.ok || !j || !Array.isArray(j.nikkes)) {
+      const priv = j && /private/.test(j.reason || j.error || "");
+      impStatus(priv
+        ? `<div class="verdict" data-v="bad"><span class="big">니케 목록이 비공개예요</span><span><a href="https://www.blablalink.com/setting/shiftyspad/private" target="_blank" rel="noopener">ShiftyPad 숨김 설정</a>에서 ‘SHIFTYPAD에 나의 니케 표시하기’를 ‘모두에게 공개’로 바꾼 뒤 다시 눌러 주세요.</span></div>`
+        : `<div class="verdict" data-v="bad"><span class="big">가져오지 못했어요</span><span>링크가 맞는지 확인해 주세요. nikke-api 서버가 잠시 안 될 수도 있어요. (응답 ${r.status}${j && j.error ? " · " + esc(j.error) : ""})</span></div>`);
+      return;
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    const slugs = [], unknown = [], gear = {}, cubes = {};
+    let tre = 0;
+    for (const n of j.nikkes) {
+      const slug = slugFromApi(n.character || {});
+      if (!slug) { unknown.push(n.character?.name?.ko || "?"); continue; }
+      slugs.push(slug);
+      const fav = n.favoriteItem, own = n.ownFavoriteItem;
+      if (fav && fav.type === "Favorite" && own && own.id === fav.id) {
+        const base = get(slug); const t = C.find(x => x.tr && x.en === base.en + " (Treasure)");
+        if (t) { slugs.push(t.s); tre++; }
+      }
+      const p = PART.map(([k]) => {
+        const opts = ((n.equipment || {})[k] || {}).options || [];
+        const sl = opts.slice(0, 3).map(o => { const key = OL_TYPE[String(o.id).slice(3, 5)]; return key ? [key, Math.min(15, Math.max(1, o.rank || 1))] : ["", 1]; });
+        while (sl.length < 3) sl.push(["", 1]);
+        return sl;
+      });
+      if (p.some(sl => sl.some(x => x[0]))) gear[slug] = { p, n: PART.map(x => x[1]), at: today, src: "link" };
+      [n.cube, n.arenaCube].forEach(cu => { const ko = cu && cu.name && cu.name.ko; if (ko && CUBE_BY.has(ko)) cubes[ko] = Math.max(cubes[ko] || 0, cu.level || 0); });
+    }
+    // gear + cube levels
+    Object.assign(GEAR, gear);
+    try { localStorage.setItem(GEAR_KEY, JSON.stringify(GEAR)); } catch (e) {}
+    Object.assign(CUBE_LV, cubes);
+    try { localStorage.setItem(CUBE_LV_KEY, JSON.stringify(CUBE_LV)); } catch (e) {}
+    document.querySelectorAll("#cubeLv select[data-cube]").forEach(sel => { sel.value = String(cubeLv(sel.dataset.cube)); });
+    const nGear = Object.keys(gear).length, nCube = Object.keys(cubes).length;
+    applyImport({ slugs, count: j.nikkes.length, matched: j.nikkes.length - unknown.length, unknown }, "링크로 가져옴", {
+      exactTreasure: true,
+      extra: `애장품 ${tre}개, 장비 옵션 ${nGear}명, 큐브 ${nCube}종 레벨도 같이 반영했어요. 장비 판정은 ‘오버로드 판정’ 탭, 큐브는 ‘하모니 큐브’ 탭에서 볼 수 있어요.`,
+    });
+  } catch (e) {
+    impStatus(`<div class="verdict" data-v="bad"><span class="big">연결이 안 돼요</span><span>인터넷 연결을 확인해 주세요. 이 화면에서 외부 연결이 막혀 있다면 웹 주소(${esc(SITE)})에서 해 주세요.</span></div>`);
+  } finally { bbBusy = false; btn.disabled = false; btn.textContent = "가져오기"; }
+}
+function setupLinkImport() {
+  const input = document.getElementById("bbLink");
+  try { input.value = localStorage.getItem(BB_KEY) || ""; } catch (e) {}
+  if (!input.value) document.getElementById("bbHow").open = true;
+  document.getElementById("bbGo").addEventListener("click", importFromLink);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") importFromLink(); });
+}
+
 // ---------- MY GEAR (ShiftyPad nikke detail page) ----------
 // The detail page lists 4 gear pieces; each has "장비 효과" followed by up to 3 "[옵션] / NN.NN%" lines.
 // An empty line shows "아직 효과를 획득하지 못했습니다", so line positions are kept.
@@ -948,20 +1042,21 @@ function importGear(text) {
 let GEAR_SEL = null;
 function renderGear() {
   const sel = document.getElementById("gearSel");
-  const keys = Object.keys(GEAR).filter(s => get(s)).sort((a, b) => (GEAR[b].at || "").localeCompare(GEAR[a].at || "") || get(a).ko.localeCompare(get(b).ko, "ko"));
+  const keys = Object.keys(GEAR).filter(s => get(s)).sort((a, b) => tScore(get(b).rb) - tScore(get(a).rb) || get(a).ko.localeCompare(get(b).ko, "ko"));
   document.getElementById("gearPick").hidden = !keys.length;
   if (!keys.length) { document.getElementById("gearOut").innerHTML = ""; return; }
   if (!GEAR_SEL || !GEAR[GEAR_SEL]) GEAR_SEL = keys[0];
-  sel.innerHTML = keys.map(s => { const J = GEAR[s].p.map(p => olJudge(get(s), p)); const n = J.filter(j => j.done).length; return `<option value="${esc(s)}">${esc(get(s).ko)} · 완성 ${n}/${GEAR[s].p.length}</option>`; }).join("");
+  sel.innerHTML = keys.map(s => { const ps = GEAR[s].p.filter(p => p.some(x => x[0])); const n = ps.filter(p => olJudge(get(s), p).done).length; return `<option value="${esc(s)}">${esc(get(s).ko)} · 완성 ${n}/${ps.length}</option>`; }).join("");
   sel.value = GEAR_SEL;
   const c = get(GEAR_SEL), g = GEAR[GEAR_SEL];
   const sum = k => g.p.reduce((a, p) => a + p.filter(x => x[0] === k).reduce((b, x) => b + OLK[k].v[x[1] - 1], 0), 0);
   const P = olPrefs(c);
   const totals = P.main.map(k => `${OLK[k].ko} 합계 <b>${sum(k).toFixed(2)}%</b>`).join(" · ");
-  document.getElementById("gearOut").innerHTML = `<p class="note" style="margin:0">${esc(c.ko)} · ${esc(g.at)} 기준${totals ? " · " + totals : ""}</p>
+  document.getElementById("gearOut").innerHTML = `<p class="note" style="margin:0">${esc(c.ko)} · ${esc(g.at)} 기준${totals ? " · " + totals : ""}${g.src === "link" ? " · 링크로 가져온 정보는 빈 줄 위치를 몰라서, 옵션이 1~2줄이면 위에서부터 채워 보여줘요" : ""}</p>
     <div class="gearcards">${g.p.map((slots, n) => {
+      if (!slots.some(x => x[0])) return `<div class="gearcard verdict"><span class="lbl">${esc((g.n && g.n[n]) || `${n + 1}번 장비`)}</span><span class="note">오버로드 전이에요</span></div>`;
       const J = olJudge(c, slots);
-      return `<div class="gearcard verdict" data-v="${J.vv}"><div class="row" style="gap:8px"><span class="lbl grow">${n + 1}번 장비</span><button class="btn small" data-gearload="${n}">판정기에서 보기</button></div>
+      return `<div class="gearcard verdict" data-v="${J.vv}"><div class="row" style="gap:8px"><span class="lbl grow">${esc((g.n && g.n[n]) || `${n + 1}번 장비`)}</span><button class="btn small" data-gearload="${n}">판정기에서 보기</button></div>
         <span class="big">${J.big}</span>
         ${J.res.map(r => r.empty ? `<div class="note">${r.i + 1}번 · 비어 있음</div>` : `<div class="gline"><span class="badge ${r.badge}">${r.i + 1}번</span><span>${esc(OLK[r.k].ko)} +${OLK[r.k].v[r.t - 1]}% <span class="note">(${r.t}단계)</span></span></div>`).join("")}
       </div>`;
