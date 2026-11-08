@@ -193,6 +193,8 @@ footer.src .srclist ul { margin: 6px 0 10px; padding-left: 18px; display: flex; 
 .cubelv select { width: auto; }
 .lv { font-family: var(--font-mono); font-size: 12px; padding: 0 6px; border-radius: 6px; background: var(--sunk); color: var(--muted); white-space: nowrap; }
 .lv.on { background: var(--accent-soft); color: var(--accent); }
+.olstat { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; padding: 8px 10px; border-radius: var(--r); background: var(--sunk); font-size: 13px; }
+.olstat .k { color: var(--muted); }
 .olgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
 .piece .phead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .piece { gap: 8px; }
@@ -353,6 +355,7 @@ h1, h2, h3, .big { text-wrap: balance; }
         <div class="field grow" id="gearPick" hidden><label for="gearSel" id="gearPickLbl">내 니케</label><select id="gearSel"></select></div>
       </div>
       <div class="row" style="gap:8px;align-items:center"><span class="lbl">판정 기준</span><div class="seg" id="olMode"><button data-v="boss" aria-pressed="true">보스전</button><button data-v="arena" aria-pressed="false">아레나</button></div><span class="note" id="olModeNote"></span></div>
+      <div id="olStat"></div>
       <div id="olWant"></div>
       <div id="gearMsg" role="status"></div>
     </div>
@@ -1025,8 +1028,19 @@ function renderOL() {
   if (c && OLS.loaded !== c.s) olLoad(c);
   const P = olPrefs(c);
   const tag = (k, cls) => olTag([k], cls);
+  document.getElementById("olStat").innerHTML = c ? (() => {
+    const tot = D.ol.lines.map(l => { let n = 0, sum = 0; OLS.pieces.forEach(p => p.forEach(([k, t]) => { if (k === l.k) { n++; sum += l.v[t - 1]; } })); return { l, n, sum }; }).filter(x => x.n);
+    const sk = SKILL[c.s] || SKILL[(C.find(b => !b.tr && b.en === c.en.replace(/ \(Treasure\)$/, "")) || {}).s];
+    const cu = CUBEOF[c.s];
+    const parts = [];
+    if (COMBAT[c.s]) parts.push(`<span><span class="k">전투력</span> <b>${fmt(COMBAT[c.s])}</b></span>`);
+    if (sk) parts.push(`<span><span class="k">스킬</span> <b>${sk.join("/")}</b></span>`);
+    if (cu) parts.push(`<span><span class="k">큐브</span> ${esc(cu[0].replace(/ 큐브$/, ""))} Lv.${cu[1]}</span>`);
+    parts.push(tot.length ? `<span><span class="k">장비 4개 합계</span> ${tot.map(x => `<b>${esc(OLSHORT[x.l.k] || x.l.ko)} ${x.sum.toFixed(2)}%</b><span class="k">(${x.n}줄)</span>`).join(" · ")}</span>` : `<span class="k">오버로드 옵션 없음</span>`);
+    return `<div class="olstat">${parts.join('<span class="k">·</span>')}</div>`;
+  })() : "";
   document.getElementById("olWant").innerHTML = c
-    ? `${COMBAT[c.s] ? `<p style="margin:0 0 8px"><b>${esc(c.ko)}</b> · 내 전투력 <b>${fmt(COMBAT[c.s])}</b></p>` : ""}<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 무기·클래스 기준)" : ""}</div>
+    ? `<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 무기·클래스 기준)" : ""}</div>
        <div class="ol-list">${P.core.map(k => tag(k, "core")).join("")}${P.sub.map(k => tag(k, "sub")).join("")}${!P.core.length && !P.sub.length ? `<span class="note">옵션작보다 장비 강화가 먼저예요. 아무 옵션이나 괜찮아요.</span>` : ""}</div>
        ${noAmmo(c) && !c.oln ? `<p class="note" style="margin:6px 0 0">${esc(c.ko)}는 최대 장탄이 오히려 손해예요(마지막 탄·장탄 기믹).</p>` : ""}
        ${OLS.mode === "arena" ? aolBox(c) : olnBox(c)}
@@ -1187,6 +1201,10 @@ async function importFromLink(opts = {}) {
     } catch (e) {}
     COMBAT = {};
     for (const n of j.nikkes) { const sl = slugFromApi(n.character || {}); if (sl && n.combat) COMBAT[sl] = n.combat; }
+    // skill levels (1스/2스/버스트) and the equipped cube per nikke
+    SKILL = {}; CUBEOF = {};
+    for (const n of j.nikkes) { const sl = slugFromApi(n.character || {}); if (!sl) continue; const k = n.skills || {}; if (k.skill1) SKILL[sl] = [k.skill1, k.skill2, k.burst]; const cu = n.cube && n.cube.name && n.cube.name.ko; if (cu) CUBEOF[sl] = [cu, n.cube.level]; }
+    try { localStorage.setItem(SKILL_KEY, JSON.stringify({ ...SKILL, __cube: CUBEOF })); } catch (e) {}
     try { localStorage.setItem(COMBAT_KEY, JSON.stringify(COMBAT)); } catch (e) {}
     // gear + cube levels
     for (const [sl, g] of Object.entries(gear)) { const old = GEAR[sl]; if (old && old.src === "edited" && sameLines(old.p, g.p)) continue; GEAR[sl] = g; }
@@ -1413,8 +1431,9 @@ document.getElementById("tierMine").addEventListener("change", e => { TIER.mine 
 
 // ---------- CAMPAIGN ----------
 const PROFILE_KEY = "nikke-helper-profile-v1", COMBAT_KEY = "nikke-helper-combat-v1";
-let PROFILE = null, COMBAT = {}, SKIN = {};
-const SKIN_KEY = "nikke-helper-skin-v1";
+let PROFILE = null, COMBAT = {}, SKIN = {}, SKILL = {}, CUBEOF = {};
+const SKIN_KEY = "nikke-helper-skin-v1", SKILL_KEY = "nikke-helper-skill-v1";
+try { SKILL = JSON.parse(localStorage.getItem(SKILL_KEY) || "{}") || {}; CUBEOF = SKILL.__cube || {}; } catch (e) {}
 try { SKIN = JSON.parse(localStorage.getItem(SKIN_KEY) || "{}") || {}; } catch (e) {}
 try { PROFILE = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null"); COMBAT = JSON.parse(localStorage.getItem(COMBAT_KEY) || "{}") || {}; } catch (e) {}
 const CAMP = { mode: "normal", ch: null, el: "", stages: {} };
