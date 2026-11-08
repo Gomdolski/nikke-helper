@@ -168,6 +168,7 @@ a.btn { display: inline-block; text-decoration: none; }
 a.btn.primary { color: var(--accent-ink); }
 footer.src { color: var(--muted); font-size: 12px; padding-block: 0 30px; }
 footer.src a { color: inherit; }
+footer.src .srclist ul { margin: 6px 0 10px; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
 @media (prefers-reduced-motion: no-preference) { .drawer { animation: slide .18s ease-out; } @keyframes slide { from { transform: translateX(16px); opacity: .6; } } }
 .upd { background: var(--accent-soft); color: var(--ink); border-bottom: 1px solid var(--accent); }
 .upd .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 10px; padding-bottom: 10px; }
@@ -266,7 +267,7 @@ h1, h2, h3, .big { text-wrap: balance; }
           <li>블라블라링크 오른쪽 위 내 사진을 눌러 <b>내 홈</b>을 열고, 주소창의 주소(<code>blablalink.com/user?openid=…</code>)를 복사해서 위 칸에 붙여넣어요.</li>
           <li>링크는 이 브라우저에 저장돼요. 다음부터는 페이지를 열면 알아서 최신 정보로 바뀌어요(6시간마다). 바로 바꾸고 싶으면 ‘가져오기’를 누르세요.</li>
         </ol>
-        <p class="note" style="margin:8px 0 0">비공식 공개 서버 <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a>를 거쳐서 가져와요. 니케 목록을 공개로 두면 내 프로필 링크를 아는 사람은 누구나 볼 수 있어요.</p>
+        <p class="note" style="margin:8px 0 0">외부 공개 서버를 거쳐서 가져와요. 니케 목록을 공개로 두면 내 프로필 링크를 아는 사람은 누구나 볼 수 있어요.</p>
       </details>
       <div class="row" id="impAutoRow">
         <button class="btn primary" id="impAuto">블라블라링크에서 바로 가져오기</button>
@@ -396,7 +397,7 @@ h1, h2, h3, .big { text-wrap: balance; }
       <label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="tierMine"> 가진 니케만</label>
     </div>
     <div class="panel scroll" style="padding:0"><table class="tierlist" id="tierTable"></table></div>
-    <p class="note" style="margin:0">평가는 Prydwen 기준이에요. 같은 칸 안에서는 화력형이 먼저, 그다음 이름순이에요. 초록 테두리는 가진 니케예요.</p>
+    <p class="note" style="margin:0">같은 칸 안에서는 화력형이 먼저, 그다음 이름순이에요. 초록 테두리는 가진 니케예요.</p>
   </section>
 
   <!-- RAID -->
@@ -998,7 +999,7 @@ function renderOL() {
     </tbody></table></div>
     <h3 style="margin-top:14px">이 정도 수치면 충분해요 (한 줄 기준)</h3>
     <div class="scroll"><table class="data"><thead><tr><th>옵션</th><th>타협</th><th>권장</th><th>종결(파랑)</th></tr></thead><tbody>${["ele", "atk", "ammo"].map(cutRow).join("")}</tbody></table></div>
-    <p class="note" style="margin:8px 0 0">처음 오버로드하면 모든 줄이 11단계로 떠서 함부로 버리지 마세요. 12단계부터 파란색이에요. 출처: 디시 니케 갤, 아카라이브 니케 채널, 에펨코리아 공략 글 정리.</p>`;
+    <p class="note" style="margin:8px 0 0">처음 오버로드하면 모든 줄이 11단계로 떠서 함부로 버리지 마세요. 12단계부터 파란색이에요.</p>`;
 }
 
 // ---------- LINK IMPORT (nikke-api, blablalink share link) ----------
@@ -1386,12 +1387,12 @@ function renderCamp() {
   elSel.value = CAMP.el;
   const weak = CAMP.el || "";
   document.getElementById("campInfo").innerHTML = c
-    ? `<div class="row" style="gap:6px 12px;align-items:center"><b>${CAMP.ch}장${c.title ? " · " + esc(c.title) : ""}</b>${c.boss ? `<span>보스 ${esc(c.boss)}</span>` : ""}${c.adv ? `<span class="chip el" data-e="${esc(c.adv)}">${EL[c.adv]} 데려가기</span>` : ""}${c.est ? `<span class="note">추정</span>` : ""}${c.core === true ? '<span class="chip">코어 있음</span>' : c.core === false ? '<span class="chip">코어 없음</span>' : ""}</div>${c.note ? `<p class="note" style="margin:6px 0 0">${esc(c.note)}</p>` : ""}<p class="note" style="margin:6px 0 0">커뮤니티 정리 기준이라 틀릴 수 있어요. 게임의 스테이지 정보창에 뜨는 코드 아이콘이 가장 정확해요. 하드도 보스는 같아요.</p>`
+    ? `<div class="row" style="gap:6px 12px;align-items:center"><b>${CAMP.ch}장${c.title ? " · " + esc(c.title) : ""}</b>${c.boss ? `<span>보스 ${esc(c.boss)}</span>` : ""}${c.adv ? `<span class="chip el" data-e="${esc(c.adv)}">${EL[c.adv]} 데려가기</span>` : ""}${c.est ? `<span class="note">추정</span>` : ""}${c.core === true ? '<span class="chip">코어 있음</span>' : c.core === false ? '<span class="chip">코어 없음</span>' : ""}</div>${c.note ? `<p class="note" style="margin:6px 0 0">${esc(c.note)}</p>` : ""}<p class="note" style="margin:6px 0 0">추정이 섞여 있어 틀릴 수 있어요. 게임의 스테이지 정보창에 뜨는 코드 아이콘이 가장 정확해요. 하드도 보스는 같아요.</p>`
     : `<span class="note">이 챕터의 보스 정보는 아직 없어요. 보스 속성을 알면 위에서 골라 주세요.</span>`;
   const m = storyDeck(weak);
   document.getElementById("campNote").textContent = weak ? `${EL[weak]} 딜러 우선` : "스토리 평가가 높은 순";
   document.getElementById("campDeck").innerHTML = m.length
-    ? `<div class="team">${m.map(x => slot(x.s, "cube")).join("")}</div><p class="note" style="margin:8px 0 0">스토리 평가(Prydwen)와 ${Object.keys(COMBAT).length ? "내 니케 전투력, " : ""}광역 처리·버스트 쿨감·힐러를 보고 골랐어요. 버스트 I → II → III 순서로 돌도록 짰어요.</p>`
+    ? `<div class="team">${m.map(x => slot(x.s, "cube")).join("")}</div><p class="note" style="margin:8px 0 0">스토리 평가와 ${Object.keys(COMBAT).length ? "내 니케 전투력, " : ""}광역 처리·버스트 쿨감·힐러를 보고 골랐어요. 버스트 I → II → III 순서로 돌도록 짰어요.</p>`
     : `<div class="empty">‘보유 니케’ 탭에서 가진 니케를 체크하면 덱을 짜줘요.</div>`;
   document.getElementById("campTips").innerHTML = (CAMPD.tips || []).map(t => `<li>${esc(t)}</li>`).join("") || "<li>정보를 모으는 중이에요.</li>";
   renderCampProg(); renderCampStages();
@@ -1547,7 +1548,7 @@ function renderRaid() {
     if (!cur.bosses.find(b => b.id === R.boss)) R.boss = cur.bosses[0].id;
     host.innerHTML = `<div class="row" style="margin-bottom:8px"><div class="field"><label for="raidSeason">시즌</label>
       <select id="raidSeason" style="width:auto;max-width:100%">${ss.map(s => `<option value="${s.season}" ${s.season === cur.season ? "selected" : ""}>${typeof s.season === "number" ? s.season + "시즌" : esc(s.season)} ·${esc(s.when)}${R.mode === "solo" ? ` · ${esc(s.bosses[0].ko)} (약점 ${EL[s.bosses[0].weak]})` : ""}${s.note ? ` (${esc(s.note)})` : ""}</option>`).join("")}</select></div>
-      <span class="note grow">${R.mode === "union" ? "보스 목록: 딜도로 기준. 위에서부터 최신 시즌이에요." : R.mode === "solo" ? "역대 보스: 나무위키 기준. 같은 보스가 다른 속성으로 다시 나오기도 해요. 위에서부터 최신 시즌이에요." : "이상개체 요격전(특특요) 보스 5마리. 하루 한 보스씩 돌아가요."}</span></div>
+      <span class="note grow">${R.mode === "union" ? "위에서부터 최신 시즌이에요." : R.mode === "solo" ? "같은 보스가 다른 속성으로 다시 나오기도 해요. 위에서부터 최신 시즌이에요." : "이상개체 요격전(특특요) 보스 5마리. 하루 한 보스씩 돌아가요."}</span></div>
       <div class="boss">${cur.bosses.map(b => { const core = b.id in CORE_MAP ? CORE_MAP[b.id] : b.core;
         return `<button class="bossbtn" data-boss="${b.id}" aria-pressed="${R.boss === b.id}"><span class="bn">${esc(b.ko)}</span><span class="row" style="gap:4px"><span class="chip el" data-e="${b.element}">${EL[b.element]}</span><span class="note">약점</span><span class="chip el" data-e="${b.weak}">${EL[b.weak]}</span></span><span class="note">${core === true ? "코어 있음" : core === false ? "코어 없음" : "코어 모름"}${b.diff ? ` · ${esc(b.diff)}` : ""}</span></button>`; }).join("")}</div>`;
   }
@@ -1693,7 +1694,17 @@ window.addEventListener("hashchange", route);
 
 // ---------- boot ----------
 document.getElementById("dataDate").textContent = `니케 ${C.length}명 · 데이터 ${D.src.prydwen} 기준 · 버전 ${APP_V.slice(0, 10)}`;
-document.getElementById("srcFoot").innerHTML = `캐릭터 평가·추천 옵션·추천 덱: <a href="https://www.prydwen.gg/nikke" target="_blank" rel="noopener">Prydwen</a> (${esc(D.src.prydwen)} 갱신분). 한국어 이름·레벨 비용: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a>. 오버로드 수치: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a>. 유니온 레이드 보스 목록: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지). 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌, 솔로 추천 덱은 솔로 ${D.raids.solo.seasons[1].season}시즌 기준이에요. 역대 솔로 레이드 보스: 나무위키. 게임 저작권은 SHIFT UP에 있어요. SHIFT UP·Level Infinite와 관계없는 비공식 비영리 팬 페이지예요. 평가와 추천은 각 출처의 의견을 요약한 거예요. 항상 최신 버전: <a href="${SITE}" target="_blank" rel="noopener">${SITE}</a>`;
+document.getElementById("srcFoot").innerHTML = `<div class="srclist"><b>출처</b><ul>
+  <li>캐릭터 평가(티어)·추천 오버로드 옵션·추천 큐브·추천 덱·이상개체 요격전 공략: <a href="https://www.prydwen.gg/nikke" target="_blank" rel="noopener">Prydwen</a> (${esc(D.src.prydwen)} 갱신분)</li>
+  <li>한국어 이름·레벨 비용·초상화·계정 가져오기·스테이지 권장 전투력: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a> (블라블라링크 공개 자료 기반)</li>
+  <li>오버로드 옵션 수치·확률: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a></li>
+  <li>오버로드 잠금·수치 기준: 디시인사이드 니케 마이너 갤러리, 아카라이브 니케 채널, 에펨코리아 공략 글</li>
+  <li>유니온 레이드 보스: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지) · 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌 기준</li>
+  <li>역대 솔로 레이드 보스: 나무위키 · 솔로 추천 덱은 솔로 ${D.raids.solo.seasons[1].season}시즌 기준</li>
+  <li>캠페인 챕터 보스·데려갈 속성·전투력 페널티: 디시·아카라이브 우월코드 정리글, 나무위키, wiki3.jp, GameWith, nikke.gg (1~10장은 추정)</li>
+  <li>별명: 디시인사이드, 아카라이브, 에펨코리아, 니마갤 위키, 인벤</li>
+</ul></div>
+<p>게임 저작권은 SHIFT UP에 있어요. SHIFT UP·Level Infinite와 관계없는 비공식 비영리 팬 페이지예요. 평가와 추천은 각 출처의 의견을 요약한 거예요. 항상 최신 버전: <a href="${SITE}" target="_blank" rel="noopener">${SITE}</a></p>`;
 buildFilters(); buildOLTable(); buildLevel(); setupImport(); buildCubeLv();
 OLS.char = Object.keys(GEAR).map(get).filter(Boolean).sort((a, b) => tScore(b.rb) - tScore(a.rb))[0] || get("scarlet") || C[0];
 document.getElementById("olq").value = OLS.char.ko;

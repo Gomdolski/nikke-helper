@@ -141,7 +141,7 @@ function renderRaid() {
     if (!cur.bosses.find(b => b.id === R.boss)) R.boss = cur.bosses[0].id;
     host.innerHTML = `<div class="row" style="margin-bottom:8px"><div class="field"><label for="raidSeason">시즌</label>
       <select id="raidSeason" style="width:auto;max-width:100%">${ss.map(s => `<option value="${s.season}" ${s.season === cur.season ? "selected" : ""}>${typeof s.season === "number" ? s.season + "시즌" : esc(s.season)} ·${esc(s.when)}${R.mode === "solo" ? ` · ${esc(s.bosses[0].ko)} (약점 ${EL[s.bosses[0].weak]})` : ""}${s.note ? ` (${esc(s.note)})` : ""}</option>`).join("")}</select></div>
-      <span class="note grow">${R.mode === "union" ? "보스 목록: 딜도로 기준. 위에서부터 최신 시즌이에요." : R.mode === "solo" ? "역대 보스: 나무위키 기준. 같은 보스가 다른 속성으로 다시 나오기도 해요. 위에서부터 최신 시즌이에요." : "이상개체 요격전(특특요) 보스 5마리. 하루 한 보스씩 돌아가요."}</span></div>
+      <span class="note grow">${R.mode === "union" ? "위에서부터 최신 시즌이에요." : R.mode === "solo" ? "같은 보스가 다른 속성으로 다시 나오기도 해요. 위에서부터 최신 시즌이에요." : "이상개체 요격전(특특요) 보스 5마리. 하루 한 보스씩 돌아가요."}</span></div>
       <div class="boss">${cur.bosses.map(b => { const core = b.id in CORE_MAP ? CORE_MAP[b.id] : b.core;
         return `<button class="bossbtn" data-boss="${b.id}" aria-pressed="${R.boss === b.id}"><span class="bn">${esc(b.ko)}</span><span class="row" style="gap:4px"><span class="chip el" data-e="${b.element}">${EL[b.element]}</span><span class="note">약점</span><span class="chip el" data-e="${b.weak}">${EL[b.weak]}</span></span><span class="note">${core === true ? "코어 있음" : core === false ? "코어 없음" : "코어 모름"}${b.diff ? ` · ${esc(b.diff)}` : ""}</span></button>`; }).join("")}</div>`;
   }
