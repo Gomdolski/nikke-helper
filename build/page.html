@@ -218,6 +218,8 @@ h1, h2, h3, .big { text-wrap: balance; }
 .rk-combo { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px solid var(--line); }
 .rk-combo:first-of-type { border-top: 0; }
 .rk-use { display: flex; flex-wrap: wrap; gap: 4px; }
+.olnote { margin-top: 10px; padding: 10px 12px; border-radius: var(--r); background: var(--accent-soft); }
+.olgoals { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
 </style>
 
 <div class="upd" id="upd" hidden><div class="wrap"><p id="updText"></p><span id="updAct"></span></div></div>
@@ -638,7 +640,8 @@ function openChar(s) {
     <div><h3>오버로드 추천 옵션</h3>
       ${c.oi || c.of ? `<div class="ol-list" style="margin-top:6px">${(c.oi || []).map(x => olTag(x, "core")).join("")}${(c.of || []).map(x => olTag(x, "sub")).join("")}</div>
       <p class="note" style="margin:6px 0 0">초록은 꼭 노릴 옵션, 노랑은 있으면 좋은 옵션이에요. 숫자는 장비 4개 중 몇 개에 붙이면 좋은지예요.</p>`
-      : `<p class="note" style="margin:6px 0 0">따로 노릴 옵션이 없어요. 오버로드는 전투력 올리는 용도로만 하면 돼요.</p>`}</div>
+      : `<p class="note" style="margin:6px 0 0">따로 노릴 옵션이 없어요. 오버로드는 전투력 올리는 용도로만 하면 돼요.</p>`}
+      ${olnBox(c)}</div>
     <div><h3>추천 하모니 큐브</h3>${c.cu ? `<ol style="margin:6px 0 0;padding-left:20px">${c.cu.map(x => `<li><b>${esc(x)}</b> <span class="note">${esc(cubeEff(x))}</span></li>`).join("")}</ol>` : `<p style="margin:6px 0 0">-</p>`}${c.cp ? `<p class="note" style="margin:2px 0 0">PvP: ${c.cp.map(esc).join(" → ")}</p>` : ""}</div>
     <div><h3>추천 스킬 레벨</h3><p style="margin:6px 0 0" class="num">${c.sk ? `최소 ${esc(c.sk.mn || "-")} · 추천 ${esc(c.sk.rc || "-")} · 최대 ${esc(c.sk.hi || "-")}` : "-"}</p><p class="note" style="margin:2px 0 0">스킬1 / 스킬2 / 버스트 순서예요.</p></div>
     <div style="display:flex;flex-direction:column;gap:8px"><h3>같이 쓰는 덱</h3>
@@ -869,6 +872,8 @@ const OLS = { char: null, pieces: emptyPieces(), loaded: null, src: "", at: "" }
 // - Slot 1 always appears, so it is rerolled unless it is blue (tier 12+).
 // - 방어력 is junk; 명중률 does nothing for MG/SR/RL; ammo hurts a few units.
 const NO_AMMO = new Set(["dorothy", "pepper", "sparkling-summer-anis", "exia"]);
+const noAmmo = c => !!c && (NO_AMMO.has(c.s) || !!(c.oln && c.oln.noAmmo));
+const olnBox = c => c && c.oln ? `<div class="olnote"><div class="row" style="gap:6px;align-items:center"><b>${esc(c.ko)} 메모</b><span class="badge ${c.oln.sure ? "ok" : "part"}">${c.oln.sure ? "많이 쓰는 기준" : "참고"}</span></div><p style="margin:4px 0 0"><b>${esc(c.oln.key)}</b></p><p class="note" style="margin:2px 0 0">${esc(c.oln.why)}</p></div>` : "";
 const OL_CUT = { ele: [9, 10, 12], atk: [7, 9, 12], ammo: [7, 9, 12] }; // tier: 타협 / 권장 / 종결(파랑)
 function olPrefs(c) {
   if (!c) return { main: [], core: [], sub: [], generic: true };
@@ -880,7 +885,7 @@ function olPrefs(c) {
     if (["MG", "SG", "RL"].includes(c.w)) sub.add("ammo");
     if (["SR", "RL"].includes(c.w)) sub.add("cs");
   }
-  if (NO_AMMO.has(c.s)) { core.delete("ammo"); sub.delete("ammo"); }
+  if (noAmmo(c)) { core.delete("ammo"); sub.delete("ammo"); }
   core.delete("def");
   if (["MG", "SR", "RL"].includes(c.w)) { core.delete("hit"); sub.delete("hit"); }
   core.forEach(k => sub.delete(k));
@@ -959,7 +964,8 @@ function renderOL() {
   document.getElementById("olWant").innerHTML = c
     ? `<div class="lbl" style="margin-bottom:6px">${esc(c.ko)}에게 좋은 옵션${P.generic ? " (추천 정보가 없어서 무기·클래스 기준)" : ""}</div>
        <div class="ol-list">${P.core.map(k => tag(k, "core")).join("")}${P.sub.map(k => tag(k, "sub")).join("")}${!P.core.length && !P.sub.length ? `<span class="note">옵션작보다 장비 강화가 먼저예요. 아무 옵션이나 괜찮아요.</span>` : ""}</div>
-       ${NO_AMMO.has(c.s) ? `<p class="note" style="margin:6px 0 0">${esc(c.ko)}는 최대 장탄이 오히려 손해예요(마지막 탄·장탄 기믹).</p>` : ""}
+       ${noAmmo(c) && !c.oln ? `<p class="note" style="margin:6px 0 0">${esc(c.ko)}는 최대 장탄이 오히려 손해예요(마지막 탄·장탄 기믹).</p>` : ""}
+       ${olnBox(c)}
        ${c.c !== "Attacker" && P.core.length ? `<p class="note" style="margin:6px 0 0">지원형·방어형은 옵션작보다 장비 강화 레벨이 더 중요해요.</p>` : ""}`
     : `<div class="note">니케를 고르면 노려야 할 옵션이 나와요.</div>`;
   // picker of nikkes with saved gear
@@ -988,7 +994,7 @@ function renderOL() {
   const rows = D.ol.lines.map(l => {
     let n = 0, sum = 0; OLS.pieces.forEach(p => p.forEach(([k, t]) => { if (k === l.k) { n++; sum += l.v[t - 1]; } }));
     return { l, n, sum };
-  }).filter(r => r.n || P.main.includes(r.l.k));
+  }).filter(r => r.n || P.main.includes(r.l.k) || (c && c.oln && (c.oln.goals || []).some(g => g.k === r.l.k)));
   const kindOf = k => P.main.includes(k) || P.core.includes(k) ? "core" : P.sub.includes(k) ? "sub" : "bad";
   const kindTxt = { core: "핵심", sub: "있으면 좋음", bad: "쓸모 적음" };
   document.getElementById("olSum").innerHTML = `<h3>장비 4개 합계</h3>
@@ -999,6 +1005,7 @@ function renderOL() {
       const b = tg ? (n >= 4 && sum >= l.v[OL_TARGET[l.k] - 1] * 4 ? "ok" : n >= 3 ? "part" : "no") : "";
       return `<tr><td style="text-align:left">${esc(l.ko)}</td><td>${b ? `<span class="badge ${b}">${n}줄</span>` : `${n}줄`}</td><td>${sum.toFixed(2)}%</td><td style="text-align:left">${goal}</td></tr>`;
     }).join("") : `<tr><td colspan="4"><span class="note">아직 넣은 옵션이 없어요.</span></td></tr>`}</tbody></table></div>
+    ${c && c.oln && c.oln.goals ? `<div class="olgoals"><b>${esc(c.ko)} 목표</b>${c.oln.goals.map(g => { const r = rows.find(x => x.l.k === g.k) || { n: 0, sum: 0 }; const ok = g.min != null ? r.sum >= g.min : r.n >= (g.lines || 1); return `<div class="gline"><span class="badge ${ok ? "ok" : "no"}">${ok ? "달성" : "아직"}</span><span>${esc(g.label)} <span class="note">· 지금 ${r.n}줄 ${r.sum.toFixed(2)}%</span></span></div>`; }).join("")}</div>` : ""}
     ${P.main.length ? `<p class="note" style="margin:8px 0 0">딜러는 장비마다 우월코드·공격력 2줄씩, 모두 합쳐 8줄이면 완성(8줄작)이에요.</p>` : ""}
     ${OLS.src === "link" || OLS.src === "edited" ? `<p class="note" style="margin:6px 0 0">링크로 가져온 장비는 빈 줄 위치를 몰라서 옵션이 1~2줄이면 위에서부터 채웠어요. 실제와 다르면 칸을 고쳐 주세요.</p>` : ""}`;
   // odds + value cuts
@@ -1780,6 +1787,7 @@ document.getElementById("srcFoot").innerHTML = `<div class="srclist"><b>출처</
   <li>한국어 이름·레벨 비용·초상화·계정 가져오기·스테이지 권장 전투력: <a href="https://github.com/leegunwoooo/nikke-api" target="_blank" rel="noopener">nikke-api</a> (블라블라링크 공개 자료 기반)</li>
   <li>오버로드 옵션 수치·확률: <a href="https://github.com/ChrisLu7899/NIKKE-Workshop" target="_blank" rel="noopener">NIKKE-Workshop</a></li>
   <li>오버로드 잠금·수치 기준: 디시인사이드 니케 마이너 갤러리, 아카라이브 니케 채널, 에펨코리아 공략 글</li>
+  <li>니케별 오버로드 메모: 아카라이브 니케 채널, nikke.beomtachi.com, nikke.gg, Prydwen, 나무위키</li>
   <li>유니온 레이드 보스 코어 여부: 아카라이브 니케 채널 시즌별 보스 특성·조합 정리글, Prydwen, nikke.gg</li>
   <li>유니온 레이드 보스: <a href="https://dildoro.com/union" target="_blank" rel="noopener">딜도로</a> (${esc(D.raids.union.seasons[0].season)}시즌까지) · 속성별 추천 덱은 유니온 ${D.raids.union.teamsFrom}시즌 기준</li>
   <li>역대 솔로 레이드 보스: 나무위키 · 솔로 추천 덱은 솔로 ${D.raids.solo.seasons[1].season}시즌 기준</li>

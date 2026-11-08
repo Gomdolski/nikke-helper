@@ -121,6 +121,19 @@ const chars = pry.chars.map((p) => {
 });
 // Treasure variants share a Korean name with the base unit; that's fine.
 
+// ---- Character-specific overload notes (build/ol_notes.json: "공식이름" -> key, why, conf, goals, noAmmo) ----
+{
+  const of = path.join(HERE, "ol_notes.json");
+  const notes = fs.existsSync(of) ? JSON.parse(fs.readFileSync(of, "utf8")).notes : {};
+  const miss = [];
+  for (const [name, n] of Object.entries(notes)) {
+    const c = chars.find((x) => x.ko === name);
+    if (!c) { miss.push(name); continue; }
+    c.oln = { key: n.key, why: n.why, sure: n.conf === "높음" ? 1 : 0, ...(n.goals ? { goals: n.goals } : {}), ...(n.noAmmo ? { noAmmo: 1 } : {}) };
+  }
+  console.log("ol notes", Object.keys(notes).length - miss.length, miss.length ? "not found: " + miss.join(", ") : "");
+}
+
 // ---- Community nicknames (build/nicknames.json: { "공식이름": ["별명", "애장품 전용 별명*"] }) ----
 {
   const nf = path.join(HERE, "nicknames.json");
