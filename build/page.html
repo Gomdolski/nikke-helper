@@ -199,11 +199,11 @@ footer.src .srclist ul { margin: 6px 0 10px; padding-left: 18px; display: flex; 
 .olstat { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; padding: 8px 10px; border-radius: var(--r); background: var(--sunk); font-size: 13px; }
 .olstat .k { color: var(--muted); }
 .olgrade-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 8px; }
-.olgrade { font-family: var(--font-display); font-weight: 700; font-size: 16px; padding: 3px 14px; border-radius: 999px; background: var(--sunk); color: var(--muted); }
-.olgrade[data-g="end"] { background: var(--accent); color: var(--accent-ink); }
-.olgrade[data-g="ok"] { background: var(--good-soft); color: var(--good); }
-.olgrade[data-g="part"] { background: var(--warn-soft); color: var(--warn); }
-.olgrade[data-g="bad"] { background: var(--bad-soft); color: var(--bad); }
+.olgrade { font-weight: 600; font-size: 15px; letter-spacing: .02em; padding: 3px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--sunk); color: var(--ink); }
+.olgrade[data-g="end"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.olgrade[data-g="ok"] { background: var(--good-soft); border-color: var(--good); }
+.olgrade[data-g="part"] { background: var(--warn-soft); border-color: var(--warn); }
+.olgrade[data-g="bad"] { background: var(--bad-soft); border-color: var(--bad); }
 .cases input { width: 64px; padding: 4px 6px; }
 .cases td:nth-child(2) input { width: 96px; }
 .olgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
