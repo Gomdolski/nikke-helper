@@ -189,6 +189,9 @@ footer.src a { color: inherit; }
 .cubelv select { width: auto; }
 .lv { font-family: var(--font-mono); font-size: 12px; padding: 0 6px; border-radius: 6px; background: var(--sunk); color: var(--muted); white-space: nowrap; }
 .lv.on { background: var(--accent-soft); color: var(--accent); }
+.gearcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.gearcard .big { font-size: 17px; }
+.gline { display: flex; align-items: center; gap: 6px; font-size: 13px; flex-wrap: wrap; }
 </style>
 
 <div class="upd" id="upd" hidden><div class="wrap"><p id="updText"></p><span id="updAct"></span></div></div>
@@ -243,8 +246,8 @@ footer.src a { color: inherit; }
         <div class="steps">
           <div class="step once"><span class="no">처음<br>한 번</span><div class="body">
             <b>북마크 만들기</b>
-            <span class="note">아래 노란 버튼을 마우스로 끌어서 북마크바에 놓으세요. 북마크바가 안 보이면 Ctrl+Shift+B를 누르세요.</span>
-            <div class="row"><a class="btn bm" id="bmLink" href="#">★ 니케 목록 복사</a><button class="btn small" id="bmCopy">끌기가 안 되면: 코드 복사</button></div>
+            <span class="note">아래 노란 버튼을 마우스로 끌어서 북마크바에 놓으세요. 북마크바가 안 보이면 Ctrl+Shift+B를 누르세요. 11월 8일 전에 만든 ‘니케 목록 복사’ 북마크는 지우고 새로 만들어 주세요(장비 점검이 추가됐어요).</span>
+            <div class="row"><a class="btn bm" id="bmLink" href="#">★ 니케 도우미로 보내기</a><button class="btn small" id="bmCopy">끌기가 안 되면: 코드 복사</button></div>
             <span class="note" id="bmCopyMsg"></span>
           </div></div>
           <div class="step"><span class="no">1</span><div class="body">
@@ -253,7 +256,7 @@ footer.src a { color: inherit; }
             <div class="row"><a class="btn primary" id="shOpen" href="https://www.blablalink.com/shiftyspad/nikke-list" target="nikke_shiftypad">ShiftyPad ‘나의 니케’ 열기</a></div>
           </div></div>
           <div class="step"><span class="no">2</span><div class="body">
-            <b>북마크바의 ‘★ 니케 목록 복사’ 누르기</b>
+            <b>북마크바의 ‘★ 니케 도우미로 보내기’ 누르기</b>
             <span class="note">목록이 다 뜬 다음에 누르세요. 다른 페이지에서 누르면 목록 페이지로 데려가 줘요.</span>
           </div></div>
           <div class="step"><span class="no">3</span><div class="body">
@@ -286,6 +289,21 @@ footer.src a { color: inherit; }
     <div>
       <h2>오버로드 판정</h2>
       <p class="lead">니케를 고르고 장비에 뜬 옵션과 단계(1~15)를 넣으면, 유지할지 다시 돌릴지 알려줘요. 옵션은 장비 한 개 기준으로 넣으세요.</p>
+    </div>
+    <div class="panel" id="gearPanel" style="display:flex;flex-direction:column;gap:10px">
+      <div class="teamhead"><h3>내 장비 점검</h3><span class="note">ShiftyPad 니케 화면의 장비 4개를 한 번에 판정해요</span></div>
+      <details id="gearHow">
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px">가져오는 법</summary>
+        <ol class="note" style="margin:8px 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+          <li><a href="https://www.blablalink.com/shiftyspad/nikke-list" target="nikke_shiftypad">ShiftyPad ‘나의 니케’</a>를 열고 점검할 니케를 눌러요.</li>
+          <li>북마크바의 <b>‘★ 니케 도우미로 보내기’</b>를 눌러요. 북마크가 없으면 ‘보유 니케’ 탭에서 만들 수 있어요.</li>
+          <li>다른 니케도 같은 탭에서 계속 눌러 보내면 돼요. 안 되면 그 화면에서 Ctrl+A, Ctrl+C 하고 아래 칸에 Ctrl+V 하세요(‘장비’ 탭이 열린 상태로).</li>
+        </ol>
+        <textarea id="gearText" rows="2" placeholder="니케 상세 화면을 복사해서 여기에 Ctrl+V"></textarea>
+      </details>
+      <div id="gearMsg" role="status"></div>
+      <div class="row" id="gearPick" hidden><div class="field grow"><label for="gearSel">점검한 니케</label><select id="gearSel"></select></div><button class="btn small" id="gearDel" type="button">이 니케 기록 지우기</button></div>
+      <div id="gearOut" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
     <div class="cols">
       <div class="panel" style="display:flex;flex-direction:column;gap:14px">
@@ -701,7 +719,7 @@ async function importFromBrowser() {
 // Bookmark that runs on blablalink.com: goes to the list page if needed, then copies the page text.
 // It first hands the list straight to the helper tab that opened ShiftyPad (no clipboard needed),
 // and also copies it with execCommand, which Chrome allows from a bookmark.
-const BOOKMARKLET = "javascript:(function(){var U='https://www.blablalink.com/shiftyspad/nikke-list';if(location.host.indexOf('blablalink.com')<0||location.pathname.indexOf('/shiftyspad/nikke-list')<0){if(confirm('나의 니케 목록 페이지로 이동할게요. 목록이 뜨면 이 북마크를 한 번 더 누르세요.'))location.href=U;return}var t=document.body.innerText;if(t.indexOf('LV.')<0){alert('목록이 아직 안 떴어요. 잠시 뒤 다시 누르세요. 로그인이 필요할 수도 있어요.');return}var sent=false;try{if(window.opener&&!window.opener.closed){window.opener.postMessage({type:'nikke-list',text:t},'*');sent=true}}catch(e){}var ok=false;try{var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.top='0';a.style.opacity='0';document.body.appendChild(a);a.focus();a.select();ok=document.execCommand('copy');document.body.removeChild(a)}catch(e){}if(sent){alert('니케 도우미로 보냈어요! 도우미 탭으로 돌아가면 반영돼 있어요.')}else if(ok){alert('복사했어요! 니케 도우미 탭의 칸에 Ctrl+V 하세요.')}else{prompt('Ctrl+C를 누른 뒤 확인을 누르세요',t)}})()";
+const BOOKMARKLET = "javascript:(function(){var U='https://www.blablalink.com/shiftyspad/nikke-list';var onB=location.host.indexOf('blablalink.com')>=0;var isList=onB&&location.pathname.indexOf('/shiftyspad/nikke-list')>=0;var isOne=onB&&!isList&&location.pathname.indexOf('/shiftyspad/nikke')>=0&&location.search.indexOf('nikke=')>=0;if(!isList&&!isOne){if(confirm('나의 니케 목록 페이지로 이동할게요. 목록이 뜨면 이 북마크를 한 번 더 누르세요.'))location.href=U;return}function send(type,t,okMsg){var sent=false;try{if(window.opener&&!window.opener.closed){window.opener.postMessage({type:type,text:t},'*');sent=true}}catch(e){}var ok=false;try{var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.top='0';a.style.opacity='0';document.body.appendChild(a);a.focus();a.select();ok=document.execCommand('copy');document.body.removeChild(a)}catch(e){}if(sent){alert('니케 도우미로 보냈어요! '+okMsg)}else if(ok){alert('복사했어요! 니케 도우미의 칸에 Ctrl+V 하세요.')}else{prompt('Ctrl+C를 누른 뒤 확인을 누르세요',t)}}if(isList){var t=document.body.innerText;if(t.indexOf('LV.')<0){alert('목록이 아직 안 떴어요. 잠시 뒤 다시 누르세요. 로그인이 필요할 수도 있어요.');return}send('nikke-list',t,'도우미 탭으로 돌아가면 반영돼 있어요.');return}var tab=[].slice.call(document.querySelectorAll('div,span,button,li,a')).filter(function(e){return e.textContent.trim()==='장비'&&e.getBoundingClientRect().width>0})[0];if(tab)tab.click();setTimeout(function(){var t=document.body.innerText;if(t.indexOf('장비 효과')<0){alert('장비 옵션이 안 보여요. 화면이 다 뜬 뒤 다시 누르세요. 오버로드한 장비가 없을 수도 있어요.');return}send('nikke-gear',t,'오버로드 판정 탭에서 결과를 볼 수 있어요.')},900)})()";
 let armedUntil = 0, lastClip = "";
 function importText(text, how, quiet) {
   const res = parseShifty(text);
@@ -731,7 +749,7 @@ function setupImport() {
   bm.addEventListener("click", e => { e.preventDefault(); document.getElementById("bmCopyMsg").textContent = "누르지 말고, 꾹 누른 채로 북마크바까지 끌어다 놓으세요."; });
   document.getElementById("bmCopy").addEventListener("click", () => {
     const m = document.getElementById("bmCopyMsg");
-    const done = () => m.textContent = "복사했어요. 북마크바에서 오른쪽 클릭 → ‘페이지 추가’ → 이름은 ‘니케 목록 복사’, URL 칸에 Ctrl+V 하세요.";
+    const done = () => m.textContent = "복사했어요. 북마크바에서 오른쪽 클릭 → ‘페이지 추가’ → 이름은 ‘니케 도우미로 보내기’, URL 칸에 Ctrl+V 하세요.";
     navigator.clipboard?.writeText(BOOKMARKLET).then(done, () => m.textContent = "복사가 막혔어요. 노란 버튼을 북마크바로 끌어다 놓아 주세요.");
   });
   document.getElementById("shOpen").addEventListener("click", () => { armedUntil = Date.now() + 15 * 60 * 1000; document.getElementById("impPasteMsg").textContent = ""; });
@@ -739,10 +757,11 @@ function setupImport() {
   // The bookmark, run in the ShiftyPad tab this page opened, posts the list here directly.
   window.addEventListener("message", e => {
     const d = e.data;
-    if (!d || d.type !== "nikke-list" || typeof d.text !== "string") return;
+    if (!d || (d.type !== "nikke-list" && d.type !== "nikke-gear") || typeof d.text !== "string") return;
     let host = ""; try { host = new URL(e.origin).hostname; } catch (err) {}
     if (!/(^|\.)blablalink\.com$/.test(host)) return;
-    importText(d.text, "ShiftyPad에서 받아옴", false);
+    if (d.type === "nikke-gear") importGear(d.text);
+    else importText(d.text, "ShiftyPad에서 받아옴", false);
   });
   document.getElementById("impAuto").addEventListener("click", importFromBrowser);
   const ta = document.getElementById("impText");
@@ -777,7 +796,57 @@ function olPrefs(c) {
   if (["MG", "SR", "RL"].includes(c.w)) { core.delete("hit"); sub.delete("hit"); }
   core.forEach(k => sub.delete(k));
   const main = ["ele", "atk"].filter(k => core.has(k));
-  return { main, core: [...core], sub: [...sub], generic: !pry.length && !pf.length, light: !atkr && !pry.length };
+  return { main, core: [...core], sub: [...sub], generic: !pry.length && !pf.length };
+}
+// Judge one gear piece: slots = [[key, tier], x3] ("" key = empty line).
+function olJudge(c, slots) {
+  const P = olPrefs(c);
+  const SP_ = D.ol.slot;
+  const res = slots.map(([k, t], i) => {
+    if (!k) return { i, empty: true };
+    const kind = P.main.includes(k) ? "main" : P.core.includes(k) ? "core" : P.sub.includes(k) ? "sub" : "bad";
+    let lock = false;
+    if (kind === "main") lock = i > 0 || t >= 12;
+    else if (kind === "core") lock = (i === 2 && t >= 8) || (i === 1 && t >= 10) || (i === 0 && t >= 13);
+    return { i, k, t, kind, lock };
+  });
+  const filled = res.filter(r => !r.empty);
+  const good = filled.filter(r => r.kind === "main" || r.kind === "core");
+  const mains = filled.filter(r => r.kind === "main");
+  const empties = res.filter(r => r.empty).length;
+  const done = !!c && (mains.length >= 2 || (good.length >= 2 && !P.main.length));
+  // once 우월코드+공격력 are in, only their values matter
+  const lowCut = r => OL_CUT[r.k] && r.t < OL_CUT[r.k][0] && (!done || !P.main.length || P.main.includes(r.k));
+  res.forEach(r => {
+    if (r.empty) { r.badge = ""; r.label = r.i ? `빈 칸 · 돌리면 ${SP_[r.i] * 100}% 확률로 옵션이 생겨요` : "비어 있음"; return; }
+    let badge = "no", label = "버리고 다시 돌리기";
+    if (!c) label = "니케를 고르면 판정";
+    else if (done && (r.kind === "main" || r.kind === "core")) { badge = "ok"; label = lowCut(r) ? "유지 · 수치 재설정 추천" : "유지"; }
+    else if (done) { badge = "no"; label = "신경 안 써도 돼요"; }
+    else if (r.lock) { badge = "ok"; label = r.i ? `잠금 · ${r.i + 1}번 칸은 ${SP_[r.i] * 100}%로만 생겨요` : "잠금 · 파랑(12단계) 이상이에요"; }
+    else if (r.kind === "main" && r.i === 0) { badge = "part"; label = "좋은 옵션이지만 1번 칸이라 잠그지 않아도 돼요"; }
+    else if (r.kind === "core") { badge = "part"; label = "좋은 옵션 · 단계가 낮아서 잠그긴 아까워요"; }
+    else if (r.kind === "sub") { badge = "part"; label = "있으면 좋음 · 잠그지 마세요"; }
+    r.badge = badge; r.label = label;
+  });
+  const locks = done ? [] : res.filter(r => r.lock);
+  const lockTxt = locks.map(r => `${r.i + 1}번`).join("·");
+  const cost = n => `잠금 ${n}줄이면 모듈이 ${n === 1 ? 2 : n === 2 ? 3 : 4}개 들고, 옵션 변경은 1번에 ${1 + n}개씩 들어요.`;
+  let vv = "bad", big, why;
+  if (!c) { vv = ""; big = "니케를 먼저 고르세요"; why = "왼쪽에서 니케를 고르고 옵션을 넣으면 판정해 드려요."; }
+  else if (!filled.length) { vv = ""; big = "옵션을 넣어 주세요"; why = "장비에 뜬 옵션 1~3줄과 단계를 고르세요."; }
+  else if (!P.core.length && !P.sub.length) { vv = "good"; big = "그대로 써도 돼요"; why = `${esc(c.ko)}는 옵션작보다 장비 강화가 중요해요. 모듈은 딜러에게 쓰는 게 좋아요.`; }
+  else if (done) {
+    const low = good.filter(lowCut);
+    vv = "good"; big = low.length ? "옵션 완성 · 수치만 올리기" : "완성이에요";
+    why = `좋은 옵션 ${good.length}줄이면 이 장비는 옵션 변경을 그만해도 돼요(8줄작 기준).`
+      + (low.length ? ` ${low.map(r => `${r.i + 1}번 ${OLK[r.k].ko}`).join(", ")} 단계가 낮으니 수치 재설정만 해 보세요.` : " 수치도 괜찮아요. 다음 장비로 넘어가세요.")
+      + (empties || filled.length > good.length ? " 남은 칸에 하나 더 노리는 것보다 수치를 올리는 게 훨씬 싸요." : "");
+  }
+  else if (locks.length) { vv = "ok"; big = `${lockTxt} 줄 잠그고 옵션 변경`; why = `${locks.some(r => r.i > 0) ? "2·3번 칸은 잘 안 생겨서" : "1번 칸이라도 파랑(12단계) 이상은 다시 뽑기 어려워서 잡아 둘 만해요. 2·3번 칸은 잘 안 생겨서"} 좋은 옵션이 뜨면 단계와 상관없이 잡아 두는 게 이득이에요. 잠근 채로 돌리다가 다른 칸에 우월코드나 공격력이 뜨면 그것도 잠그세요. ${cost(locks.length)}`; }
+  else if (good.length) { vv = "ok"; big = "잠그지 말고 전부 다시 돌리기"; why = "좋은 옵션이 1번 칸에만 있거나 단계가 낮아요. 1번 칸은 매번 100% 다시 생겨서 잠그면 비용만 늘어요. 2·3번 칸에 좋은 옵션이 뜰 때 잠그세요."; }
+  else { vv = "bad"; big = "전부 다시 돌리세요"; why = "이 니케에게 쓸모 있는 옵션이 없어요. 잠금 없이 옵션 변경을 하세요."; }
+  return { P, res, vv, big, why, done };
 }
 function renderOL() {
   const c = OLS.char;
@@ -795,57 +864,16 @@ function renderOL() {
   if (!host.dataset.ready) {
     host.innerHTML = OLS.slots.map((_, i) => `<div class="olslot"><span class="tag">${i + 1}번 옵션</span><select id="ols${i}" aria-label="${i + 1}번 옵션">${opt}</select><select id="olt${i}" aria-label="${i + 1}번 단계">${tierOpt}</select><div class="res" id="olr${i}"></div></div>`).join("");
     host.dataset.ready = 1;
-    OLS.slots.forEach((s, i) => { document.getElementById("ols" + i).value = s[0]; document.getElementById("olt" + i).value = s[1]; });
   }
-  const SP_ = D.ol.slot;
-  const res = OLS.slots.map(([k, t], i) => {
-    if (!k) return { i, empty: true };
-    const kind = P.main.includes(k) ? "main" : P.core.includes(k) ? "core" : P.sub.includes(k) ? "sub" : "bad";
-    let lock = false;
-    if (kind === "main") lock = i > 0 || t >= 12;
-    else if (kind === "core") lock = (i === 2 && t >= 8) || (i === 1 && t >= 10) || (i === 0 && t >= 13);
-    return { i, k, t, kind, lock };
-  });
-  const filled = res.filter(r => !r.empty);
-  const good = filled.filter(r => r.kind === "main" || r.kind === "core");
-  const mains = filled.filter(r => r.kind === "main");
-  const empties = res.filter(r => r.empty).length;
-  const lowCut = r => OL_CUT[r.k] && r.t < OL_CUT[r.k][0];
-  const done = !!c && (mains.length >= 2 || (good.length >= 2 && !P.main.length));
-  res.forEach(r => {
+  OLS.slots.forEach((s, i) => { document.getElementById("ols" + i).value = s[0]; document.getElementById("olt" + i).value = s[1]; });
+  const J = olJudge(c, OLS.slots);
+  J.res.forEach(r => {
     const el = document.getElementById("olr" + r.i);
-    if (r.empty) { el.innerHTML = `<span class="note">${r.i ? `빈 칸 · 돌리면 ${SP_[r.i] * 100}% 확률로 옵션이 생겨요` : "비어 있음"}</span>`; return; }
-    const L = OLK[r.k];
-    let badge = "no", label = "버리고 다시 돌리기";
-    if (!c) label = "니케를 고르면 판정";
-    else if (done && (r.kind === "main" || r.kind === "core")) { badge = "ok"; label = lowCut(r) ? "유지 · 수치 재설정 추천" : "유지"; }
-    else if (done) { badge = "no"; label = "신경 안 써도 돼요"; }
-    else if (r.lock) { badge = "ok"; label = r.i ? `잠금 · ${r.i + 1}번 칸은 ${SP_[r.i] * 100}%로만 생겨요` : "잠금 · 파랑(12단계) 이상이에요"; }
-    else if (r.kind === "main" && r.i === 0) { badge = "part"; label = "좋은 옵션이지만 1번 칸이라 잠그지 않아도 돼요"; }
-    else if (r.kind === "core") { badge = "part"; label = "좋은 옵션 · 단계가 낮아서 잠그긴 아까워요"; }
-    else if (r.kind === "sub") { badge = "part"; label = "있으면 좋음 · 잠그지 마세요"; }
-    el.innerHTML = `<span class="badge ${badge}">${label}</span><span class="num">${esc(L.ko)} +${L.v[r.t - 1]}% (${r.t}단계)</span>`;
+    el.innerHTML = r.empty ? `<span class="note">${r.label}</span>` : `<span class="badge ${r.badge}">${r.label}</span><span class="num">${esc(OLK[r.k].ko)} +${OLK[r.k].v[r.t - 1]}% (${r.t}단계)</span>`;
   });
-  const locks = res.filter(r => r.lock);
-  const lockTxt = locks.map(r => `${r.i + 1}번`).join("·");
-  const cost = n => `잠금 ${n}줄이면 모듈이 ${n === 1 ? 2 : n === 2 ? 3 : 4}개 들고, 옵션 변경은 1번에 ${1 + n}개씩 들어요.`;
   const v = document.getElementById("olVerdict");
-  let vv = "bad", big, why;
-  if (!c) { vv = ""; big = "니케를 먼저 고르세요"; why = "왼쪽에서 니케를 고르고 옵션을 넣으면 판정해 드려요."; }
-  else if (!filled.length) { vv = ""; big = "옵션을 넣어 주세요"; why = "장비에 뜬 옵션 1~3줄과 단계를 고르세요."; }
-  else if (!P.core.length && !P.sub.length) { vv = "good"; big = "그대로 써도 돼요"; why = `${esc(c.ko)}는 옵션작보다 장비 강화가 중요해요. 모듈은 딜러에게 쓰는 게 좋아요.`; }
-  else if (done) {
-    const low = good.filter(lowCut);
-    vv = "good"; big = "옵션은 완성이에요";
-    why = `좋은 옵션 ${good.length}줄이면 이 장비는 옵션 변경을 그만해도 돼요(8줄작 기준).`
-      + (low.length ? ` ${low.map(r => `${r.i + 1}번 ${OLK[r.k].ko}`).join(", ")} 단계가 낮으니 수치 재설정만 해 보세요.` : " 수치도 괜찮아요. 다음 장비로 넘어가세요.")
-      + (empties || filled.length > good.length ? " 남은 칸에 하나 더 노리는 것보다 수치를 올리는 게 훨씬 싸요." : "");
-  }
-  else if (locks.length) { vv = "ok"; big = `${lockTxt} 줄 잠그고 옵션 변경`; why = `${locks.some(r => r.i > 0) ? "2·3번 칸은 잘 안 생겨서" : "1번 칸이라도 파랑(12단계) 이상은 다시 뽑기 어려워서 잡아 둘 만해요. 2·3번 칸은 잘 안 생겨서"} 좋은 옵션이 뜨면 단계와 상관없이 잡아 두는 게 이득이에요. 잠근 채로 돌리다가 다른 칸에 우월코드나 공격력이 뜨면 그것도 잠그세요. ${cost(locks.length)}`; }
-  else if (good.length) { vv = "ok"; big = "잠그지 말고 전부 다시 돌리기"; why = "좋은 옵션이 1번 칸에만 있거나 단계가 낮아요. 1번 칸은 매번 100% 다시 생겨서 잠그면 비용만 늘어요. 2·3번 칸에 좋은 옵션이 뜰 때 잠그세요."; }
-  else { vv = "bad"; big = "전부 다시 돌리세요"; why = "이 니케에게 쓸모 있는 옵션이 없어요. 잠금 없이 옵션 변경을 하세요."; }
-  v.dataset.v = vv;
-  v.innerHTML = `<span class="lbl">판정</span><span class="big">${big}</span><span>${why}</span>`;
+  v.dataset.v = J.vv;
+  v.innerHTML = `<span class="lbl">판정</span><span class="big">${J.big}</span><span>${J.why}</span>`;
   // odds + value cuts
   const W = D.ol.lines.reduce((a, l) => a + l.w, 0);
   const pMain = (P.main.length ? P.main : P.core).reduce((a, k) => a + (OLK[k]?.w || 0), 0) / W;
@@ -860,6 +888,99 @@ function renderOL() {
     <div class="scroll"><table class="data"><thead><tr><th>옵션</th><th>타협</th><th>권장</th><th>종결(파랑)</th></tr></thead><tbody>${["ele", "atk", "ammo"].map(cutRow).join("")}</tbody></table></div>
     <p class="note" style="margin:8px 0 0">처음 오버로드하면 모든 줄이 11단계로 떠서 함부로 버리지 마세요. 12단계부터 파란색이에요. 출처: 디시 니케 갤, 아카라이브 니케 채널, 에펨코리아 공략 글 정리.</p>`;
 }
+
+// ---------- MY GEAR (ShiftyPad nikke detail page) ----------
+// The detail page lists 4 gear pieces; each has "장비 효과" followed by up to 3 "[옵션] / NN.NN%" lines.
+// An empty line shows "아직 효과를 획득하지 못했습니다", so line positions are kept.
+const GEAR_KEY = "nikke-helper-gear-v1";
+let GEAR = {};
+try { GEAR = JSON.parse(localStorage.getItem(GEAR_KEY) || "{}") || {}; } catch (e) {}
+const OL_BY_LABEL = {};
+D.ol.lines.forEach(l => { OL_BY_LABEL[l.ko.replace(/\s+/g, "")] = l.k; });
+OL_BY_LABEL["크리티컬피해량증가"] = "cd";
+function olTierOf(k, val) {
+  const v = OLK[k].v; let best = 0;
+  v.forEach((x, i) => { if (Math.abs(x - val) < Math.abs(v[best] - val)) best = i; });
+  return best + 1;
+}
+function parseGear(text) {
+  const t = String(text || "").replace(/\r/g, "");
+  const lines = t.split("\n").map(s => s.trim());
+  let name = "";
+  const top = lines.indexOf("Top Up");
+  if (top >= 0) name = lines.slice(top + 1).find(s => s && s !== "Loading...") || "";
+  if (!name) { const cv = lines.findIndex(s => /^CV\s*:/.test(s)); if (cv >= 0) name = lines.slice(cv + 1).find(Boolean) || ""; }
+  const parts = t.split("효과의 수치는 전투 진입 시 적용됩니다.").slice(1);
+  const pieces = parts.slice(0, 4).map(part => {
+    const ls = part.split("\n").map(s => s.trim()).filter(Boolean);
+    const slots = [];
+    for (let i = 0; i < ls.length && slots.length < 3; i++) {
+      const s = ls[i];
+      if (s === "장비 능력치" || s === "닫기" || /^\d{2}$/.test(s) || s === "호감도 에피소드") break;
+      if (/아직 효과를 획득하지 못했습니다/.test(s)) { slots.push(["", 1]); continue; }
+      const m = s.match(/^\[(.+)\]$/);
+      if (m) {
+        const k = OL_BY_LABEL[m[1].replace(/\s+/g, "")];
+        const val = parseFloat((ls[i + 1] || "").replace("%", ""));
+        if (k && !isNaN(val)) { slots.push([k, olTierOf(k, val)]); i++; }
+        else slots.push(["", 1]);
+      }
+    }
+    while (slots.length < 3) slots.push(["", 1]);
+    return slots;
+  });
+  return { name, pieces };
+}
+function importGear(text) {
+  const out = document.getElementById("gearMsg");
+  const g = parseGear(text);
+  const hit = g.name ? (D.names[nrm(g.name)] || []) : [];
+  const c = hit.length ? get(hit[0]) : null;
+  if (!c) { out.innerHTML = `<p class="note" style="margin:0;color:var(--bad)">니케 상세 화면이 아니거나 이름을 못 찾았어요${g.name ? ` (${esc(g.name)})` : ""}. ShiftyPad에서 니케를 하나 눌러 들어간 화면에서 해 주세요.</p>`; return false; }
+  if (!g.pieces.length) { out.innerHTML = `<p class="note" style="margin:0;color:var(--bad)">${esc(c.ko)}의 장비 옵션이 안 보여요. 상세 화면의 ‘장비’ 탭을 연 상태에서 다시 해 주세요. 오버로드한 장비가 없을 수도 있어요.</p>`; return false; }
+  GEAR[c.s] = { p: g.pieces, at: new Date().toISOString().slice(0, 10) };
+  try { localStorage.setItem(GEAR_KEY, JSON.stringify(GEAR)); } catch (e) {}
+  out.innerHTML = `<p class="note" style="margin:0">${esc(c.ko)} 장비 ${g.pieces.length}개를 가져왔어요.</p>`;
+  GEAR_SEL = c.s;
+  if (S.view !== "ol") location.hash = "#ol"; else renderGear();
+  return true;
+}
+let GEAR_SEL = null;
+function renderGear() {
+  const sel = document.getElementById("gearSel");
+  const keys = Object.keys(GEAR).filter(s => get(s)).sort((a, b) => (GEAR[b].at || "").localeCompare(GEAR[a].at || "") || get(a).ko.localeCompare(get(b).ko, "ko"));
+  document.getElementById("gearPick").hidden = !keys.length;
+  if (!keys.length) { document.getElementById("gearOut").innerHTML = ""; return; }
+  if (!GEAR_SEL || !GEAR[GEAR_SEL]) GEAR_SEL = keys[0];
+  sel.innerHTML = keys.map(s => { const J = GEAR[s].p.map(p => olJudge(get(s), p)); const n = J.filter(j => j.done).length; return `<option value="${esc(s)}">${esc(get(s).ko)} · 완성 ${n}/${GEAR[s].p.length}</option>`; }).join("");
+  sel.value = GEAR_SEL;
+  const c = get(GEAR_SEL), g = GEAR[GEAR_SEL];
+  const sum = k => g.p.reduce((a, p) => a + p.filter(x => x[0] === k).reduce((b, x) => b + OLK[k].v[x[1] - 1], 0), 0);
+  const P = olPrefs(c);
+  const totals = P.main.map(k => `${OLK[k].ko} 합계 <b>${sum(k).toFixed(2)}%</b>`).join(" · ");
+  document.getElementById("gearOut").innerHTML = `<p class="note" style="margin:0">${esc(c.ko)} · ${esc(g.at)} 기준${totals ? " · " + totals : ""}</p>
+    <div class="gearcards">${g.p.map((slots, n) => {
+      const J = olJudge(c, slots);
+      return `<div class="gearcard verdict" data-v="${J.vv}"><div class="row" style="gap:8px"><span class="lbl grow">${n + 1}번 장비</span><button class="btn small" data-gearload="${n}">판정기에서 보기</button></div>
+        <span class="big">${J.big}</span>
+        ${J.res.map(r => r.empty ? `<div class="note">${r.i + 1}번 · 비어 있음</div>` : `<div class="gline"><span class="badge ${r.badge}">${r.i + 1}번</span><span>${esc(OLK[r.k].ko)} +${OLK[r.k].v[r.t - 1]}% <span class="note">(${r.t}단계)</span></span></div>`).join("")}
+      </div>`;
+    }).join("")}</div>`;
+}
+document.getElementById("gearSel").addEventListener("change", e => { GEAR_SEL = e.target.value; renderGear(); });
+document.getElementById("gearDel").addEventListener("click", () => { if (!GEAR_SEL) return; delete GEAR[GEAR_SEL]; GEAR_SEL = null; try { localStorage.setItem(GEAR_KEY, JSON.stringify(GEAR)); } catch (e) {} renderGear(); });
+document.getElementById("gearOut").addEventListener("click", e => {
+  const b = e.target.closest("[data-gearload]"); if (!b) return;
+  const c = get(GEAR_SEL); OLS.char = c; OLS.slots = GEAR[GEAR_SEL].p[+b.dataset.gearload].map(x => x.slice());
+  document.getElementById("olq").value = c.ko; renderOL();
+  document.getElementById("olVerdict").scrollIntoView({ behavior: "smooth", block: "center" });
+});
+(() => {
+  const ta = document.getElementById("gearText");
+  const run = () => { if (ta.value.trim() && importGear(ta.value)) ta.value = ""; };
+  ta.addEventListener("paste", () => setTimeout(run, 0));
+  ta.addEventListener("change", run);
+})();
 function buildOLTable() {
   const cols = [1, 5, 6, 10, 11, 15];
   document.getElementById("olTable").innerHTML = `<thead><tr><th>옵션</th>${cols.map(t => `<th>${t}단계</th>`).join("")}<th>나올 비중</th></tr></thead><tbody>${D.ol.lines.map(l => `<tr><td>${esc(l.ko)}</td>${cols.map(t => `<td>${l.v[t - 1]}%</td>`).join("")}<td>${l.w}%</td></tr>`).join("")}</tbody>`;
@@ -1207,7 +1328,7 @@ function route() {
 function renderAll() {
   if (S.view === "dex") renderDex();
   if (S.view === "owned") renderOwned();
-  if (S.view === "ol") renderOL();
+  if (S.view === "ol") { renderOL(); renderGear(); }
   if (S.view === "cube") renderCube();
   if (S.view === "tier") renderTier();
   if (S.view === "raid") renderRaid();
