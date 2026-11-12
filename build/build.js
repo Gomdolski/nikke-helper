@@ -217,9 +217,9 @@ function buildRaids() {
   const solo = {
     source: ss.source,
     seasons: [
-      { season: 43, when: "2026-11-12 ~ 11-19", note: "예정", bosses: [{
+      { season: 43, when: "2026-11-12 ~ 11-19", note: "진행 중", bosses: [{
         id: "s43", ko: (RANK && RANK.current && RANK.current.season === 43 && RANK.current.boss) || "43시즌 보스", en: "", element: "Wind", weak: "Fire", core: null,
-        tips: ["작열 딜러 위주로 준비하세요. 시즌이 끝나기 전까지는 같은 작열 약점이었던 지난 시즌 상위권 덱을 참고로 보여줘요.", "코어 유무가 공개되면 아래 버튼으로 바꿔 주세요."], teams: [],
+        tips: ["50장 보스가 다시 나와요. 풍압 보스라 작열 딜러 위주로 준비하세요.", "석상 → 촉수 2단계로 진행돼요. 기관총·저격총 니케가 편하다는 평이 많아요.", "시즌이 끝나기 전까지는 같은 작열 약점이었던 지난 시즌 상위권 덱을 참고로 보여줘요.", "코어 유무가 공개되면 아래 버튼으로 바꿔 주세요."], teams: [],
       }] },
       ...past,
     ],
