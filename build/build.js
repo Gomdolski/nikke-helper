@@ -294,7 +294,7 @@ function buildSoloRank() {
   for (const [n, s] of Object.entries(RANK.seasons)) {
     seasons[n] = {
       boss: s.boss, weak: s.weak, raidDate: s.raidDate, players: s.players,
-      combos: s.combos.slice(0, 12).map((c) => ({ m: c.m.map(sl), n: c.n, avg: c.avg, best: c.best })).filter((c) => c.m.every(Boolean)),
+      combos: s.combos.slice(0, 30).map((c) => ({ m: c.m.map(sl), n: c.n, avg: c.avg, best: c.best })).filter((c) => c.m.every(Boolean)),
       usage: s.usage.slice(0, 30).map(([ko, k]) => [sl(ko), k]).filter((x) => x[0]),
       top: s.top.slice(0, 3).map((p) => ({ rank: p.rank, total: p.total, sq: p.sq.map((q) => ({ m: q.m.map(sl), d: q.d })) })),
     };

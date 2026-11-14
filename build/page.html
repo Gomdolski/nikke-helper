@@ -1954,6 +1954,14 @@ function syncMineBtn() {
   document.getElementById("raidMineNote").textContent = RAID_MINE ? "덱 5명을 모두 가진 것만 보여줘요. 다시 누르면 전체가 나와요." : "";
 }
 const eok = n => (n / 1e8).toFixed(n >= 1e10 ? 0 : 1) + "억";
+// Let's Doro only has the top 50 per server, so "more" shows more of their deck combos, not more players.
+const RANK_FIRST = 8;
+let RANK_MORE = false;
+document.addEventListener("click", e => {
+  if (e.target.id !== "rkMore") return;
+  const was = RANK_MORE; RANK_MORE = !RANK_MORE; renderRaidRank();
+  if (was) document.getElementById("raidRank").scrollIntoView({ block: "start" });
+});
 function renderRaidRank() {
   const box = document.getElementById("raidRank");
   const SR = D.soloRank;
@@ -1969,7 +1977,8 @@ function renderRaidRank() {
   box.hidden = false;
   const own = ownSlug;
   const pool = RAID_MINE ? data.combos.filter(c => c.m.every(own)) : data.combos;
-  const combos = pool.slice(0, 8).map(c => {
+  const rest = Math.max(0, pool.length - RANK_FIRST);
+  const combos = pool.slice(0, RANK_MORE ? pool.length : RANK_FIRST).map(c => {
     const have = c.m.filter(own).length;
     return `<div class="rk-combo"><div class="row" style="gap:6px 10px"><b>${c.n}명 사용</b><span class="note">평균 ${eok(c.avg)} · 최고 ${c.best}위</span><span class="badge ${have === 5 ? "ok" : have >= 3 ? "part" : "no"}">내 니케 ${have}/5</span></div><div class="team">${teamSlots(c.m, data.weak, data.combos, "cube")}</div></div>`;
   }).join("");
@@ -1978,6 +1987,7 @@ function renderRaidRank() {
     ${note ? `<p class="note" style="margin:4px 0 0">${note}</p>` : ""}
     <p class="note" style="margin:4px 0 8px">한 사람이 덱 5개를 쓰니까, 많이 쓴 조합일수록 이번 보스에 잘 맞는다는 뜻이에요. 초록 칸이 가진 니케예요. 칸 아래 ⇄ 작은 얼굴은 그 자리에 대신 넣을 수 있는 니케예요.</p>
     ${combos || `<div class="empty">가진 니케 5명으로 바로 쓸 수 있는 상위권 조합이 없어요. 버튼을 다시 눌러 전체를 보세요.</div>`}
+    ${rest ? `<div class="row" style="justify-content:center;margin-top:6px"><button class="btn small" type="button" id="rkMore" aria-expanded="${RANK_MORE}">${RANK_MORE ? "접기" : `+ 조합 ${rest}개 더 보기`}</button></div>` : ""}
     <h3 style="margin-top:12px">상위권 니케 사용률${RAID_MINE ? " (가진 니케만)" : ""}</h3>
     <p class="note" style="margin:4px 0 8px">상위 ${data.players}명 중 몇 %가 쓴 니케인지예요.</p>
     <div class="rk-use">${use}</div>`;

@@ -31,7 +31,7 @@ function summarize(j, meta) {
   }
   return {
     ...meta, raidDate: j.raidDate, players: j.rankings.length,
-    combos: [...combos.values()].sort((a, b) => b.n - a.n || b.dmg / b.n - a.dmg / a.n).slice(0, 20).map((c) => ({ m: c.m, n: c.n, avg: Math.round(c.dmg / c.n), best: c.best })),
+    combos: [...combos.values()].sort((a, b) => b.n - a.n || b.dmg / b.n - a.dmg / a.n).slice(0, 30).map((c) => ({ m: c.m, n: c.n, avg: Math.round(c.dmg / c.n), best: c.best })),
     usage: [...usage.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40),
     top: j.rankings.slice(0, 3).map((p) => ({ rank: p.rank, total: p.totalDamage, sq: (p.squads || []).map((q) => ({ m: (q.nikkes || []).map((n) => n.nikkeName), d: q.damage })) })),
   };
