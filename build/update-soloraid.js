@@ -32,7 +32,7 @@ function summarize(j, meta) {
     used.forEach((x) => usage.set(x, (usage.get(x) || 0) + 1));
   }
   return {
-    ...meta, raidDate: j.raidDate, players: j.rankings.length,
+    ...meta, raidDate: j.raidDate, collected: j.createdAt || null, players: j.rankings.length,
     combos: [...combos.values()].sort((a, b) => b.n - a.n || b.dmg / b.n - a.dmg / a.n).slice(0, 30).map((c) => ({ m: c.m, n: c.n, avg: Math.round(c.dmg / c.n), best: c.best })),
     usage: [...usage.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40),
     top: j.rankings.slice(0, 3).map((p) => ({ rank: p.rank, total: p.totalDamage, sq: (p.squads || []).map((q) => ({ m: (q.nikkes || []).map((n) => n.nikkeName), d: q.damage })) })),
@@ -65,12 +65,13 @@ function summarize(j, meta) {
       if (sv === SERVER && !out.current) out.current = { season: s.seasonNumber, ...meta, dataSeason: hasData ? s.seasonNumber : j.fallbackSeason ? j.fallbackSeason.seasonNumber : (prev && prev.current && prev.current.season === s.seasonNumber && prev.current.dataSeason) || s.seasonNumber };
       if (!hasData) continue; // no data yet
       const old = before && before[s.seasonNumber];
-      if (!old || old.raidDate !== j.raidDate || old.players !== j.rankings.length) changed.push(sv);
+      // Let's Doro re-collects about hourly (createdAt, KST without a zone), so compare that, not just the date
+      if (!old || old.raidDate !== j.raidDate || old.collected !== (j.createdAt || null) || old.players !== j.rankings.length) changed.push(sv);
       into[s.seasonNumber] = summarize(j, meta);
     }
   }
   const cur = out.current.season;
-  const dates = [SERVER, ...OTHERS].map((sv) => { const x = (sv === SERVER ? out.seasons : out.others[sv].seasons)[cur]; return `${sv} ${x ? x.raidDate : "없음"}`; }).join(", ");
+  const dates = [SERVER, ...OTHERS].map((sv) => { const x = (sv === SERVER ? out.seasons : out.others[sv].seasons)[cur]; return `${sv} ${x ? (x.collected || x.raidDate) : "없음"}`; }).join(", ");
   if (onlyCurrent && !changed.length) {
     console.log(out.seasons[cur] ? `S${cur} 기록 그대로 (${dates})` : `S${cur} 아직 기록 없음`);
     console.log(out.seasons[cur] ? "UNCHANGED" : "NODATA");
@@ -78,6 +79,6 @@ function summarize(j, meta) {
   }
   fs.writeFileSync(FILE, JSON.stringify(out, null, 1));
   console.log("solo raid ranking: current S" + cur, "(data from S" + out.current.dataSeason + ")", "· KR seasons with data:", Object.keys(out.seasons).join(", "));
-  if (onlyCurrent) console.log(`S${cur} 기록 ${(out.seasons[cur] || {}).raidDate || ""} (바뀐 서버: ${changed.join(", ")})`);
+  if (onlyCurrent) console.log(`S${cur} 기록 ${String((out.seasons[cur] || {}).collected || (out.seasons[cur] || {}).raidDate || "").slice(0, 16).replace("T", " ")} (바뀐 서버: ${changed.join(", ")})`);
   console.log("UPDATED");
 })().catch((e) => { console.error(e.message); console.log("ERROR"); process.exitCode = 1; });

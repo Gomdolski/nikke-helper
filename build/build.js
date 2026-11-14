@@ -295,7 +295,7 @@ function buildSoloRank() {
     const seasons = {};
     for (const [n, s] of Object.entries(src || {})) {
       seasons[n] = {
-        boss: s.boss, weak: s.weak, raidDate: s.raidDate, players: s.players,
+        boss: s.boss, weak: s.weak, raidDate: s.raidDate, collected: s.collected || null, players: s.players,
         combos: s.combos.slice(0, 30).map((c) => ({ m: c.m.map(sl), n: c.n, avg: c.avg, best: c.best })).filter((c) => c.m.every(Boolean)),
         usage: s.usage.slice(0, 30).map(([ko, k]) => [sl(ko), k]).filter((x) => x[0]),
         top: s.top.slice(0, 3).map((p) => ({ rank: p.rank, total: p.total, sq: p.sq.map((q) => ({ m: q.m.map(sl), d: q.d })) })),
@@ -306,12 +306,14 @@ function buildSoloRank() {
   const seasons = conv(RANK.seasons);
   const others = {};
   for (const [sv, o] of Object.entries(RANK.others || {})) others[sv] = { seasons: conv(o.seasons) };
+  // the servers file also carries Korea and the current season, so the page's refresh button can pull everything at once
+  if (Object.keys(others).length) { others.KR = { seasons }; others.current = RANK.current; others.at = RANK.at; }
   const file = path.join(ROOT, "soloraid-servers.json");
   let otherInfo = null;
   if (Object.keys(others).length) {
     const json = JSON.stringify(others);
     fs.writeFileSync(file, json);
-    otherInfo = { file: "soloraid-servers.json", v: crypto.createHash("sha256").update(json).digest("hex").slice(0, 8), list: Object.keys(others) };
+    otherInfo = { file: "soloraid-servers.json", v: crypto.createHash("sha256").update(json).digest("hex").slice(0, 8), list: Object.keys(RANK.others) };
   }
   if (miss.size) console.log("solo rank names not linked:", [...miss].join(", "));
   return { at: RANK.at, server: RANK.server, current: RANK.current, seasons, others: otherInfo };

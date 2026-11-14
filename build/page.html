@@ -234,6 +234,11 @@ h1, h2, h3, .big { text-wrap: balance; }
 .rk-combo { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px solid var(--line); }
 .rk-combo:first-of-type { border-top: 0; }
 .rk-use { display: flex; flex-wrap: wrap; gap: 4px; }
+.rk-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.rk-bar .grow { flex: 1; }
+.rk-bar .lsd { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+.rk-bar .lsd img { border-radius: 3px; }
+.rk-status { margin: 6px 0 10px; }
 .slot .subs { display: flex; align-items: center; gap: 3px; margin-top: 3px; color: var(--muted); font-size: 11px; }
 .slot .sub { display: inline-flex; border: 1.5px solid var(--line); border-radius: 5px; cursor: pointer; background: var(--surface); }
 .slot .sub.have { border-color: var(--good); }
@@ -1977,8 +1982,36 @@ async function loadOtherServers() {
   RANK_OTHER_BUSY = false;
   renderRaidRank();
 }
+// Let's Doro blocks calls from other sites, so refresh re-reads the newest copy this site has (the Mac mini
+// pulls Let's Doro every 5 hours during a season). Their page can't be opened on a given server by address.
+const LD_NAME = { KR: "한섭", JP: "일섭", GLOBAL: "글로벌", NA: "북미", SEA: "동남아" };
+let RANK_BUSY = false, RANK_STATUS = "";
+const whenText = d => d.collected ? `${d.collected.slice(5, 10)} ${d.collected.slice(11, 16)} 수집` : `${d.raidDate || ""} 기록`;
+function curRankData() {
+  const SR = D.soloRank, want = curSeason("solo").season;
+  const ss = RANK_SV === "KR" ? SR.seasons : ((RANK_OTHER || {})[RANK_SV] || {}).seasons || {};
+  return ss[want] || (SR.current && ss[SR.current.dataSeason]) || null;
+}
+async function refreshRank() {
+  const o = D.soloRank && D.soloRank.others; if (!o || RANK_BUSY) return;
+  const before = (curRankData() || {}).collected;
+  RANK_BUSY = true; RANK_STATUS = ""; renderRaidRank();
+  try {
+    const r = await fetch(`${o.file}?t=${Date.now()}`, { cache: "no-store" }); if (!r.ok) throw new Error(r.status);
+    const j = await r.json();
+    if (j.KR) D.soloRank.seasons = j.KR.seasons;
+    if (j.current) D.soloRank.current = j.current;
+    RANK_OTHER = j; RANK_OTHER_ERR = false;
+    const now = curRankData();
+    RANK_STATUS = !now ? "기록을 다시 불러왔어요." : now.collected && now.collected !== before ? `새 기록을 가져왔어요 · ${whenText(now)}.` : `이미 최신이에요 · ${whenText(now)}. 레츠도로는 한 시간마다, 이 사이트는 레이드 기간에 5시간마다 새 기록을 가져와요.`;
+  } catch (e) { RANK_STATUS = "기록을 불러오지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요."; }
+  RANK_BUSY = false;
+  renderRaid();
+}
 document.addEventListener("click", e => {
+  if (e.target.closest("#rkRefresh")) { refreshRank(); return; }
   const b = e.target.closest("#rkServer button"); if (!b) return;
+  RANK_STATUS = "";
   RANK_SV = b.dataset.v; RANK_MORE = false;
   try { localStorage.setItem(RK_SV_KEY, RANK_SV); } catch (err) {}
   renderRaidRank();
@@ -1989,7 +2022,12 @@ function renderRaidRank() {
   if (S.raid.mode !== "solo" || !SR) { box.hidden = true; return; }
   const list = ["KR", ...((SR.others && SR.others.list) || [])];
   if (!list.includes(RANK_SV)) RANK_SV = "KR";
-  const tabs = list.length > 1 ? `<div class="seg" id="rkServer" role="group" aria-label="서버" style="margin-bottom:10px">${list.map(v => `<button data-v="${v}" aria-pressed="${v === RANK_SV}">${SERVERS[v] || v}</button>`).join("")}</div>` : "";
+  const seg = list.length > 1 ? `<div class="seg" id="rkServer" role="group" aria-label="서버">${list.map(v => `<button data-v="${v}" aria-pressed="${v === RANK_SV}">${SERVERS[v] || v}</button>`).join("")}</div>` : "";
+  const ldName = LD_NAME[RANK_SV] || "한섭";
+  const tabs = `<div class="rk-bar">${seg}<span class="grow"></span>
+    ${SR.others ? `<button class="btn small" type="button" id="rkRefresh" ${RANK_BUSY ? "disabled" : ""} title="이 사이트에 올라온 가장 최신 기록을 다시 불러와요">${RANK_BUSY ? "확인 중…" : "↻ 새로고침"}</button>` : ""}
+    <a class="btn small lsd" href="https://letsdoro.com/soloraid" target="_blank" rel="noopener" title="레츠도로 솔로레이드 랭킹 열기 (열리면 ‘${ldName}’을 눌러 주세요)"><img src="https://letsdoro.com/favicon-32x32.png?v=2" alt="" width="16" height="16" referrerpolicy="no-referrer" onerror="this.remove()">레츠도로 ↗</a></div>
+    <p class="note rk-status">${RANK_STATUS || `레츠도로는 한 시간마다 기록을 모으고, 이 사이트는 레이드 기간에 5시간마다 가져와요.`}${RANK_SV !== "KR" ? ` 레츠도로에서는 ‘${ldName}’을 눌러야 이 서버가 보여요.` : ""}</p>`;
   let seasons = SR.seasons;
   if (RANK_SV !== "KR") {
     if (!RANK_OTHER) {
@@ -2022,7 +2060,7 @@ function renderRaidRank() {
     return `<div class="rk-combo"><div class="row" style="gap:6px 10px"><b>${c.n}명 사용</b><span class="note">평균 ${eok(c.avg)} · 최고 ${c.best}위</span><span class="badge ${have === 5 ? "ok" : have >= 3 ? "part" : "no"}">내 니케 ${have}/5</span></div><div class="team">${teamSlots(c.m, data.weak, data.combos, "cube")}</div></div>`;
   }).join("");
   const use = (RAID_MINE ? data.usage.filter(([x]) => own(x)) : data.usage).slice(0, 20).map(([x, k]) => { const c = get(x); return c ? `<span class="tn ${own(x) ? "have" : ""}" data-open="${esc(x)}" role="button" tabindex="0">${pfImg(c, "mini")}${esc(c.ko)} <span class="k">${Math.round(k / data.players * 100)}%</span></span>` : ""; }).join("");
-  box.innerHTML = `${tabs}<div class="teamhead"><h3>상위권이 실제로 쓴 덱 · ${label} ${svName} 서버 상위 ${data.players}명</h3><span class="note">${esc(data.raidDate || "")} 기록</span></div>
+  box.innerHTML = `${tabs}<div class="teamhead"><h3>상위권이 실제로 쓴 덱 · ${label} ${svName} 서버 상위 ${data.players}명</h3><span class="note">${esc(whenText(data))}</span></div>
     ${note ? `<p class="note" style="margin:4px 0 0">${note}</p>` : ""}
     <p class="note" style="margin:4px 0 8px">한 사람이 덱 5개를 쓰니까, 많이 쓴 조합일수록 이번 보스에 잘 맞는다는 뜻이에요. 초록 칸이 가진 니케예요. 칸 아래 ⇄ 작은 얼굴은 그 자리에 대신 넣을 수 있는 니케예요.</p>
     ${combos || `<div class="empty">가진 니케 5명으로 바로 쓸 수 있는 상위권 조합이 없어요. 버튼을 다시 눌러 전체를 보세요.</div>`}

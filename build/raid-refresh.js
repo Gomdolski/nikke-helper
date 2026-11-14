@@ -20,7 +20,7 @@ try {
   catch (e) { done("ERROR", "순위 받기 실패: " + String(e.stderr || e.message).trim()); process.exit(1); }
   const lines = r.trim().split("\n"), st = lines.pop();
   if (st !== "UPDATED") { done(st, lines.join(" / ")); process.exit(0); }
-  const m = lines[lines.length - 1].match(/S(\d+) 기록 (\S+)/);
+  const m = lines[lines.length - 1].match(/S(\d+) 기록 (.+?) \(/);
   const note = m ? `솔로 레이드 ${m[1]}시즌 상위권 기록 갱신 (${m[2]})` : "솔로 레이드 상위권 기록 갱신";
   const b = run(process.execPath, "build/build.js", "--note", note);
   const warn = b.split("\n").filter((l) => /not linked|not found/i.test(l));
