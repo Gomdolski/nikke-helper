@@ -23,7 +23,8 @@ try {
   const m = lines[lines.length - 1].match(/S(\d+) 기록 (.+?) \(/);
   const note = m ? `솔로 레이드 ${m[1]}시즌 상위권 기록 갱신 (${m[2]})` : "솔로 레이드 상위권 기록 갱신";
   const b = run(process.execPath, "build/build.js", "--note", note);
-  const warn = b.split("\n").filter((l) => /not linked|not found/i.test(l));
+  // only the ranking's own name check matters here; build.js always prints "roster names not linked: none | shared names: ..."
+  const warn = b.split("\n").filter((l) => /^solo rank names not linked:/i.test(l)).map((l) => l.replace(/^solo rank names not linked:\s*/i, ""));
   run("git", "add", "-A");
   run("git", "commit", "-q", "-m", `${note}\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`);
   if (push) run("git", "push", "-q", "origin", "HEAD:main");
