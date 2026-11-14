@@ -340,7 +340,11 @@ const json = JSON.stringify(out);
 const tpl = fs.readFileSync(path.join(HERE, "page.html"), "utf8");
 // Version = hash of everything that ends up in the page, so any change shows the update notice.
 const APP_V = out.built + "-" + crypto.createHash("sha256").update(tpl).update(json).digest("hex").slice(0, 8);
-const page = tpl.replace("/*__DATA__*/null", () => json.replace(/</g, "\\u003c")).replace("__APP_V__", APP_V);
+// The "new version" notice follows a second hash that leaves out the solo raid ranking and the build date:
+// during a raid season the ranking is refreshed every few hours, and that alone shouldn't ping anyone
+// (the page's ranking refresh button picks it up instead).
+const NOTICE_V = crypto.createHash("sha256").update(tpl).update(JSON.stringify({ ...out, soloRank: null, built: null })).digest("hex").slice(0, 8);
+const page = tpl.replace("/*__DATA__*/null", () => json.replace(/</g, "\\u003c")).replace("__APP_V__", APP_V).replace("__NOTICE_V__", NOTICE_V);
 fs.mkdirSync(path.join(ROOT, "out"), { recursive: true });
 fs.writeFileSync(path.join(ROOT, "out", "nikke-helper-artifact.html"), page);
 
@@ -356,5 +360,5 @@ const skeleton = '<!doctype html><html lang="ko"><head><meta charset="utf-8"><me
   + '<style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style></head><body>';
 const site = skeleton.replace("</head>", "<title>니케 지휘관 도우미</title></head>");
 fs.writeFileSync(path.join(ROOT, "index.html"), site + page + "</body></html>");
-fs.writeFileSync(path.join(ROOT, "version.json"), JSON.stringify({ v: APP_V, built: out.built, note: NOTE }, null, 2) + "\n");
+fs.writeFileSync(path.join(ROOT, "version.json"), JSON.stringify({ v: APP_V, nv: NOTICE_V, built: out.built, note: NOTE }, null, 2) + "\n");
 console.log("index.html + version.json written, version", APP_V);

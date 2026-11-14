@@ -599,6 +599,7 @@ h1, h2, h3, .big { text-wrap: balance; }
 <script>
 const D = /*__DATA__*/null;
 const APP_V = "__APP_V__";
+const NOTICE_V = "__NOTICE_V__"; // changes only when something other than the solo raid ranking changed
 const SITE = "https://gomdolski.github.io/nikke-helper/";
 
 // ---------- vocab ----------
@@ -2003,7 +2004,7 @@ async function refreshRank() {
     if (j.current) D.soloRank.current = j.current;
     RANK_OTHER = j; RANK_OTHER_ERR = false;
     const now = curRankData();
-    RANK_STATUS = !now ? "기록을 다시 불러왔어요." : now.collected && now.collected !== before ? `새 기록을 가져왔어요 · ${whenText(now)}.` : `이미 최신이에요 · ${whenText(now)}. 레츠도로는 한 시간마다, 이 사이트는 레이드 기간에 5시간마다 새 기록을 가져와요.`;
+    RANK_STATUS = !now ? "기록을 다시 불러왔어요." : now.collected && now.collected !== before ? `새 기록을 가져왔어요 · ${whenText(now)}.` : `이미 최신이에요 · ${whenText(now)}. 레츠도로는 한 시간마다 새 기록을 가져와요.`;
   } catch (e) { RANK_STATUS = "기록을 불러오지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요."; }
   RANK_BUSY = false;
   renderRaid();
@@ -2027,7 +2028,7 @@ function renderRaidRank() {
   const tabs = `<div class="rk-bar">${seg}<span class="grow"></span>
     ${SR.others ? `<button class="btn small" type="button" id="rkRefresh" ${RANK_BUSY ? "disabled" : ""} title="이 사이트에 올라온 가장 최신 기록을 다시 불러와요">${RANK_BUSY ? "확인 중…" : "↻ 새로고침"}</button>` : ""}
     <a class="btn small lsd" href="https://letsdoro.com/soloraid" target="_blank" rel="noopener" title="레츠도로 솔로레이드 랭킹 열기 (열리면 ‘${ldName}’을 눌러 주세요)"><img src="https://letsdoro.com/favicon-32x32.png?v=2" alt="" width="16" height="16" referrerpolicy="no-referrer" onerror="this.remove()">레츠도로 ↗</a></div>
-    <p class="note rk-status">${RANK_STATUS || `레츠도로는 한 시간마다 기록을 모으고, 이 사이트는 레이드 기간에 5시간마다 가져와요.`}${RANK_SV !== "KR" ? ` 레츠도로에서는 ‘${ldName}’을 눌러야 이 서버가 보여요.` : ""}</p>`;
+    <p class="note rk-status">${RANK_STATUS || `레츠도로는 한 시간마다 새 기록을 가져와요.`}${RANK_SV !== "KR" ? ` 레츠도로에서는 ‘${ldName}’을 눌러야 이 서버가 보여요.` : ""}</p>`;
   let seasons = SR.seasons;
   if (RANK_SV !== "KR") {
     if (!RANK_OTHER) {
@@ -2421,7 +2422,8 @@ async function checkUpdate() {
     const r = await fetch(SITE + "version.json?t=" + Date.now(), { cache: "no-store" });
     if (!r.ok) return;
     const j = await r.json();
-    if (!j.v || j.v === APP_V) return;
+    // ranking-only refreshes keep the same "nv", so no notice for those
+    if (j.nv ? j.nv === NOTICE_V : (!j.v || j.v === APP_V)) return;
     updShown = true;
     const onSite = location.href.startsWith(SITE);
     document.getElementById("updText").innerHTML = `<b>새 버전이 나왔어요</b>`;
