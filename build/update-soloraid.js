@@ -1,4 +1,5 @@
-// Solo raid top-50 decks (Korean server) from Let's Doro, aggregated per season.
+// Solo raid top-50 decks per server (KR, JP, GLOBAL, NA, SEA) from Let's Doro, aggregated per season.
+// Let's Doro only keeps the top 50 of each server.
 // Usage: node build/update-soloraid.js            -> all seasons (weekly update)
 //        node build/update-soloraid.js --current  -> only the newest season, merged into the saved file (raid-time refresh)
 // Writes build/src/soloraid_rank.json, then run build.js.
@@ -8,6 +9,7 @@ const fs = require("fs");
 const path = require("path");
 const API = "https://api3.letsdoro.com/api/soloraid";
 const SERVER = "KR";
+const OTHERS = ["JP", "GLOBAL", "NA", "SEA"]; // shown as tabs on the page, loaded on demand
 const FILE = path.join(__dirname, "src", "soloraid_rank.json");
 const EL = { FIRE: "Fire", WATER: "Water", WIND: "Wind", ELECTRONIC: "Electric", ELECTRIC: "Electric", IRON: "Iron" };
 const get = async (u) => { const r = await fetch(u, { headers: { "User-Agent": "nikke-helper (github.com/Gomdolski/nikke-helper)" } }); if (!r.ok) throw new Error(u + " " + r.status); return r.json(); };
@@ -41,32 +43,41 @@ function summarize(j, meta) {
   const onlyCurrent = process.argv.includes("--current");
   const seasons = (await get(`${API}/seasons`)).sort((a, b) => b.seasonNumber - a.seasonNumber);
   const prev = fs.existsSync(FILE) ? JSON.parse(fs.readFileSync(FILE, "utf8")) : null;
-  const out = { at: kstToday(), source: "https://letsdoro.com/soloraid", server: SERVER, current: null, seasons: onlyCurrent && prev ? { ...prev.seasons } : {} };
-  let changed = false;
-  for (const s of onlyCurrent ? seasons.slice(0, 1) : seasons) {
-    const meta = { boss: s.bossName, weak: EL[s.bossWeakElement] || null, start: s.startDate, end: s.endDate };
-    if (onlyCurrent) {
-      // a season's ranking keeps changing until the day after it ends
-      const t = kstToday();
-      if (t < s.startDate || t > addDay(s.endDate, 1)) { console.log(`S${s.seasonNumber} ${s.startDate}~${s.endDate} 기간 아님`); console.log("OUTSIDE"); return; }
-    }
-    const j = await get(`${API}/seasons/${s.id}/ranking?server=${SERVER}`);
-    await sleep(800); // be gentle: one request per season
-    const hasData = !j.fallbackSeason && j.seasonId === s.id && Array.isArray(j.rankings) && j.rankings.length > 0;
-    if (!out.current) out.current = { season: s.seasonNumber, ...meta, dataSeason: hasData ? s.seasonNumber : j.fallbackSeason ? j.fallbackSeason.seasonNumber : (prev && prev.current && prev.current.season === s.seasonNumber && prev.current.dataSeason) || s.seasonNumber };
-    if (!hasData) continue; // no data yet
-    const old = prev && prev.seasons[s.seasonNumber];
-    if (!old || old.raidDate !== j.raidDate || old.players !== j.rankings.length) changed = true;
-    out.seasons[s.seasonNumber] = summarize(j, meta);
+  const keep = (sv) => (onlyCurrent && prev ? { ...((sv === SERVER ? prev : (prev.others || {})[sv]) || {}).seasons } : {});
+  // Korean server stays at the top level (the page embeds it); other servers go under "others".
+  const out = { at: kstToday(), source: "https://letsdoro.com/soloraid", server: SERVER, current: null, seasons: keep(SERVER), others: {} };
+  for (const sv of OTHERS) out.others[sv] = { seasons: keep(sv) };
+  const list = onlyCurrent ? seasons.slice(0, 1) : seasons;
+  if (onlyCurrent) {
+    // a season's ranking keeps changing until the day after it ends
+    const s = list[0], t = kstToday();
+    if (t < s.startDate || t > addDay(s.endDate, 1)) { console.log(`S${s.seasonNumber} ${s.startDate}~${s.endDate} 기간 아님`); console.log("OUTSIDE"); return; }
   }
-  if (onlyCurrent && !changed) {
-    const cur = out.seasons[out.current.season];
-    console.log(cur ? `S${out.current.season} 기록 ${cur.raidDate} 그대로` : `S${out.current.season} 아직 기록 없음`);
-    console.log(cur ? "UNCHANGED" : "NODATA");
+  const changed = [];
+  for (const sv of [SERVER, ...OTHERS]) {
+    const into = sv === SERVER ? out.seasons : out.others[sv].seasons;
+    const before = sv === SERVER ? prev && prev.seasons : prev && prev.others && prev.others[sv] && prev.others[sv].seasons;
+    for (const s of list) {
+      const meta = { boss: s.bossName, weak: EL[s.bossWeakElement] || null, start: s.startDate, end: s.endDate };
+      const j = await get(`${API}/seasons/${s.id}/ranking?server=${sv}`);
+      await sleep(800); // be gentle: one request at a time
+      const hasData = !j.fallbackSeason && j.seasonId === s.id && Array.isArray(j.rankings) && j.rankings.length > 0;
+      if (sv === SERVER && !out.current) out.current = { season: s.seasonNumber, ...meta, dataSeason: hasData ? s.seasonNumber : j.fallbackSeason ? j.fallbackSeason.seasonNumber : (prev && prev.current && prev.current.season === s.seasonNumber && prev.current.dataSeason) || s.seasonNumber };
+      if (!hasData) continue; // no data yet
+      const old = before && before[s.seasonNumber];
+      if (!old || old.raidDate !== j.raidDate || old.players !== j.rankings.length) changed.push(sv);
+      into[s.seasonNumber] = summarize(j, meta);
+    }
+  }
+  const cur = out.current.season;
+  const dates = [SERVER, ...OTHERS].map((sv) => { const x = (sv === SERVER ? out.seasons : out.others[sv].seasons)[cur]; return `${sv} ${x ? x.raidDate : "없음"}`; }).join(", ");
+  if (onlyCurrent && !changed.length) {
+    console.log(out.seasons[cur] ? `S${cur} 기록 그대로 (${dates})` : `S${cur} 아직 기록 없음`);
+    console.log(out.seasons[cur] ? "UNCHANGED" : "NODATA");
     return;
   }
   fs.writeFileSync(FILE, JSON.stringify(out, null, 1));
-  console.log("solo raid ranking: current S" + out.current.season, "(data from S" + out.current.dataSeason + ")", "· seasons with data:", Object.keys(out.seasons).join(", "));
-  if (onlyCurrent) console.log(`S${out.current.season} 기록 ${out.seasons[out.current.season].raidDate}`);
+  console.log("solo raid ranking: current S" + cur, "(data from S" + out.current.dataSeason + ")", "· KR seasons with data:", Object.keys(out.seasons).join(", "));
+  if (onlyCurrent) console.log(`S${cur} 기록 ${(out.seasons[cur] || {}).raidDate || ""} (바뀐 서버: ${changed.join(", ")})`);
   console.log("UPDATED");
 })().catch((e) => { console.error(e.message); console.log("ERROR"); process.exitCode = 1; });

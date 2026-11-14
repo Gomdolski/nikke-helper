@@ -1962,18 +1962,56 @@ document.addEventListener("click", e => {
   const was = RANK_MORE; RANK_MORE = !RANK_MORE; renderRaidRank();
   if (was) document.getElementById("raidRank").scrollIntoView({ block: "start" });
 });
+// Server tabs: Korea is in the page; the other servers' file is fetched the first time a tab is opened.
+const SERVERS = { KR: "한국", JP: "일본", GLOBAL: "글로벌", NA: "북미", SEA: "동남아" };
+const RK_SV_KEY = "nikke-helper-rank-server-v1";
+let RANK_SV = "KR", RANK_OTHER = null, RANK_OTHER_ERR = false, RANK_OTHER_BUSY = false;
+try { RANK_SV = localStorage.getItem(RK_SV_KEY) || "KR"; } catch (e) {}
+async function loadOtherServers() {
+  const o = D.soloRank && D.soloRank.others;
+  if (!o || RANK_OTHER || RANK_OTHER_BUSY) return;
+  RANK_OTHER_BUSY = true;
+  try { const r = await fetch(`${o.file}?v=${o.v}`); if (!r.ok) throw new Error(r.status); RANK_OTHER = await r.json(); RANK_OTHER_ERR = false; }
+  catch (e) { RANK_OTHER_ERR = true; }
+  RANK_OTHER_BUSY = false;
+  renderRaidRank();
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("#rkServer button"); if (!b) return;
+  RANK_SV = b.dataset.v; RANK_MORE = false;
+  try { localStorage.setItem(RK_SV_KEY, RANK_SV); } catch (err) {}
+  renderRaidRank();
+});
 function renderRaidRank() {
   const box = document.getElementById("raidRank");
   const SR = D.soloRank;
   if (S.raid.mode !== "solo" || !SR) { box.hidden = true; return; }
-  const want = curSeason("solo").season;
-  let data = SR.seasons[want], label = `${want}시즌`, note = "";
-  if (!data && SR.current && SR.current.season === want && SR.seasons[SR.current.dataSeason]) {
-    data = SR.seasons[SR.current.dataSeason];
-    label = `${SR.current.dataSeason}시즌`;
-    note = `${want}시즌은 아직 끝나지 않아서, 약점이 같았던 ${SR.current.dataSeason}시즌(${esc(data.boss)}) 기록을 보여줘요.`;
+  const list = ["KR", ...((SR.others && SR.others.list) || [])];
+  if (!list.includes(RANK_SV)) RANK_SV = "KR";
+  const tabs = list.length > 1 ? `<div class="seg" id="rkServer" role="group" aria-label="서버" style="margin-bottom:10px">${list.map(v => `<button data-v="${v}" aria-pressed="${v === RANK_SV}">${SERVERS[v] || v}</button>`).join("")}</div>` : "";
+  let seasons = SR.seasons;
+  if (RANK_SV !== "KR") {
+    if (!RANK_OTHER) {
+      box.hidden = false;
+      box.innerHTML = `${tabs}<div class="empty">${RANK_OTHER_ERR ? "다른 서버 기록을 불러오지 못했어요. 인터넷 연결을 확인하거나 한국 탭을 보세요." : "다른 서버 기록을 불러오는 중이에요…"}</div>`;
+      if (!RANK_OTHER_ERR) loadOtherServers();
+      return;
+    }
+    seasons = (RANK_OTHER[RANK_SV] || {}).seasons || {};
   }
-  if (!data) { box.hidden = true; return; }
+  const svName = SERVERS[RANK_SV] || RANK_SV;
+  const want = curSeason("solo").season;
+  let data = seasons[want], label = `${want}시즌`, note = "";
+  if (!data && SR.current && SR.current.season === want && seasons[SR.current.dataSeason]) {
+    data = seasons[SR.current.dataSeason];
+    label = `${SR.current.dataSeason}시즌`;
+    note = `${want}시즌 기록이 아직 없어서, 약점이 같았던 ${SR.current.dataSeason}시즌(${esc(data.boss)}) 기록을 보여줘요.`;
+  }
+  if (!data) {
+    if (RANK_SV === "KR") { box.hidden = true; return; }
+    box.hidden = false; box.innerHTML = `${tabs}<div class="empty">${svName} 서버의 ${want}시즌 기록이 없어요.</div>`; return;
+  }
+  if (RANK_SV !== "KR") note = (note ? note + " " : "") + `${svName} 서버 기록이에요. 서버마다 계정 성장 정도가 달라서 덱 경향을 참고하는 용도로 보세요.`;
   box.hidden = false;
   const own = ownSlug;
   const pool = RAID_MINE ? data.combos.filter(c => c.m.every(own)) : data.combos;
@@ -1983,7 +2021,7 @@ function renderRaidRank() {
     return `<div class="rk-combo"><div class="row" style="gap:6px 10px"><b>${c.n}명 사용</b><span class="note">평균 ${eok(c.avg)} · 최고 ${c.best}위</span><span class="badge ${have === 5 ? "ok" : have >= 3 ? "part" : "no"}">내 니케 ${have}/5</span></div><div class="team">${teamSlots(c.m, data.weak, data.combos, "cube")}</div></div>`;
   }).join("");
   const use = (RAID_MINE ? data.usage.filter(([x]) => own(x)) : data.usage).slice(0, 20).map(([x, k]) => { const c = get(x); return c ? `<span class="tn ${own(x) ? "have" : ""}" data-open="${esc(x)}" role="button" tabindex="0">${pfImg(c, "mini")}${esc(c.ko)} <span class="k">${Math.round(k / data.players * 100)}%</span></span>` : ""; }).join("");
-  box.innerHTML = `<div class="teamhead"><h3>상위권이 실제로 쓴 덱 · ${label} 한국 서버 상위 ${data.players}명</h3><span class="note">${esc(data.raidDate || "")} 기록</span></div>
+  box.innerHTML = `${tabs}<div class="teamhead"><h3>상위권이 실제로 쓴 덱 · ${label} ${svName} 서버 상위 ${data.players}명</h3><span class="note">${esc(data.raidDate || "")} 기록</span></div>
     ${note ? `<p class="note" style="margin:4px 0 0">${note}</p>` : ""}
     <p class="note" style="margin:4px 0 8px">한 사람이 덱 5개를 쓰니까, 많이 쓴 조합일수록 이번 보스에 잘 맞는다는 뜻이에요. 초록 칸이 가진 니케예요. 칸 아래 ⇄ 작은 얼굴은 그 자리에 대신 넣을 수 있는 니케예요.</p>
     ${combos || `<div class="empty">가진 니케 5명으로 바로 쓸 수 있는 상위권 조합이 없어요. 버튼을 다시 눌러 전체를 보세요.</div>`}
