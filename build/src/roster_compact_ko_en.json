@@ -1,7 +1,7 @@
 {
  "source": "https://nikke-api.pages.dev/api/nikkes (+/api/nikkes/:id?fields=details.squad.name)",
  "fetched": "2026-11-05T10:04:25.697Z",
- "count": 206,
+ "count": 207,
  "characters": [
   {
    "id": 101801,
@@ -2886,6 +2886,20 @@
    "squad_ko": "특별과외활동부",
    "squad_en": "Specialized Extracurricular Execution Squad",
    "icon": "https://sg-tools-cdn.blablalink.com/rl-70/wz-95/299445690a5ae3849c194e4ee25eaa17.webp"
+  },
+  {
+   "id": null,
+   "ko": "스카이",
+   "en": "Sky",
+   "rarity": "SSR",
+   "corporation": "ELYSION",
+   "burst": "I",
+   "weapon": "SR",
+   "class": "Supporter",
+   "element": "Iron",
+   "squad_ko": "오버 더 호라이즌",
+   "squad_en": "Over the Horizon",
+   "icon": ""
   }
  ]
 }
